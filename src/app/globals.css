@@ -37,6 +37,18 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+button:not(:disabled),
+a[href] {
+  touch-action: manipulation;
+}
+
+button:not(:disabled):active,
+a[href]:active {
+  filter: brightness(0.92);
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+
 .chart-star {
   position: absolute;
   border-radius: 9999px;
@@ -102,6 +114,12 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):active,
+  a[href]:active {
+    filter: brightness(0.88);
+    transform: none;
+  }
+
   .chart-star,
   .chart-constellation-line,
   .chart-orbit,
