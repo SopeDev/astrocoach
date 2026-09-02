@@ -37,13 +37,23 @@ Last updated: 2026-09-02
 - Added a deliberately empty My Map state so no reflection is saved without the user's future explicit choice.
 - Moved post-onboarding appearance controls into Account while preserving and persisting the accessible theme toggle throughout onboarding.
 - Made Account appearance changes update optimistically with an explicit selected state and localized saving, success, and failure feedback while retaining the prior theme if persistence fails.
+- Prevented the authenticated database-theme initializer from overwriting live Account theme changes; it now initializes once per signed-in user on a device while later clicks apply immediately through `next-themes`.
 - Added returning-user stage resolution so sign-in and language selection resume the appropriate onboarding step, orientation, or main Home screen.
+- Added evidence-gated EXPLORE progression that requires multiple recent qualifying model signals before offering a user-controlled closer look, and requires fresh evidence before repeating a declined invitation.
+- Implemented the first RECOGNIZE loop with a distinct structured-output contract, tentative evidence-grounded Pattern formulation, user correction or rejection, and automatic return to EXPLORE when a proposition is rejected.
+- Added explicit Pattern saving: only a formulation the user has clearly accepted can be offered for My Map, saving requires a separate tap, and the completed conversation becomes read-only.
+- Replaced the My Map placeholder with a mobile-first list of the user's deliberately saved recognized Patterns.
+- Added orchestration and recognition-contract tests and applied the RECOGNIZE/Pattern persistence migration to the shared Prisma Postgres database.
+- Made conversation pages reliably reach the true document bottom on initial load and after user messages, AstroCoach responses, retries, transition invitations, and Pattern-save state changes.
+- Made the conversation composer grow and shrink with its text, capped at one-third of the viewport before switching to internal scrolling.
+- Added an English/Spanish selector to Account that updates the saved user preference, locale cookie, and localized route together; limited implicit locale synchronization to first sign-in and protected stored chat bubbles from browser page translation.
 
 ## Remaining
 
 - Add conversation-management details such as conversation titles and archival or deletion behavior after the core navigation is evaluated.
-- Evaluate EXPLORE response quality with representative conversations before implementing RECOGNIZE.
-- Implement the RECOGNIZE flow when structured signals and lived evidence warrant a Candidate Pattern.
+- Evaluate EXPLORE readiness and RECOGNIZE accuracy with representative conversations, especially premature invitations, partial agreement, rejection, and revised wording.
+- Add Pattern detail, editing, archival, and provenance views after validating that saved formulations are useful.
+- Implement DEEP_EXPLORE only after recognized Patterns and their handoff behavior are stable.
 
 ## Known issues and open questions
 
@@ -58,4 +68,4 @@ Last updated: 2026-09-02
 
 ## Next planned slice
 
-Manually evaluate the orientation, Home-to-EXPLORE handoff, saved-conversation navigation, and first EXPLORE conversations for clarity, tone, context use, and retry behavior. Refine observed interaction or prompt failures before adding RECOGNIZE and explicit “keep in My Map” behavior.
+Manually evaluate the complete EXPLORE → invitation → RECOGNIZE → My Map path with strong, weak, rejected, and partly accepted candidate Patterns. Refine readiness thresholds and prompt behavior from observed failures before adding Pattern editing or DEEP_EXPLORE.

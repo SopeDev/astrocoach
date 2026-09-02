@@ -27,7 +27,10 @@ export async function requireCurrentUser(locale: Locale) {
   const selectedLocale = (await cookies()).get("astrocoach-locale")?.value;
 
   if (selectedLocale === locale && user.locale !== locale) {
-    return db.user.update({ where: { id: user.id }, data: { locale } });
+    const hasStartedOnboarding = await db.initialIntent.findUnique({ where: { userId: user.id }, select: { id: true } });
+    if (!hasStartedOnboarding) {
+      return db.user.update({ where: { id: user.id }, data: { locale } });
+    }
   }
 
   return user;

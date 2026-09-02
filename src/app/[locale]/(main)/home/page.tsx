@@ -26,7 +26,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="flex items-center justify-between"><h2 className="font-semibold text-slate-950 dark:text-white">{messages.home.recentTitle}</h2><Link className="text-sm font-medium text-violet-700 dark:text-violet-300" href={`/${locale}/conversations`}>{messages.home.viewAll}</Link></div>
           <Link className="mt-3 flex min-h-20 cursor-pointer items-center gap-4 rounded-2xl border border-slate-200/80 bg-white/75 p-4 shadow-sm transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-950/55 dark:hover:border-violet-700" href={`/${locale}/explore/${latest.id}`}>
             <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-200"><MessagesSquare aria-hidden="true" className="size-5" /></span>
-            <span className="min-w-0 flex-1"><span className="block truncate font-medium text-slate-900 dark:text-white">{latest.title ?? messages.home.untitled}</span><span className="mt-1 block text-sm text-slate-500 dark:text-slate-400">{messages.home.continue}</span></span>
+            <span className="min-w-0 flex-1"><span className="block truncate font-medium text-slate-900 dark:text-white">{latest.title ?? messages.home.untitled}</span><span className="mt-1 block text-sm text-slate-500 dark:text-slate-400">{latest.status === "closed" ? messages.home.review : messages.home.continue}</span></span>
             <ArrowRight aria-hidden="true" className="size-4 shrink-0 text-slate-400" />
           </Link>
         </section>

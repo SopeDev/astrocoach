@@ -129,10 +129,11 @@
       "error": "We couldn’t open that conversation. Please try again.",
       "suggestions": ["Something happened", "I’m feeling something", "I need to make a decision", "I keep noticing something", "Just talk"]
     },
-    "recentTitle": "Continue exploring",
+    "recentTitle": "Recent conversation",
     "viewAll": "View all",
     "untitled": "Untitled conversation",
-    "continue": "Return to this conversation"
+    "continue": "Return to this conversation",
+    "review": "Review this conversation"
   },
   "conversations": {
     "title": "Conversations",
@@ -147,7 +148,9 @@
     "title": "My Map",
     "description": "A place for the patterns, insights, and practices you choose to keep.",
     "emptyTitle": "Your map will grow with you",
-    "emptyDescription": "Nothing is added automatically. When something useful becomes clear in a conversation, you’ll decide whether it belongs here."
+    "emptyDescription": "Nothing is added automatically. When something useful becomes clear in a conversation, you’ll decide whether it belongs here.",
+    "patternsTitle": "Patterns you’ve recognized",
+    "patternLabel": "Pattern"
   },
   "account": {
     "title": "Account",
@@ -155,10 +158,14 @@
     "appearance": "Appearance",
     "appearanceDescription": "Choose how AstroCoach looks on this device and save the preference to your account.",
     "themes": { "system": "System", "light": "Light", "dark": "Dark", "saving": "Saving…", "saved": "Appearance saved.", "saveError": "We couldn't save that change. Try again." },
+    "language": "Language",
+    "languageDescription": "Choose the language AstroCoach uses for the app and future responses.",
+    "selected": "selected",
     "signOut": "Sign out"
   },
   "explore": {
     "title": "Explore",
+    "closerTitle": "Looking at a possible pattern",
     "emptyTitle": "What’s going on?",
     "emptyDescription": "Start wherever feels most useful. You can share something that happened, a feeling, a decision, or simply what’s been on your mind.",
     "inputLabel": "Message AstroCoach",
@@ -169,7 +176,19 @@
     "generationError": "Your message is saved, but I couldn’t respond just now.",
     "messageError": "Write a message before sending.",
     "backHome": "Back to Home",
-    "account": "Open account"
+    "account": "Open account",
+    "transitionTitle": "Something may be taking shape",
+    "transitionDescription": "There may be a recurring thread in what you’ve shared. You can look at it more closely or keep exploring for now.",
+    "transitionAccept": "Look at it more closely",
+    "transitionDecline": "Keep exploring",
+    "patternTitle": "Keep what you recognized?",
+    "patternDescription": "Save it to My Map so you can return to it later.",
+    "savePattern": "Keep in My Map",
+    "savingPattern": "Saving to My Map…",
+    "patternSaved": "Saved to My Map",
+    "viewMap": "View My Map",
+    "returnHome": "Return Home",
+    "actionError": "That didn’t work just now. Please try again."
   },
   "onboarding": {
     "changeLanguage": "Change language",

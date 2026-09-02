@@ -19,5 +19,5 @@ export default async function MainAppLayout({ children, params }: { children: Re
   const messages = getDictionary(locale);
   const profileInitial = (user.name?.trim()[0] ?? user.email?.trim()[0] ?? "A").toUpperCase();
 
-  return <AppShell locale={locale} messages={messages.appShell} profileInitial={profileInitial}><ThemePreferenceSync preference={user.theme} />{children}</AppShell>;
+  return <AppShell locale={locale} messages={messages.appShell} profileInitial={profileInitial}><ThemePreferenceSync preference={user.theme} userId={user.id} />{children}</AppShell>;
 }
