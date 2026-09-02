@@ -79,15 +79,20 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) return fallbackInitialQuestions(context.locale, context.areaLabels, context.currentContext);
 
-  const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
-    model: env.OPENAI_MODEL,
-    instructions: `${sharedInstructions(context.locale)} Generate exactly three initial discovery questions. Together they should establish a broad but personalized first picture and cover different dimensions rather than variations of one theme. Move from accessible lived experience toward slightly deeper inquiry. Do not ask for information already present in the user's context. Chart symbolism may only help select hypotheses worth testing.`,
-    input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
-    text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
-  });
+  try {
+    const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
+      model: env.OPENAI_MODEL,
+      instructions: `${sharedInstructions(context.locale)} Generate exactly three initial discovery questions. Together they should establish a broad but personalized first picture and cover different dimensions rather than variations of one theme. Move from accessible lived experience toward slightly deeper inquiry. Do not ask for information already present in the user's context. Chart symbolism may only help select hypotheses worth testing.`,
+      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
+      text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
+    });
 
-  if (!response.output_parsed) throw new Error("The model did not return initial discovery questions");
-  return response.output_parsed.questions;
+    if (!response.output_parsed) throw new Error("The model did not return initial discovery questions");
+    return response.output_parsed.questions;
+  } catch (error) {
+    console.warn("Initial discovery generation unavailable; using fallback questions", error instanceof Error ? error.message : error);
+    return fallbackInitialQuestions(context.locale, context.areaLabels, context.currentContext);
+  }
 }
 
 export async function generateFinalDiscoveryQuestions(context: DiscoveryContext & {
@@ -97,14 +102,19 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) return fallbackFinalQuestions(context.locale);
 
-  const exchanges = context.initialQuestions.map((question, index) => ({ question, answer: context.initialAnswers[index] }));
-  const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
-    model: env.OPENAI_MODEL,
-    instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing questions after examining the three initial exchanges. These are not generic extra questions. Identify the highest-value remaining uncertainties, contradictions, assumptions, competing explanations, or missing context. Treat the answers as more authoritative than chart symbolism. Do not repeat anything already answered. Prefer questions that distinguish between plausible understandings and materially improve the initial picture.`,
-    input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
-    text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
-  });
+  try {
+    const exchanges = context.initialQuestions.map((question, index) => ({ question, answer: context.initialAnswers[index] }));
+    const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
+      model: env.OPENAI_MODEL,
+      instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing questions after examining the three initial exchanges. These are not generic extra questions. Identify the highest-value remaining uncertainties, contradictions, assumptions, competing explanations, or missing context. Treat the answers as more authoritative than chart symbolism. Do not repeat anything already answered. Prefer questions that distinguish between plausible understandings and materially improve the initial picture.`,
+      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
+      text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
+    });
 
-  if (!response.output_parsed) throw new Error("The model did not return final discovery questions");
-  return response.output_parsed.questions;
+    if (!response.output_parsed) throw new Error("The model did not return final discovery questions");
+    return response.output_parsed.questions;
+  } catch (error) {
+    console.warn("Final discovery generation unavailable; using fallback questions", error instanceof Error ? error.message : error);
+    return fallbackFinalQuestions(context.locale);
+  }
 }

@@ -30,7 +30,7 @@ export async function selectLanguage(formData: FormData) {
   if (session?.user?.id) {
     const { db } = await import("@/db/client");
     await db.user.update({ where: { id: session.user.id }, data: { locale } });
-    redirect(`/${locale}/onboarding/birth-data`);
+    redirect(`/${locale}/continue`);
   }
 
   redirect(`/${locale}/sign-in`);

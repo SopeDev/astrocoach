@@ -4,23 +4,23 @@
   "languageName": "English",
   "auth": {
     "back": "Back to language selection",
-    "title": "Create your space",
-    "description": "Sign in so your birth details and future reflections stay connected to you.",
+    "title": "Your space starts here",
+    "description": "Sign in to keep your reflections together and return whenever something is on your mind.",
     "google": "Continue with Google",
     "or": "or",
     "emailComingSoon": "Email and password sign-in is coming next",
-    "privacy": "AstroCoach uses your account only to protect and save your experience."
+    "privacy": "Your account keeps this space private and available when you return."
   },
   "birthData": {
     "title": "When were you born?",
-    "description": "Your birth date and time help us calculate the astronomical context used for your reflections.",
+    "description": "Your birth date shows your planetary signs. An exact birth time also gives us your rising sign and houses.",
     "dateLabel": "Birth date",
-    "dateHint": "Use the date shown on your birth record.",
+    "dateHint": "Use the date shown on your birth record if you have it.",
     "timeUnknownLabel": "I don’t know my birth time",
     "timeLabel": "Birth time",
-    "unknownTimeExplanation": "That’s completely okay. We can still use planetary placements, but we won’t calculate or interpret houses or angles without a reliable birth time.",
-    "continue": "Save and continue",
-    "saved": "Your birth date and time preference have been saved.",
+    "unknownTimeExplanation": "That’s completely okay. We can still use your planetary signs, but we’ll leave out your rising sign and houses.",
+    "continue": "Continue",
+    "saved": "Your starting details are saved.",
     "errors": {
       "invalidDate": "Enter a valid birth date.",
       "futureDate": "Birth date cannot be in the future.",
@@ -31,7 +31,7 @@
   "birthLocation": {
     "back": "Back to birth date and time",
     "title": "Where were you born?",
-    "description": "Choose the city or town where you were born so we can place your chart accurately.",
+    "description": "Together with your birth time, your birthplace helps us work out your rising sign and houses for where you were born.",
     "searchLabel": "Birthplace",
     "searchPlaceholder": "Start typing a city or town",
     "searchHint": "Type at least two letters, then choose a result from the list.",
@@ -39,8 +39,8 @@
     "noResults": "No matching places found. Try a nearby city or a different spelling.",
     "searchError": "Location search is temporarily unavailable. Please try again.",
     "selectedLabel": "Selected:",
-    "continue": "Save and continue",
-    "saved": "Your birthplace has been saved and your initial chart is ready.",
+    "continue": "Continue",
+    "saved": "Your birthplace is saved.",
     "errors": {
       "required": "Search for and select a birthplace from the list.",
       "service": "We couldn’t verify that location right now. Please try again."
@@ -49,7 +49,7 @@
   "initialIntent": {
     "back": "Back to birthplace",
     "title": "What brings you here?",
-    "description": "Choose the areas that feel most relevant right now. This helps us begin with your lived experience, not assumptions.",
+    "description": "Choose the areas that matter most to you right now. We’ll use them to focus your first questions.",
     "areas": {
       "relationships": "Relationships & intimacy",
       "money": "Money & security",
@@ -66,8 +66,8 @@
     "contextPlaceholder": "Share as much or as little as feels useful…",
     "contextHint": "A recent situation, uncertainty, or recurring thought is a good place to start.",
     "continue": "Prepare my questions",
-    "preparingTitle": "Connecting the dots",
-    "preparingDescription": "We’re preparing your chart and combining it with what matters to you to find thoughtful places to begin.",
+    "preparingTitle": "Finding your starting point",
+    "preparingDescription": "We’re bringing together what you’ve shared so your first questions feel relevant to you.",
     "errors": {
       "areas": "Choose at least one area to continue.",
       "context": "Keep your description under 2,000 characters.",
@@ -76,7 +76,7 @@
   },
   "initialDiscovery": {
     "title": "A few places to begin",
-    "description": "Take these one at a time. Your answers—not the chart—shape what we ask next.",
+    "description": "Take these one at a time. What you share will shape what we ask next.",
     "step": "Question",
     "initialStage": "Getting the picture",
     "finalStage": "Clarifying what matters",
@@ -91,25 +91,90 @@
     "answerRequired": "Write an answer before continuing.",
     "serviceError": "We couldn’t prepare the next step right now. Please try again.",
     "completedTitle": "Your starting point is ready",
-    "completedDescription": "Thank you. We now have enough lived context to begin exploring without treating your chart as a conclusion."
+    "completedDescription": "Thank you. You’ve given us a clear place to begin, and we can take it from here.",
+    "continueToExplore": "Continue"
   },
-  "chartReview": {
-    "back": "Back to birthplace",
-    "title": "Your starting chart",
-    "description": "Here is the astronomical chart calculated from the birth information you provided. This is context for exploration, not a conclusion about you.",
-    "edit": "Edit",
-    "unknownTime": "Time unknown",
-    "unknownTimeNote": "Because your birth time is unknown, these positions use local noon as a reference. Houses, angles, nodes, and aspects are intentionally omitted.",
-    "planets": "Planetary positions",
-    "angles": "Angles",
-    "houseCusps": "House cusps",
-    "house": "House",
-    "technical": "Calculated locally with {engine}. Decimal longitude is shown to help verify the result."
+  "orientation": {
+    "title": "Here’s how AstroCoach works",
+    "description": "Come here when something in your life feels worth understanding. We’ll help you explore it and keep what becomes useful.",
+    "share": {
+      "title": "Start with what’s happening",
+      "description": "Bring a moment, feeling, decision, or something you keep noticing."
+    },
+    "explore": {
+      "title": "Understand it together",
+      "description": "We’ll ask thoughtful questions and help you make sense of your own experience."
+    },
+    "keep": {
+      "title": "Keep what fits",
+      "description": "When something feels true and useful, you can save it to My Map and return to it later."
+    },
+    "continue": "Go to my home"
+  },
+  "appShell": {
+    "home": "Home",
+    "conversations": "Conversations",
+    "map": "My Map",
+    "account": "Account"
+  },
+  "home": {
+    "greeting": "Welcome back, {name}",
+    "greetingFallback": "Welcome back",
+    "title": "What’s going on?",
+    "description": "Start with whatever feels most present right now.",
+    "composer": {
+      "placeholder": "Write what’s on your mind…",
+      "send": "Start conversation",
+      "opening": "Opening your conversation…",
+      "error": "We couldn’t open that conversation. Please try again.",
+      "suggestions": ["Something happened", "I’m feeling something", "I need to make a decision", "I keep noticing something", "Just talk"]
+    },
+    "recentTitle": "Continue exploring",
+    "viewAll": "View all",
+    "untitled": "Untitled conversation",
+    "continue": "Return to this conversation"
+  },
+  "conversations": {
+    "title": "Conversations",
+    "description": "Return to something you were exploring or begin again from Home.",
+    "untitled": "Untitled conversation",
+    "messageCount": "{count} messages",
+    "emptyTitle": "No conversations yet",
+    "emptyDescription": "When something is on your mind, start from Home and it will appear here.",
+    "goHome": "Go to Home"
+  },
+  "map": {
+    "title": "My Map",
+    "description": "A place for the patterns, insights, and practices you choose to keep.",
+    "emptyTitle": "Your map will grow with you",
+    "emptyDescription": "Nothing is added automatically. When something useful becomes clear in a conversation, you’ll decide whether it belongs here."
+  },
+  "account": {
+    "title": "Account",
+    "defaultName": "AstroCoach account",
+    "appearance": "Appearance",
+    "appearanceDescription": "Choose how AstroCoach looks on this device and save the preference to your account.",
+    "themes": { "system": "System", "light": "Light", "dark": "Dark", "saving": "Saving…", "saved": "Appearance saved.", "saveError": "We couldn't save that change. Try again." },
+    "signOut": "Sign out"
+  },
+  "explore": {
+    "title": "Explore",
+    "emptyTitle": "What’s going on?",
+    "emptyDescription": "Start wherever feels most useful. You can share something that happened, a feeling, a decision, or simply what’s been on your mind.",
+    "inputLabel": "Message AstroCoach",
+    "inputPlaceholder": "Write what’s on your mind…",
+    "send": "Send message",
+    "thinking": "Thinking with you…",
+    "retry": "Try again",
+    "generationError": "Your message is saved, but I couldn’t respond just now.",
+    "messageError": "Write a message before sending.",
+    "backHome": "Back to Home",
+    "account": "Open account"
   },
   "onboarding": {
     "changeLanguage": "Change language",
     "languageSavedTitle": "English selected",
     "languageSavedDescription": "Your language preference has been saved. We’ll use English throughout your experience.",
-    "nextStep": "Birth details are the next development slice."
+    "nextStep": "Let’s start with a few details about you."
   }
 }

@@ -4,23 +4,23 @@
   "languageName": "Español",
   "auth": {
     "back": "Volver a la selección de idioma",
-    "title": "Crea tu espacio",
-    "description": "Inicia sesión para que tus datos de nacimiento y futuras reflexiones permanezcan vinculados contigo.",
+    "title": "Tu espacio comienza aquí",
+    "description": "Inicia sesión para mantener tus reflexiones juntas y volver cuando tengas algo en mente.",
     "google": "Continuar con Google",
     "or": "o",
     "emailComingSoon": "El acceso con correo y contraseña será el próximo paso",
-    "privacy": "AstroCoach usa tu cuenta únicamente para proteger y guardar tu experiencia."
+    "privacy": "Tu cuenta mantiene este espacio privado y disponible cuando regreses."
   },
   "birthData": {
     "title": "¿Cuándo naciste?",
-    "description": "Tu fecha y hora de nacimiento nos ayudan a calcular el contexto astronómico que usaremos en tus reflexiones.",
+    "description": "Tu fecha de nacimiento muestra tus signos planetarios. Una hora exacta también nos da tu ascendente y tus casas.",
     "dateLabel": "Fecha de nacimiento",
-    "dateHint": "Usa la fecha que aparece en tu registro de nacimiento.",
+    "dateHint": "Usa la fecha que aparece en tu registro de nacimiento si lo tienes.",
     "timeUnknownLabel": "No sé mi hora de nacimiento",
     "timeLabel": "Hora de nacimiento",
-    "unknownTimeExplanation": "No hay problema. Podemos usar las posiciones planetarias, pero no calcularemos ni interpretaremos casas o ángulos sin una hora de nacimiento confiable.",
-    "continue": "Guardar y continuar",
-    "saved": "Guardamos tu fecha de nacimiento y tu preferencia de hora.",
+    "unknownTimeExplanation": "No hay problema. Aún podemos usar tus signos planetarios, pero omitiremos tu ascendente y tus casas.",
+    "continue": "Continuar",
+    "saved": "Guardamos tus datos iniciales.",
     "errors": {
       "invalidDate": "Ingresa una fecha de nacimiento válida.",
       "futureDate": "La fecha de nacimiento no puede estar en el futuro.",
@@ -31,7 +31,7 @@
   "birthLocation": {
     "back": "Volver a la fecha y hora de nacimiento",
     "title": "¿Dónde naciste?",
-    "description": "Elige la ciudad o localidad donde naciste para que podamos ubicar tu carta con precisión.",
+    "description": "Junto con tu hora de nacimiento, el lugar nos ayuda a obtener tu ascendente y tus casas desde donde naciste.",
     "searchLabel": "Lugar de nacimiento",
     "searchPlaceholder": "Empieza a escribir una ciudad o localidad",
     "searchHint": "Escribe al menos dos letras y elige un resultado de la lista.",
@@ -39,8 +39,8 @@
     "noResults": "No encontramos lugares que coincidan. Prueba con una ciudad cercana u otra escritura.",
     "searchError": "La búsqueda de ubicaciones no está disponible temporalmente. Inténtalo de nuevo.",
     "selectedLabel": "Seleccionado:",
-    "continue": "Guardar y continuar",
-    "saved": "Guardamos tu lugar de nacimiento y tu carta inicial está lista.",
+    "continue": "Continuar",
+    "saved": "Guardamos tu lugar de nacimiento.",
     "errors": {
       "required": "Busca y selecciona un lugar de nacimiento de la lista.",
       "service": "No pudimos verificar ese lugar en este momento. Inténtalo de nuevo."
@@ -49,7 +49,7 @@
   "initialIntent": {
     "back": "Volver al lugar de nacimiento",
     "title": "¿Qué te trae por aquí?",
-    "description": "Elige las áreas que se sienten más relevantes ahora. Esto nos ayuda a comenzar con tu experiencia, no con suposiciones.",
+    "description": "Elige las áreas que más te importan ahora. Las usaremos para enfocar tus primeras preguntas.",
     "areas": {
       "relationships": "Relaciones e intimidad",
       "money": "Dinero y seguridad",
@@ -66,8 +66,8 @@
     "contextPlaceholder": "Comparte tanto o tan poco como te resulte útil…",
     "contextHint": "Una situación reciente, una incertidumbre o un pensamiento recurrente es un buen punto de partida.",
     "continue": "Preparar mis preguntas",
-    "preparingTitle": "Conectando los puntos",
-    "preparingDescription": "Estamos preparando tu carta y combinándola con lo que te importa para encontrar buenos puntos de partida.",
+    "preparingTitle": "Encontrando tu punto de partida",
+    "preparingDescription": "Estamos reuniendo lo que compartiste para que tus primeras preguntas sean relevantes para ti.",
     "errors": {
       "areas": "Elige al menos un área para continuar.",
       "context": "Limita tu descripción a 2.000 caracteres.",
@@ -76,7 +76,7 @@
   },
   "initialDiscovery": {
     "title": "Algunos puntos para comenzar",
-    "description": "Vamos una pregunta a la vez. Tus respuestas —no la carta— determinan qué preguntamos después.",
+    "description": "Vamos una pregunta a la vez. Lo que compartas determinará qué preguntamos después.",
     "step": "Pregunta",
     "initialStage": "Entendiendo el panorama",
     "finalStage": "Aclarando lo importante",
@@ -91,25 +91,90 @@
     "answerRequired": "Escribe una respuesta antes de continuar.",
     "serviceError": "No pudimos preparar el siguiente paso en este momento. Inténtalo de nuevo.",
     "completedTitle": "Tu punto de partida está listo",
-    "completedDescription": "Gracias. Ya tenemos suficiente contexto vivido para comenzar a explorar sin tratar tu carta como una conclusión."
+    "completedDescription": "Gracias. Ya tenemos un punto de partida claro y podemos continuar desde aquí.",
+    "continueToExplore": "Continuar"
   },
-  "chartReview": {
-    "back": "Volver al lugar de nacimiento",
-    "title": "Tu carta inicial",
-    "description": "Esta es la carta astronómica calculada a partir de los datos de nacimiento que proporcionaste. Es un contexto para explorar, no una conclusión sobre ti.",
-    "edit": "Editar",
-    "unknownTime": "Hora desconocida",
-    "unknownTimeNote": "Como se desconoce tu hora de nacimiento, estas posiciones usan el mediodía local como referencia. Omitimos intencionalmente las casas, los ángulos, los nodos y los aspectos.",
-    "planets": "Posiciones planetarias",
-    "angles": "Ángulos",
-    "houseCusps": "Cúspides de las casas",
-    "house": "Casa",
-    "technical": "Calculado localmente con {engine}. Mostramos la longitud decimal para facilitar la verificación."
+  "orientation": {
+    "title": "Así funciona AstroCoach",
+    "description": "Ven cuando haya algo en tu vida que quieras comprender mejor. Te ayudaremos a explorarlo y a conservar lo que te resulte útil.",
+    "share": {
+      "title": "Comienza con lo que está pasando",
+      "description": "Trae un momento, una emoción, una decisión o algo que sigues notando."
+    },
+    "explore": {
+      "title": "Compréndelo en compañía",
+      "description": "Te haremos preguntas cuidadosas y te ayudaremos a entender tu propia experiencia."
+    },
+    "keep": {
+      "title": "Conserva lo que encaje",
+      "description": "Cuando algo se sienta verdadero y útil, podrás guardarlo en Mi Mapa y retomarlo después."
+    },
+    "continue": "Ir a mi inicio"
+  },
+  "appShell": {
+    "home": "Inicio",
+    "conversations": "Conversaciones",
+    "map": "Mi Mapa",
+    "account": "Cuenta"
+  },
+  "home": {
+    "greeting": "Qué gusto verte, {name}",
+    "greetingFallback": "Qué gusto verte",
+    "title": "¿Qué está pasando?",
+    "description": "Comienza con lo que esté más presente para ti ahora.",
+    "composer": {
+      "placeholder": "Escribe lo que tienes en mente…",
+      "send": "Iniciar conversación",
+      "opening": "Abriendo tu conversación…",
+      "error": "No pudimos abrir esa conversación. Inténtalo de nuevo.",
+      "suggestions": ["Pasó algo", "Estoy sintiendo algo", "Necesito tomar una decisión", "Sigo notando algo", "Solo quiero hablar"]
+    },
+    "recentTitle": "Continúa explorando",
+    "viewAll": "Ver todas",
+    "untitled": "Conversación sin título",
+    "continue": "Volver a esta conversación"
+  },
+  "conversations": {
+    "title": "Conversaciones",
+    "description": "Retoma algo que estabas explorando o comienza de nuevo desde Inicio.",
+    "untitled": "Conversación sin título",
+    "messageCount": "{count} mensajes",
+    "emptyTitle": "Aún no hay conversaciones",
+    "emptyDescription": "Cuando tengas algo en mente, comienza desde Inicio y aparecerá aquí.",
+    "goHome": "Ir a Inicio"
+  },
+  "map": {
+    "title": "Mi Mapa",
+    "description": "Un lugar para los patrones, aprendizajes y prácticas que decidas conservar.",
+    "emptyTitle": "Tu mapa crecerá contigo",
+    "emptyDescription": "Nada se agrega automáticamente. Cuando algo útil se aclare en una conversación, tú decidirás si pertenece aquí."
+  },
+  "account": {
+    "title": "Cuenta",
+    "defaultName": "Cuenta de AstroCoach",
+    "appearance": "Apariencia",
+    "appearanceDescription": "Elige cómo se ve AstroCoach en este dispositivo y guarda la preferencia en tu cuenta.",
+    "themes": { "system": "Sistema", "light": "Claro", "dark": "Oscuro", "saving": "Guardando…", "saved": "Apariencia guardada.", "saveError": "No pudimos guardar ese cambio. Inténtalo de nuevo." },
+    "signOut": "Cerrar sesión"
+  },
+  "explore": {
+    "title": "Explorar",
+    "emptyTitle": "¿Qué está pasando?",
+    "emptyDescription": "Comienza por donde te resulte más útil. Puedes compartir algo que pasó, una emoción, una decisión o simplemente lo que tienes en mente.",
+    "inputLabel": "Mensaje para AstroCoach",
+    "inputPlaceholder": "Escribe lo que tienes en mente…",
+    "send": "Enviar mensaje",
+    "thinking": "Pensando contigo…",
+    "retry": "Intentar de nuevo",
+    "generationError": "Tu mensaje está guardado, pero no pude responder en este momento.",
+    "messageError": "Escribe un mensaje antes de enviarlo.",
+    "backHome": "Volver a Inicio",
+    "account": "Abrir cuenta"
   },
   "onboarding": {
     "changeLanguage": "Cambiar idioma",
     "languageSavedTitle": "Español seleccionado",
     "languageSavedDescription": "Guardamos tu preferencia de idioma. Usaremos español durante toda tu experiencia.",
-    "nextStep": "Los datos de nacimiento son la próxima etapa de desarrollo."
+    "nextStep": "Comencemos con algunos datos sobre ti."
   }
 }

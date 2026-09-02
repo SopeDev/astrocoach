@@ -89,6 +89,7 @@ export async function saveInitialIntent(
           finalQuestions: [],
           finalAnswers: [],
           discoveryCompletedAt: null,
+          orientationCompletedAt: null,
           questionsGenerated: calculatedAt,
         },
         update: {
@@ -99,6 +100,7 @@ export async function saveInitialIntent(
           finalQuestions: [],
           finalAnswers: [],
           discoveryCompletedAt: null,
+          orientationCompletedAt: null,
           questionsGenerated: calculatedAt,
         },
       }),

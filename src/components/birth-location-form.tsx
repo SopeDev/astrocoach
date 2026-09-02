@@ -132,7 +132,7 @@ export function BirthLocationForm({ locale, messages, defaultLocation }: {
             aria-activedescendant={activeIndex >= 0 ? `location-option-${results[activeIndex]?.geonameId}` : undefined}
             aria-autocomplete="list"
             aria-controls="location-results"
-            aria-describedby={formError ? "location-error" : "location-hint"}
+            aria-describedby={formError ? "location-error" : selected ? undefined : "location-hint"}
             aria-expanded={listVisible}
             aria-invalid={Boolean(formError)}
             autoComplete="off"
@@ -169,7 +169,7 @@ export function BirthLocationForm({ locale, messages, defaultLocation }: {
           </ul>
         ) : null}
 
-        {formError ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" id="location-error" role="alert">{formError}</p> : searchFailed ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">{messages.searchError}</p> : searched && !searching && query.trim().length >= 2 ? <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{messages.noResults}</p> : <p className="mt-2 text-sm text-slate-500 dark:text-slate-400" id="location-hint">{messages.searchHint}</p>}
+        {formError ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" id="location-error" role="alert">{formError}</p> : selected ? null : searchFailed ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">{messages.searchError}</p> : searched && !searching && query.trim().length >= 2 ? <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{messages.noResults}</p> : <p className="mt-2 text-sm text-slate-500 dark:text-slate-400" id="location-hint">{messages.searchHint}</p>}
       </div>
 
       {selected ? <div className="rounded-xl bg-violet-50 p-4 text-sm text-violet-900 dark:bg-violet-950/50 dark:text-violet-100"><span className="font-semibold">{messages.selectedLabel}</span> {selected.label}</div> : null}

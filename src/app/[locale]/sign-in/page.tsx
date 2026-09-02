@@ -27,14 +27,14 @@ export default async function SignInPage({ params }: {
   }
 
   if ((await auth())?.user) {
-    redirect(`/${locale}/onboarding/birth-data`);
+    redirect(`/${locale}/continue`);
   }
 
   const messages = getDictionary(locale);
 
   async function signInWithGoogle() {
     "use server";
-    await signIn("google", { redirectTo: `/${locale}/onboarding/birth-data` });
+    await signIn("google", { redirectTo: `/${locale}/continue` });
   }
 
   return (

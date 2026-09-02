@@ -7,6 +7,8 @@ import { completeInitialDiscovery, prepareFinalDiscoveryQuestions } from "@/app/
 import type { Locale } from "@/i18n/config";
 
 type Messages = {
+  title: string;
+  description: string;
   step: string;
   initialStage: string;
   finalStage: string;
@@ -22,6 +24,7 @@ type Messages = {
   serviceError: string;
   completedTitle: string;
   completedDescription: string;
+  continueToExplore: string;
 };
 
 export function DiscoveryFlow({
@@ -59,6 +62,7 @@ export function DiscoveryFlow({
         <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"><Check aria-hidden="true" className="size-6" /></div>
         <h2 className="mt-5 text-2xl font-semibold text-slate-950 dark:text-white">{messages.completedTitle}</h2>
         <p className="mx-auto mt-3 max-w-md leading-7 text-slate-600 dark:text-slate-300">{messages.completedDescription}</p>
+        <Link className="mt-6 flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-violet-800 dark:bg-violet-600 dark:hover:bg-violet-500" href={`/${locale}/onboarding/orientation`}>{messages.continueToExplore}<ArrowRight aria-hidden="true" className="size-4" /></Link>
       </div>
     );
   }
@@ -123,9 +127,14 @@ export function DiscoveryFlow({
         ))}
       </div>
 
-      <div className="mt-8 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-800 dark:bg-slate-950/60">
-        <p className="text-xs font-semibold tracking-[0.18em] text-violet-700 uppercase dark:text-violet-300">{stageLabel} · {messages.step} {current + 1} / 5</p>
-        <h2 className="mt-4 text-balance text-2xl font-semibold leading-9 text-slate-950 dark:text-white">{currentQuestion}</h2>
+      <div className="mt-6 text-center">
+        <h1 className="text-balance text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl dark:text-white">{messages.title}</h1>
+        <p className="mx-auto mt-2 max-w-lg text-pretty text-sm leading-6 text-slate-600 sm:text-base dark:text-slate-300">{messages.description}</p>
+      </div>
+
+      <div className="mt-6 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-800 dark:bg-slate-950/60">
+        <p className="text-xs font-semibold tracking-[0.14em] text-violet-700 uppercase dark:text-violet-300">{stageLabel}</p>
+        <p className="mt-4 text-pretty text-lg font-normal leading-7 text-slate-900 sm:text-xl sm:leading-8 dark:text-slate-100">{currentQuestion}</p>
         <label className="mt-7 block text-sm font-semibold text-slate-800 dark:text-slate-100" htmlFor="discoveryAnswer">{messages.answerLabel}</label>
         <textarea
           autoFocus
