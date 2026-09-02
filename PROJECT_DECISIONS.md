@@ -31,5 +31,6 @@ Last updated: 2026-09-01
 
 - The application is designed for Vercel deployment and uses environment-based configuration.
 - Development uses npm and commits the generated lockfile.
+- The user exclusively handles Git staging, commits, and pushes. The coding agent may inspect Git state but must not mutate it.
 - Production builds currently use Next.js's webpack builder and the TypeScript compiler API because the development execution environment blocks Turbopack's internal localhost binding and detached TypeScript CLI process.
 - Each implementation slice must leave linting, type checking, and the production build passing.
