@@ -8,6 +8,11 @@ export default defineConfig({
     seed: "tsx src/db/seed.ts",
   },
   datasource: {
-    url: process.env.DIRECT_URL || env("DATABASE_URL"),
+    url:
+      process.env.DIRECT_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.astro_POSTGRES_URL ||
+      process.env.astro_DATABASE_URL ||
+      env("DATABASE_URL"),
   },
 });

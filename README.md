@@ -6,7 +6,7 @@ AstroCoach is a responsive, bilingual self-exploration application that uses ast
 
 1. Install dependencies with `npm install`.
 2. Copy `.env.example` to `.env` and provide the required values.
-3. Start PostgreSQL with `docker compose up -d postgres`, or set `DATABASE_URL` to a pooled Neon PostgreSQL connection and `DIRECT_URL` to its direct migration connection.
+3. Start PostgreSQL with `docker compose up -d postgres`, or set `DATABASE_URL` to a Prisma Postgres connection. Vercel Marketplace aliases are also supported automatically.
 4. Apply migrations with `npm run db:deploy`.
 5. Seed the development user with `npm run db:seed`.
 6. Start the application with `npm run dev`.

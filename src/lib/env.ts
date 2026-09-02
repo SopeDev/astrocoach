@@ -8,8 +8,12 @@ const serverEnvSchema = z.object({
 
 export function getServerEnv() {
   return serverEnvSchema.parse({
-    DATABASE_URL: process.env.DATABASE_URL,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    OPENAI_MODEL: process.env.OPENAI_MODEL,
+    DATABASE_URL:
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.astro_DATABASE_URL ||
+      process.env.astro_POSTGRES_URL,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY || undefined,
+    OPENAI_MODEL: process.env.OPENAI_MODEL || undefined,
   });
 }

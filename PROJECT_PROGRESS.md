@@ -14,6 +14,9 @@ Last updated: 2026-09-01
 - Added the required project-level implementation instructions in `AGENTS.md`.
 - Generated and validated the initial Prisma migration and Prisma Client for the user schema.
 - Verified linting, strict TypeScript checking, and a production Next.js build.
+- Initialized the Git repository, pushed the scaffold to `SopeDev/astrocoach`, and connected the Vercel `astrocoach` project.
+- Connected a Prisma Postgres database through Vercel and added safe environment-variable alias resolution.
+- Applied the initial production migration and seeded `dev@astrocoach.local` in Prisma Postgres.
 
 ## Remaining
 
@@ -27,7 +30,7 @@ Last updated: 2026-09-01
 
 ## Known issues and open questions
 
-- A PostgreSQL instance and `DATABASE_URL` are required before migrations or the seed can run. Neon is the selected managed provider for Vercel but has not been provisioned or connected yet.
+- The Prisma Postgres connection is currently shared by Production and Preview deployments. A separate preview database should be introduced before schema-changing preview deployments become routine.
 - OpenCage and GeoNames credentials from the earlier `astro-ai` prototype may be reused later, but no credentials have been copied into this repository.
 - The natal calculation engine will be selected in its dedicated slice after comparing the practical open-source and hosted options.
 - Proper authentication is intentionally deferred; the development user is not an authentication mechanism.

@@ -16,8 +16,8 @@ Last updated: 2026-09-01
 - Use Tailwind CSS for styling and add shadcn/ui components selectively rather than adopting a broad component layer upfront.
 - Support English and Spanish from the first onboarding flow. Locale values use stable `en` and `es` identifiers so additional languages can be added later.
 - Support system, light, and dark color themes with `next-themes`.
-- Use Prisma 7 as the ORM and migration system for PostgreSQL. Use Neon as the managed PostgreSQL provider for Vercel deployments while retaining ordinary local PostgreSQL for development.
-- Use Prisma's PostgreSQL driver adapter. `DATABASE_URL` is the pooled application connection; `DIRECT_URL` may provide a direct Neon connection for migrations.
+- Use Prisma 7 as the ORM and migration system for PostgreSQL. Use Prisma Postgres, connected through the Vercel Marketplace, as the managed production database while retaining ordinary local PostgreSQL for development.
+- Use Prisma's PostgreSQL driver adapter. Prefer standard `DATABASE_URL` and `DIRECT_URL` names; accept the Vercel integration's generated `POSTGRES_URL` and resource-prefixed `astro_*` aliases so deployment is not coupled to manually copied secrets.
 - Represent the seeded development identity as a normal user row with a stable UUID. Future authentication should resolve an authenticated identity to the same user model rather than require a separate domain model.
 
 ## External services
