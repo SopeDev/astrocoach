@@ -13,6 +13,15 @@ AstroCoach is a responsive, bilingual self-exploration application that uses ast
 
 The seeded development identity is `dev@astrocoach.local`. It is intentionally not a login credential.
 
+## Google authentication
+
+AstroCoach uses Auth.js with Google OAuth and database-backed sessions. Create a Google OAuth web client and configure these authorized redirect URIs:
+
+- Local: `http://localhost:3000/api/auth/callback/google`
+- Production: `https://YOUR_DOMAIN/api/auth/callback/google`
+
+Set `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and a cryptographically random `AUTH_SECRET` in `.env.local` and in the Vercel project environment. Generate an Auth.js secret with `npx auth secret` or `openssl rand -base64 32`.
+
 Use `npm run db:studio` to inspect local or Neon data with Prisma Studio.
 
 ## Verification

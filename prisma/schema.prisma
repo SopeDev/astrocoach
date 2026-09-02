@@ -23,13 +23,70 @@ enum Theme {
 }
 
 model User {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email       String   @unique
-  displayName String   @map("display_name")
-  locale      Locale   @default(en)
-  theme       Theme    @default(system)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String?   @map("display_name")
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified") @db.Timestamptz(6)
+  image         String?
+  locale        Locale    @default(en)
+  theme         Theme     @default(system)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  accounts      Account[]
+  sessions      Session[]
+  birthProfile  BirthProfile?
 
   @@map("users")
+}
+
+model BirthProfile {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String   @unique @map("user_id") @db.Uuid
+  birthDate        DateTime @map("birth_date") @db.Date
+  birthTimeMinutes Int?     @map("birth_time_minutes")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("birth_profiles")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id") @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime @db.Timestamptz(6)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime @db.Timestamptz(6)
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }

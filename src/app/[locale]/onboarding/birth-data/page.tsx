@@ -1,11 +1,18 @@
 import Link from "next/link";
-import { ArrowLeft, MoonStar } from "lucide-react";
+import { ArrowLeft, CheckCircle2, MoonStar } from "lucide-react";
+import { BirthDataForm } from "@/components/birth-data-form";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { requireCurrentUser } from "@/lib/auth-user";
 
-export default async function BirthDataPlaceholderPage({ params }: {
+function formatTime(minutes: number) {
+  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+}
+
+export default async function BirthDataPage({ params, searchParams }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ saved?: string }>;
 }) {
   const { locale } = await params;
 
@@ -14,9 +21,12 @@ export default async function BirthDataPlaceholderPage({ params }: {
   }
 
   const messages = getDictionary(locale);
+  const user = await requireCurrentUser(locale);
+  const { saved } = await searchParams;
+  const birthProfile = await (await import("@/db/client")).db.birthProfile.findUnique({ where: { userId: user.id } });
 
   return (
-    <main className="relative flex min-h-svh items-center justify-center overflow-hidden px-5 py-14 sm:px-8">
+    <main className="relative min-h-svh overflow-hidden px-5 py-20 sm:px-8 sm:py-24">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,var(--glow-primary),transparent_34%),radial-gradient(circle_at_bottom_right,var(--glow-secondary),transparent_32%)]" />
       <div className="absolute left-5 top-5 sm:left-8 sm:top-8">
         <Link aria-label={messages.onboarding.changeLanguage} className="flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white/70 text-slate-700 shadow-sm backdrop-blur transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-200 dark:hover:bg-slate-900" href="/">
@@ -27,14 +37,25 @@ export default async function BirthDataPlaceholderPage({ params }: {
         <ThemeToggle label={messages.themeToggle} />
       </div>
 
-      <section className="relative w-full max-w-xl text-center">
-        <div className="mx-auto mb-6 flex size-12 items-center justify-center rounded-2xl border border-violet-200/70 bg-white/70 text-violet-700 shadow-sm backdrop-blur dark:border-violet-800/60 dark:bg-violet-950/40 dark:text-violet-200">
-          <MoonStar aria-hidden="true" className="size-5" />
+      <section className="relative mx-auto w-full max-w-lg">
+        <div className="text-center">
+          <div className="mx-auto mb-5 flex size-12 items-center justify-center rounded-2xl border border-violet-200/70 bg-white/70 text-violet-700 shadow-sm backdrop-blur dark:border-violet-800/60 dark:bg-violet-950/40 dark:text-violet-200">
+            <MoonStar aria-hidden="true" className="size-5" />
+          </div>
+          <p className="mb-3 text-sm font-medium tracking-[0.18em] text-violet-700 uppercase dark:text-violet-300">{messages.appName}</p>
+          <h1 className="text-balance text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl dark:text-white">{messages.birthData.title}</h1>
+          <p className="mx-auto mt-4 max-w-md text-pretty leading-7 text-slate-600 dark:text-slate-300">{messages.birthData.description}</p>
         </div>
-        <p className="mb-3 text-sm font-medium tracking-[0.18em] text-violet-700 uppercase dark:text-violet-300">{messages.appName}</p>
-        <h1 className="text-balance text-3xl font-semibold tracking-tight text-slate-950 sm:text-5xl dark:text-white">{messages.onboarding.languageSavedTitle}</h1>
-        <p className="mx-auto mt-5 max-w-md text-pretty text-lg leading-8 text-slate-600 dark:text-slate-300">{messages.onboarding.languageSavedDescription}</p>
-        <p className="mt-8 text-sm text-slate-500 dark:text-slate-400">{messages.onboarding.nextStep}</p>
+
+        <div className="mt-8 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-800 dark:bg-slate-950/60">
+          {saved === "1" ? <div className="mb-5 flex items-start gap-3 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200" role="status"><CheckCircle2 aria-hidden="true" className="mt-0.5 size-4 shrink-0" />{messages.birthData.saved}</div> : null}
+          <BirthDataForm
+            defaultDate={birthProfile?.birthDate.toISOString().slice(0, 10)}
+            defaultTime={birthProfile?.birthTimeMinutes === null || birthProfile?.birthTimeMinutes === undefined ? undefined : formatTime(birthProfile.birthTimeMinutes)}
+            locale={locale}
+            messages={messages.birthData}
+          />
+        </div>
       </section>
     </main>
   );

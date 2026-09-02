@@ -7,11 +7,11 @@ async function seed() {
     create: {
       id: DEVELOPMENT_USER_ID,
       email: DEVELOPMENT_USER_EMAIL,
-      displayName: "Development User",
+      name: "Development User",
       locale: "en",
       theme: "system",
     },
-    update: { displayName: "Development User" },
+    update: { name: "Development User" },
   });
 
   console.log(`Seeded development user: ${DEVELOPMENT_USER_EMAIL}`);

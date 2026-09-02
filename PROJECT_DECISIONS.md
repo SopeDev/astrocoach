@@ -1,6 +1,6 @@
 # Project Decisions
 
-Last updated: 2026-09-01
+Last updated: 2026-09-02
 
 ## Product scope
 
@@ -8,7 +8,9 @@ Last updated: 2026-09-01
 - Only EXPLORE mode is in the current implementation scope. The other documented modes remain future product direction.
 - Astrology acts primarily as an internal context and inquiry engine. It must not be presented as proof about the user.
 - Birth time is optional. Houses and angles must not be calculated or presented when it is unavailable.
-- Full authentication and detailed high-stakes safety architecture are deferred for the prototype.
+- Store birth dates as calendar dates and known birth times as minutes after midnight. A null birth time explicitly means unknown and must remain distinct from midnight.
+- Use Auth.js with database-backed sessions and Google OAuth as the first authentication method. Email/password authentication remains a separate future slice so registration, verification, recovery, rate limiting, and account linking can be designed together.
+- Detailed high-stakes safety architecture remains deferred for the prototype.
 
 ## Application architecture
 
@@ -19,9 +21,9 @@ Last updated: 2026-09-01
 - Support system, light, and dark color themes with `next-themes`.
 - AstroCoach is a mobile-first progressive web application. Every interface starts with phone ergonomics, touch targets, safe-area behavior, and standalone display constraints before adding tablet or desktop enhancements.
 - Maintain an installable web app manifest and platform app icons. Add offline caching or push behavior only through deliberate, separately verified slices so stale application code or private user data is not cached accidentally.
-- Use Prisma 7 as the ORM and migration system for PostgreSQL. Use Prisma Postgres, connected through the Vercel Marketplace, as the managed production database while retaining ordinary local PostgreSQL for development.
+- Use Prisma 7 as the ORM and migration system for PostgreSQL. During solo early development, local, preview, and production environments share the Prisma Postgres database connected through the Vercel Marketplace; split environments before broader testing or routine schema-changing previews.
 - Use Prisma's PostgreSQL driver adapter. Prefer standard `DATABASE_URL` and `DIRECT_URL` names; accept the Vercel integration's generated `POSTGRES_URL` and resource-prefixed `astro_*` aliases so deployment is not coupled to manually copied secrets.
-- Represent the seeded development identity as a normal user row with a stable UUID. Future authentication should resolve an authenticated identity to the same user model rather than require a separate domain model.
+- Resolve all personal data through the authenticated Auth.js user. The seeded development identity remains fixture data only and must not be used as a runtime identity.
 
 ## External services
 

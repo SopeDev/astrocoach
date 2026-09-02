@@ -2,6 +2,32 @@
   "appName": "AstroCoach",
   "themeToggle": "Cambiar tema de color",
   "languageName": "Español",
+  "auth": {
+    "back": "Volver a la selección de idioma",
+    "title": "Crea tu espacio",
+    "description": "Inicia sesión para que tus datos de nacimiento y futuras reflexiones permanezcan vinculados contigo.",
+    "google": "Continuar con Google",
+    "or": "o",
+    "emailComingSoon": "El acceso con correo y contraseña será el próximo paso",
+    "privacy": "AstroCoach usa tu cuenta únicamente para proteger y guardar tu experiencia."
+  },
+  "birthData": {
+    "title": "¿Cuándo naciste?",
+    "description": "Tu fecha y hora de nacimiento nos ayudan a calcular el contexto astronómico que usaremos en tus reflexiones.",
+    "dateLabel": "Fecha de nacimiento",
+    "dateHint": "Usa la fecha que aparece en tu registro de nacimiento.",
+    "timeKnownLabel": "Sé mi hora de nacimiento",
+    "timeLabel": "Hora de nacimiento",
+    "unknownTimeExplanation": "No hay problema. Podemos usar las posiciones planetarias, pero no calcularemos ni interpretaremos casas o ángulos sin una hora de nacimiento confiable.",
+    "continue": "Guardar y continuar",
+    "saved": "Guardamos tu fecha de nacimiento y tu preferencia de hora.",
+    "errors": {
+      "invalidDate": "Ingresa una fecha de nacimiento válida.",
+      "futureDate": "La fecha de nacimiento no puede estar en el futuro.",
+      "requiredTime": "Ingresa tu hora de nacimiento o desactiva «Sé mi hora de nacimiento».",
+      "invalidTime": "Ingresa una hora de nacimiento válida."
+    }
+  },
   "onboarding": {
     "changeLanguage": "Cambiar idioma",
     "languageSavedTitle": "Español seleccionado",

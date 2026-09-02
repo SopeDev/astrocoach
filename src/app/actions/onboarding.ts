@@ -3,8 +3,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { auth } from "@/auth";
 import { locales } from "@/i18n/config";
-import { DEVELOPMENT_USER_EMAIL } from "@/lib/development-user";
 
 const languageSelectionSchema = z.object({ locale: z.enum(locales) });
 
@@ -16,13 +16,6 @@ export async function selectLanguage(formData: FormData) {
   }
 
   const { locale } = result.data;
-  const { db } = await import("@/db/client");
-
-  await db.user.update({
-    where: { email: DEVELOPMENT_USER_EMAIL },
-    data: { locale },
-  });
-
   const cookieStore = await cookies();
   cookieStore.set("astrocoach-locale", locale, {
     httpOnly: true,
@@ -32,5 +25,13 @@ export async function selectLanguage(formData: FormData) {
     path: "/",
   });
 
-  redirect(`/${locale}/onboarding/birth-data`);
+  const session = await auth();
+
+  if (session?.user?.id) {
+    const { db } = await import("@/db/client");
+    await db.user.update({ where: { id: session.user.id }, data: { locale } });
+    redirect(`/${locale}/onboarding/birth-data`);
+  }
+
+  redirect(`/${locale}/sign-in`);
 }

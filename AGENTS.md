@@ -48,22 +48,22 @@ Prefer simple local components when they are sufficient.
 
 ### Browser verification
 
-Use Playwright/browser tooling when a change affects observable user behavior,
-including:
+Do not run Playwright or browser automation automatically during normal implementation.
 
-- onboarding flows,
-- forms and validation,
-- navigation,
-- responsive behavior,
-- language switching,
-- theme switching,
-- client-side interactions,
-- or browser/runtime errors.
+Assume the user will perform manual exploratory testing during development.
 
-For substantial user-facing slices, verify the main happy path in the browser
-after implementation.
+Use Playwright/browser tooling only when:
 
-Do not use browser automation when static checks alone are sufficient.
+- the user explicitly asks for automated browser verification,
+- the user says a feature or development slice is ready for final testing,
+- reproducing or diagnosing a browser-specific issue requires it,
+- or an existing automated browser test needs to be updated or fixed.
+
+When browser verification is requested, focus on the smallest set of important flows and edge cases needed to validate the change.
+
+Avoid exhaustive browser testing unless explicitly requested.
+
+Prefer static checks, unit/integration tests, and targeted automated tests during normal development.
 
 ### Database tooling
 

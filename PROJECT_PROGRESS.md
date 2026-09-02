@@ -1,6 +1,6 @@
 # Project Progress
 
-Last updated: 2026-09-01
+Last updated: 2026-09-02
 
 ## Implemented
 
@@ -19,10 +19,12 @@ Last updated: 2026-09-01
 - Applied the initial production migration and seeded `dev@astrocoach.local` in Prisma Postgres.
 - Implemented language-first onboarding with English and Spanish selection, server-side persistence to the development user, an HTTP-only locale cookie, localized routes, and translated starter content.
 - Established the mobile-first PWA foundation with install metadata, standalone display configuration, theme-aware mobile browser metadata, and platform app icons.
+- Added Google authentication with Auth.js, Prisma-backed accounts and sessions, a localized mobile-first sign-in screen, authenticated onboarding protection, and locale persistence after sign-in.
+- Removed runtime dependence on the shared seeded development user and applied the authentication migration to the managed Prisma Postgres database.
+- Implemented localized, mobile-first birth date and optional birth time collection with authenticated persistence, edit support, server validation, and explicit unknown-time handling.
 
 ## Remaining
 
-- Implement birth data collection with optional birth time.
 - Add worldwide birthplace search and historical timezone resolution.
 - Calculate and persist the initial natal chart data.
 - Capture a current concern and create a conversation.
@@ -34,9 +36,10 @@ Last updated: 2026-09-01
 - The Prisma Postgres connection is currently shared by Production and Preview deployments. A separate preview database should be introduced before schema-changing preview deployments become routine.
 - OpenCage and GeoNames credentials from the earlier `astro-ai` prototype may be reused later, but no credentials have been copied into this repository.
 - The natal calculation engine will be selected in its dedicated slice after comparing the practical open-source and hosted options.
-- Proper authentication is intentionally deferred; the development user is not an authentication mechanism.
+- Google sign-in requires `AUTH_SECRET`, `AUTH_GOOGLE_ID`, and `AUTH_GOOGLE_SECRET` in local and Vercel environments before the OAuth flow can run.
+- Email/password authentication is intentionally reserved for a focused security slice covering verification, recovery, rate limiting, password hashing, and safe account linking.
 - Prisma CLI 7.10 currently brings audit findings through its bundled, unused MySQL driver and configuration merge utility. The application uses PostgreSQL, runtime packages are unaffected, and npm's suggested fix is an unsupported breaking Prisma downgrade, so it was not applied.
 
 ## Next planned slice
 
-Build localized birth-data onboarding: birth date, optional birth time, and a clear explanation of what changes when time is unknown. Worldwide birthplace search remains the following dedicated slice.
+Add localized worldwide birthplace search, persist coordinates and an IANA timezone, and resolve the historically applicable UTC offset for the saved birth date and time.
