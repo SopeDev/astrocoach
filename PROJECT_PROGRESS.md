@@ -22,11 +22,13 @@ Last updated: 2026-09-02
 - Added Google authentication with Auth.js, Prisma-backed accounts and sessions, a localized mobile-first sign-in screen, authenticated onboarding protection, and locale persistence after sign-in.
 - Removed runtime dependence on the shared seeded development user and applied the authentication migration to the managed Prisma Postgres database.
 - Implemented localized, mobile-first birth date and optional birth time collection with authenticated persistence, edit support, server validation, and explicit unknown-time handling.
+- Added authenticated worldwide birthplace search through a server-mediated GeoNames endpoint, keyboard-accessible mobile results, authoritative server-side place verification, coordinates and IANA timezone persistence, and historical UTC instant resolution for known birth times.
+- Added locally computed natal charts with pinned Celestine 0.2.1, a project-owned versioned data contract, input hashing and calculation provenance, Placidus houses for exact times, strict omission of time-dependent structures for unknown times, automatic stale-chart invalidation, and reference tests.
+- Added a real saving/calculation transition after birthplace submission and a localized chart-review screen showing source birth details, planetary and node positions, decimal longitudes, angles, and expandable house cusps for manual verification.
+- Added Chiron to exact and unknown-time chart calculations and upgraded the calculation transition to a full-screen, reduced-motion-aware celestial animation with moving stars, connecting constellation lines, and orbital motion.
 
 ## Remaining
 
-- Add worldwide birthplace search and historical timezone resolution.
-- Calculate and persist the initial natal chart data.
 - Capture a current concern and create a conversation.
 - Implement EXPLORE responses with structured internal signals.
 - Save and resume conversations.
@@ -34,12 +36,12 @@ Last updated: 2026-09-02
 ## Known issues and open questions
 
 - The Prisma Postgres connection is currently shared by Production and Preview deployments. A separate preview database should be introduced before schema-changing preview deployments become routine.
-- OpenCage and GeoNames credentials from the earlier `astro-ai` prototype may be reused later, but no credentials have been copied into this repository.
-- The natal calculation engine will be selected in its dedicated slice after comparing the practical open-source and hosted options.
+- GeoNames is configured for local birthplace lookup. The same `GEONAMES_USERNAME` must remain configured in each Vercel environment that serves the onboarding flow.
+- Celestine is young despite its substantial upstream tests. Keep project-owned reference fixtures and review upgrades deliberately rather than accepting automatic minor-version changes.
 - Google sign-in requires `AUTH_SECRET`, `AUTH_GOOGLE_ID`, and `AUTH_GOOGLE_SECRET` in local and Vercel environments before the OAuth flow can run.
 - Email/password authentication is intentionally reserved for a focused security slice covering verification, recovery, rate limiting, password hashing, and safe account linking.
 - Prisma CLI 7.10 currently brings audit findings through its bundled, unused MySQL driver and configuration merge utility. The application uses PostgreSQL, runtime packages are unaffected, and npm's suggested fix is an unsupported breaking Prisma downgrade, so it was not applied.
 
 ## Next planned slice
 
-Add localized worldwide birthplace search, persist coordinates and an IANA timezone, and resolve the historically applicable UTC offset for the saved birth date and time.
+Build localized initial-intent onboarding: selectable life areas plus an optional description of what is currently happening, persisted for the authenticated user before starting the first EXPLORE conversation.

@@ -16,7 +16,7 @@
     "description": "Your birth date and time help us calculate the astronomical context used for your reflections.",
     "dateLabel": "Birth date",
     "dateHint": "Use the date shown on your birth record.",
-    "timeKnownLabel": "I know my birth time",
+    "timeUnknownLabel": "I don’t know my birth time",
     "timeLabel": "Birth time",
     "unknownTimeExplanation": "That’s completely okay. We can still use planetary placements, but we won’t calculate or interpret houses or angles without a reliable birth time.",
     "continue": "Save and continue",
@@ -24,9 +24,42 @@
     "errors": {
       "invalidDate": "Enter a valid birth date.",
       "futureDate": "Birth date cannot be in the future.",
-      "requiredTime": "Enter your birth time or turn off ‘I know my birth time.’",
+      "requiredTime": "Enter your birth time or select ‘I don’t know my birth time.’",
       "invalidTime": "Enter a valid birth time."
     }
+  },
+  "birthLocation": {
+    "back": "Back to birth date and time",
+    "title": "Where were you born?",
+    "description": "Choose the city or town where you were born so we can place your chart accurately.",
+    "searchLabel": "Birthplace",
+    "searchPlaceholder": "Start typing a city or town",
+    "searchHint": "Type at least two letters, then choose a result from the list.",
+    "searching": "Searching for places",
+    "noResults": "No matching places found. Try a nearby city or a different spelling.",
+    "searchError": "Location search is temporarily unavailable. Please try again.",
+    "selectedLabel": "Selected:",
+    "continue": "Save birthplace",
+    "calculatingTitle": "Preparing your chart",
+    "calculatingDescription": "We’re securely saving your birth information and calculating your planetary positions.",
+    "saved": "Your birthplace has been saved and your initial chart is ready.",
+    "errors": {
+      "required": "Search for and select a birthplace from the list.",
+      "service": "We couldn’t verify that location right now. Please try again."
+    }
+  },
+  "chartReview": {
+    "back": "Back to birthplace",
+    "title": "Your starting chart",
+    "description": "Here is the astronomical chart calculated from the birth information you provided. This is context for exploration, not a conclusion about you.",
+    "edit": "Edit",
+    "unknownTime": "Time unknown",
+    "unknownTimeNote": "Because your birth time is unknown, these positions use local noon as a reference. Houses, angles, nodes, and aspects are intentionally omitted.",
+    "planets": "Planetary positions",
+    "angles": "Angles",
+    "houseCusps": "House cusps",
+    "house": "House",
+    "technical": "Calculated locally with {engine}. Decimal longitude is shown to help verify the result."
   },
   "onboarding": {
     "changeLanguage": "Change language",

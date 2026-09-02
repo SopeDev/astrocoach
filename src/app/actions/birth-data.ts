@@ -15,7 +15,7 @@ export type BirthDataFormState = {
 
 const birthDataSchema = z.object({
   birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  birthTimeKnown: z.boolean(),
+  birthTimeUnknown: z.boolean(),
   birthTime: z.string(),
 });
 
@@ -36,7 +36,7 @@ export async function saveBirthData(
 
   const result = birthDataSchema.safeParse({
     birthDate: formData.get("birthDate"),
-    birthTimeKnown: formData.get("birthTimeKnown") === "on",
+    birthTimeUnknown: formData.get("birthTimeUnknown") === "on",
     birthTime: formData.get("birthTime") ?? "",
   });
 
@@ -44,7 +44,7 @@ export async function saveBirthData(
     return { errors: { birthDate: "invalid" } };
   }
 
-  const { birthDate, birthTimeKnown, birthTime } = result.data;
+  const { birthDate, birthTimeUnknown, birthTime } = result.data;
   const today = new Date().toISOString().slice(0, 10);
 
   if (birthDate > today) {
@@ -53,7 +53,7 @@ export async function saveBirthData(
 
   let birthTimeMinutes: number | null = null;
 
-  if (birthTimeKnown) {
+  if (!birthTimeUnknown) {
     const timeMatch = /^(\d{2}):(\d{2})$/.exec(birthTime);
 
     if (!timeMatch) {
@@ -72,18 +72,23 @@ export async function saveBirthData(
 
   const user = await requireCurrentUser(locale);
 
-  await db.birthProfile.upsert({
-    where: { userId: user.id },
-    create: {
-      userId: user.id,
-      birthDate: new Date(`${birthDate}T00:00:00.000Z`),
-      birthTimeMinutes,
-    },
-    update: {
-      birthDate: new Date(`${birthDate}T00:00:00.000Z`),
-      birthTimeMinutes,
-    },
-  });
+  await db.$transaction([
+    db.birthProfile.upsert({
+      where: { userId: user.id },
+      create: {
+        userId: user.id,
+        birthDate: new Date(`${birthDate}T00:00:00.000Z`),
+        birthTimeMinutes,
+      },
+      update: {
+        birthDate: new Date(`${birthDate}T00:00:00.000Z`),
+        birthTimeMinutes,
+        birthInstant: null,
+        utcOffsetMinutes: null,
+      },
+    }),
+    db.natalChart.deleteMany({ where: { userId: user.id } }),
+  ]);
 
-  redirect(`/${locale}/onboarding/birth-data?saved=1`);
+  redirect(`/${locale}/onboarding/birth-location`);
 }

@@ -36,3 +36,79 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
+
+.chart-star {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgb(221 214 254);
+  box-shadow: 0 0 10px rgb(167 139 250 / 0.9);
+  animation: chart-twinkle 2.8s ease-in-out infinite;
+}
+
+.chart-constellation-line {
+  stroke: rgb(196 181 253);
+  stroke-width: 1;
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: chart-draw 3.4s ease-in-out infinite alternate;
+}
+
+.chart-constellation-line-delayed { animation-delay: 0.8s; }
+.chart-constellation-line-late { animation-delay: 1.5s; }
+
+.chart-orbit {
+  position: relative;
+  animation: chart-float 3s ease-in-out infinite;
+}
+
+.chart-orbit::before {
+  position: absolute;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: rgb(216 180 254);
+  box-shadow: 0 0 16px rgb(192 132 252);
+  content: "";
+  animation: chart-orbit 3.2s linear infinite;
+}
+
+.chart-progress-dot { animation: chart-pulse 1.5s ease-in-out infinite; }
+.chart-progress-dot:nth-child(2) { animation-delay: 0.2s; }
+.chart-progress-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes chart-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
+@keyframes chart-draw {
+  0% { opacity: 0.1; stroke-dashoffset: 420; }
+  100% { opacity: 0.8; stroke-dashoffset: 0; }
+}
+
+@keyframes chart-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes chart-orbit {
+  from { transform: rotate(0deg) translateX(3.5rem) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(3.5rem) rotate(-360deg); }
+}
+
+@keyframes chart-pulse {
+  0%, 100% { opacity: 0.25; transform: scaleX(0.75); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-star,
+  .chart-constellation-line,
+  .chart-orbit,
+  .chart-orbit::before,
+  .chart-progress-dot {
+    animation: none;
+  }
+
+  .chart-constellation-line { stroke-dashoffset: 0; }
+}

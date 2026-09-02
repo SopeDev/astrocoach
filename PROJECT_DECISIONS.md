@@ -9,6 +9,7 @@ Last updated: 2026-09-02
 - Astrology acts primarily as an internal context and inquiry engine. It must not be presented as proof about the user.
 - Birth time is optional. Houses and angles must not be calculated or presented when it is unavailable.
 - Store birth dates as calendar dates and known birth times as minutes after midnight. A null birth time explicitly means unknown and must remain distinct from midnight.
+- Use the MIT-licensed Celestine engine, pinned to an exact version behind a project-owned adapter, for local natal calculations without an external API. Include Chiron, and use Placidus houses and Mean Lunar Nodes for exact-time charts. For unknown-time charts, calculate planets including Chiron at local noon as an explicitly uncertain reference and omit houses, angles, nodes, and aspects.
 - Use Auth.js with database-backed sessions and Google OAuth as the first authentication method. Email/password authentication remains a separate future slice so registration, verification, recovery, rate limiting, and account linking can be designed together.
 - Detailed high-stakes safety architecture remains deferred for the prototype.
 
@@ -29,6 +30,7 @@ Last updated: 2026-09-02
 
 - Keep all external-service credentials server-only. Never expose them through `NEXT_PUBLIC_*` variables.
 - Use a server-mediated external geocoder for prototype birthplace search. Preserve coordinates and an IANA timezone identifier, then resolve the historically applicable offset for the birth date and time.
+- Use GeoNames for prototype populated-place search and timezone lookup. Treat its place ID as the submitted selection, re-fetch authoritative coordinates server-side, and derive the historical UTC instant locally from the returned IANA timezone.
 - Use the OpenAI Responses API when conversational AI is implemented and request application-facing metadata through Structured Outputs.
 - The OpenAI model is configured with `OPENAI_MODEL`. The development default is `gpt-5.6-luna`, selected as the current cost-sensitive model; it can be changed without code changes.
 

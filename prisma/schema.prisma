@@ -35,20 +35,50 @@ model User {
   accounts      Account[]
   sessions      Session[]
   birthProfile  BirthProfile?
+  natalChart    NatalChart?
 
   @@map("users")
 }
 
 model BirthProfile {
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId           String   @unique @map("user_id") @db.Uuid
-  birthDate        DateTime @map("birth_date") @db.Date
-  birthTimeMinutes Int?     @map("birth_time_minutes")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String    @unique @map("user_id") @db.Uuid
+  birthDate         DateTime  @map("birth_date") @db.Date
+  birthTimeMinutes  Int?      @map("birth_time_minutes")
+  geonameId         Int?      @map("geoname_id")
+  locationName      String?   @map("location_name")
+  adminName         String?   @map("admin_name")
+  countryName       String?   @map("country_name")
+  countryCode       String?   @map("country_code") @db.Char(2)
+  latitude          Decimal?  @db.Decimal(9, 6)
+  longitude         Decimal?  @db.Decimal(9, 6)
+  timezoneId        String?   @map("timezone_id")
+  utcOffsetMinutes  Int?      @map("utc_offset_minutes")
+  birthInstant      DateTime? @map("birth_instant") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("birth_profiles")
+}
+
+model NatalChart {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId               String   @unique @map("user_id") @db.Uuid
+  engine               String
+  engineVersion        String   @map("engine_version")
+  schemaVersion        Int      @map("schema_version")
+  inputHash            String   @map("input_hash")
+  timeAccuracy         String   @map("time_accuracy")
+  houseSystem          String?  @map("house_system")
+  sourceProfileUpdated DateTime @map("source_profile_updated") @db.Timestamptz(6)
+  calculatedAt         DateTime @default(now()) @map("calculated_at") @db.Timestamptz(6)
+  data                 Json
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("natal_charts")
 }
 
 model Account {

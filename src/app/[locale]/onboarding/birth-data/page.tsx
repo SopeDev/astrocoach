@@ -52,6 +52,7 @@ export default async function BirthDataPage({ params, searchParams }: {
           <BirthDataForm
             defaultDate={birthProfile?.birthDate.toISOString().slice(0, 10)}
             defaultTime={birthProfile?.birthTimeMinutes === null || birthProfile?.birthTimeMinutes === undefined ? undefined : formatTime(birthProfile.birthTimeMinutes)}
+            defaultTimeUnknown={birthProfile ? birthProfile.birthTimeMinutes === null : false}
             locale={locale}
             messages={messages.birthData}
           />

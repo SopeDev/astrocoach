@@ -16,7 +16,7 @@
     "description": "Tu fecha y hora de nacimiento nos ayudan a calcular el contexto astronómico que usaremos en tus reflexiones.",
     "dateLabel": "Fecha de nacimiento",
     "dateHint": "Usa la fecha que aparece en tu registro de nacimiento.",
-    "timeKnownLabel": "Sé mi hora de nacimiento",
+    "timeUnknownLabel": "No sé mi hora de nacimiento",
     "timeLabel": "Hora de nacimiento",
     "unknownTimeExplanation": "No hay problema. Podemos usar las posiciones planetarias, pero no calcularemos ni interpretaremos casas o ángulos sin una hora de nacimiento confiable.",
     "continue": "Guardar y continuar",
@@ -24,9 +24,42 @@
     "errors": {
       "invalidDate": "Ingresa una fecha de nacimiento válida.",
       "futureDate": "La fecha de nacimiento no puede estar en el futuro.",
-      "requiredTime": "Ingresa tu hora de nacimiento o desactiva «Sé mi hora de nacimiento».",
+      "requiredTime": "Ingresa tu hora de nacimiento o selecciona «No sé mi hora de nacimiento».",
       "invalidTime": "Ingresa una hora de nacimiento válida."
     }
+  },
+  "birthLocation": {
+    "back": "Volver a la fecha y hora de nacimiento",
+    "title": "¿Dónde naciste?",
+    "description": "Elige la ciudad o localidad donde naciste para que podamos ubicar tu carta con precisión.",
+    "searchLabel": "Lugar de nacimiento",
+    "searchPlaceholder": "Empieza a escribir una ciudad o localidad",
+    "searchHint": "Escribe al menos dos letras y elige un resultado de la lista.",
+    "searching": "Buscando lugares",
+    "noResults": "No encontramos lugares que coincidan. Prueba con una ciudad cercana u otra escritura.",
+    "searchError": "La búsqueda de ubicaciones no está disponible temporalmente. Inténtalo de nuevo.",
+    "selectedLabel": "Seleccionado:",
+    "continue": "Guardar lugar de nacimiento",
+    "calculatingTitle": "Preparando tu carta",
+    "calculatingDescription": "Estamos guardando de forma segura tus datos de nacimiento y calculando tus posiciones planetarias.",
+    "saved": "Guardamos tu lugar de nacimiento y tu carta inicial está lista.",
+    "errors": {
+      "required": "Busca y selecciona un lugar de nacimiento de la lista.",
+      "service": "No pudimos verificar ese lugar en este momento. Inténtalo de nuevo."
+    }
+  },
+  "chartReview": {
+    "back": "Volver al lugar de nacimiento",
+    "title": "Tu carta inicial",
+    "description": "Esta es la carta astronómica calculada a partir de los datos de nacimiento que proporcionaste. Es un contexto para explorar, no una conclusión sobre ti.",
+    "edit": "Editar",
+    "unknownTime": "Hora desconocida",
+    "unknownTimeNote": "Como se desconoce tu hora de nacimiento, estas posiciones usan el mediodía local como referencia. Omitimos intencionalmente las casas, los ángulos, los nodos y los aspectos.",
+    "planets": "Posiciones planetarias",
+    "angles": "Ángulos",
+    "houseCusps": "Cúspides de las casas",
+    "house": "Casa",
+    "technical": "Calculado localmente con {engine}. Mostramos la longitud decimal para facilitar la verificación."
   },
   "onboarding": {
     "changeLanguage": "Cambiar idioma",
