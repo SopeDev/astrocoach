@@ -1,13 +1,12 @@
 import { db } from "./client";
-
-const DEVELOPMENT_USER_ID = "00000000-0000-4000-8000-000000000001";
+import { DEVELOPMENT_USER_EMAIL, DEVELOPMENT_USER_ID } from "../lib/development-user";
 
 async function seed() {
   await db.user.upsert({
-    where: { email: "dev@astrocoach.local" },
+    where: { email: DEVELOPMENT_USER_EMAIL },
     create: {
       id: DEVELOPMENT_USER_ID,
-      email: "dev@astrocoach.local",
+      email: DEVELOPMENT_USER_EMAIL,
       displayName: "Development User",
       locale: "en",
       theme: "system",
@@ -15,7 +14,7 @@ async function seed() {
     update: { displayName: "Development User" },
   });
 
-  console.log("Seeded development user: dev@astrocoach.local");
+  console.log(`Seeded development user: ${DEVELOPMENT_USER_EMAIL}`);
   await db.$disconnect();
 }
 

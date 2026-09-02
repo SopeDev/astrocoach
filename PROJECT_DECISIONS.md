@@ -15,7 +15,10 @@ Last updated: 2026-09-01
 - Use the Next.js App Router with TypeScript and React Server Components by default.
 - Use Tailwind CSS for styling and add shadcn/ui components selectively rather than adopting a broad component layer upfront.
 - Support English and Spanish from the first onboarding flow. Locale values use stable `en` and `es` identifiers so additional languages can be added later.
+- Localized product routes begin with `/{locale}`. The selected locale is stored on the user and in an HTTP-only `astrocoach-locale` cookie so server-rendered document language and navigation remain consistent before full authentication exists.
 - Support system, light, and dark color themes with `next-themes`.
+- AstroCoach is a mobile-first progressive web application. Every interface starts with phone ergonomics, touch targets, safe-area behavior, and standalone display constraints before adding tablet or desktop enhancements.
+- Maintain an installable web app manifest and platform app icons. Add offline caching or push behavior only through deliberate, separately verified slices so stale application code or private user data is not cached accidentally.
 - Use Prisma 7 as the ORM and migration system for PostgreSQL. Use Prisma Postgres, connected through the Vercel Marketplace, as the managed production database while retaining ordinary local PostgreSQL for development.
 - Use Prisma's PostgreSQL driver adapter. Prefer standard `DATABASE_URL` and `DIRECT_URL` names; accept the Vercel integration's generated `POSTGRES_URL` and resource-prefixed `astro_*` aliases so deployment is not coupled to manually copied secrets.
 - Represent the seeded development identity as a normal user row with a stable UUID. Future authentication should resolve an authenticated identity to the same user model rather than require a separate domain model.

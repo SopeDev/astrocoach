@@ -17,10 +17,11 @@ Last updated: 2026-09-01
 - Initialized the Git repository, pushed the scaffold to `SopeDev/astrocoach`, and connected the Vercel `astrocoach` project.
 - Connected a Prisma Postgres database through Vercel and added safe environment-variable alias resolution.
 - Applied the initial production migration and seeded `dev@astrocoach.local` in Prisma Postgres.
+- Implemented language-first onboarding with English and Spanish selection, server-side persistence to the development user, an HTTP-only locale cookie, localized routes, and translated starter content.
+- Established the mobile-first PWA foundation with install metadata, standalone display configuration, theme-aware mobile browser metadata, and platform app icons.
 
 ## Remaining
 
-- Implement language-first onboarding and persist the user's selection.
 - Implement birth data collection with optional birth time.
 - Add worldwide birthplace search and historical timezone resolution.
 - Calculate and persist the initial natal chart data.
@@ -38,4 +39,4 @@ Last updated: 2026-09-01
 
 ## Next planned slice
 
-Build the language-first onboarding screen for English and Spanish, persist the selected locale to the development user, and establish localized routing/content behavior.
+Build localized birth-data onboarding: birth date, optional birth time, and a clear explanation of what changes when time is unknown. Worldwide birthplace search remains the following dedicated slice.

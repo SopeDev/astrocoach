@@ -1,5 +1,11 @@
 {
   "appName": "AstroCoach",
   "themeToggle": "Toggle color theme",
-  "languageName": "English"
+  "languageName": "English",
+  "onboarding": {
+    "changeLanguage": "Change language",
+    "languageSavedTitle": "English selected",
+    "languageSavedDescription": "Your language preference has been saved. We’ll use English throughout your experience.",
+    "nextStep": "Birth details are the next development slice."
+  }
 }

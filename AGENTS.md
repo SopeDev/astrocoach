@@ -1,3 +1,7 @@
+# AstroCoach Agent Instructions
+
+## Development workflow
+
 Before implementing a substantial new feature:
 
 - Review PROJECT_DECISIONS.md and PROJECT_PROGRESS.md.
@@ -9,3 +13,62 @@ Before implementing a substantial new feature:
 - Update PROJECT_DECISIONS.md only for durable decisions.
 - Update PROJECT_PROGRESS.md with completed work and the next planned slice.
 - Do not stage, commit, or push Git changes. The user always handles Git staging, commits, and pushes.
+- Treat AstroCoach as a mobile-first, installable PWA. Design and implement the smallest viewport first, then enhance layouts for larger screens.
+
+## Tool usage
+
+Use available development tools only when they materially improve accuracy or verification.
+
+### Next.js tooling
+
+For work involving Next.js framework behavior, APIs, routing, rendering,
+Server Components, caching, data fetching, middleware, configuration,
+or framework-specific errors:
+
+- Consult the version-matched Next.js documentation available to the project
+  before relying on remembered framework behavior.
+- Use the available Next.js development/diagnostic tooling when investigating
+  runtime, build, routing, rendering, or framework-specific issues.
+- Prefer project-local/version-matched Next.js documentation over assumptions
+  based on older Next.js versions.
+
+Do not invoke Next.js tooling unnecessarily for ordinary TypeScript,
+CSS, copy, or simple application logic.
+
+### shadcn
+
+Use the shadcn MCP when:
+
+- searching for an appropriate existing shadcn component,
+- checking the current component API,
+- or installing a shadcn component.
+
+Do not introduce a shadcn component merely because one exists.
+Prefer simple local components when they are sufficient.
+
+### Browser verification
+
+Use Playwright/browser tooling when a change affects observable user behavior,
+including:
+
+- onboarding flows,
+- forms and validation,
+- navigation,
+- responsive behavior,
+- language switching,
+- theme switching,
+- client-side interactions,
+- or browser/runtime errors.
+
+For substantial user-facing slices, verify the main happy path in the browser
+after implementation.
+
+Do not use browser automation when static checks alone are sufficient.
+
+### Database tooling
+
+Do not use direct database tooling unless inspecting or modifying the actual
+development database is necessary.
+
+Prefer application code, migrations, seeds, and automated tests for normal
+database development.
