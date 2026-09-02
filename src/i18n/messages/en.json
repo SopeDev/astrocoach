@@ -75,10 +75,23 @@
     }
   },
   "initialDiscovery": {
-    "back": "Back to your interests",
     "title": "A few places to begin",
-    "description": "These questions are invitations, not conclusions. They help us learn what actually resonates with your experience.",
-    "note": "Answering these questions conversationally is the next slice. Your chart remains private background context rather than a verdict about you."
+    "description": "Take these one at a time. Your answers—not the chart—shape what we ask next.",
+    "step": "Question",
+    "initialStage": "Getting the picture",
+    "finalStage": "Clarifying what matters",
+    "answerLabel": "Your answer",
+    "answerPlaceholder": "Write what comes to mind…",
+    "back": "Back",
+    "next": "Next question",
+    "prepareFinal": "Continue",
+    "preparingFinal": "Thinking…",
+    "complete": "Finish discovery",
+    "saving": "Saving…",
+    "answerRequired": "Write an answer before continuing.",
+    "serviceError": "We couldn’t prepare the next step right now. Please try again.",
+    "completedTitle": "Your starting point is ready",
+    "completedDescription": "Thank you. We now have enough lived context to begin exploring without treating your chart as a conclusion."
   },
   "chartReview": {
     "back": "Back to birthplace",

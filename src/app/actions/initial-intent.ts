@@ -6,7 +6,7 @@ import { db } from "@/db/client";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
-import { generateDiscoveryQuestions } from "@/lib/initial-discovery";
+import { generateInitialDiscoveryQuestions } from "@/lib/initial-discovery";
 import { LIFE_AREA_KEYS } from "@/lib/life-areas";
 import { calculateNatalChart, NATAL_ENGINE, NATAL_ENGINE_VERSION, NATAL_SCHEMA_VERSION } from "@/lib/natal-chart";
 
@@ -52,7 +52,7 @@ export async function saveInitialIntent(
     });
     const messages = getDictionary(locale);
     const areaLabels = result.data.lifeAreas.map((key) => messages.initialIntent.areas[key]);
-    const questions = await generateDiscoveryQuestions({
+    const questions = await generateInitialDiscoveryQuestions({
       locale,
       areaLabels,
       currentContext: result.data.currentContext || null,
@@ -85,12 +85,20 @@ export async function saveInitialIntent(
           lifeAreas: result.data.lifeAreas,
           currentContext: result.data.currentContext || null,
           discoveryQuestions: questions,
+          initialAnswers: [],
+          finalQuestions: [],
+          finalAnswers: [],
+          discoveryCompletedAt: null,
           questionsGenerated: calculatedAt,
         },
         update: {
           lifeAreas: result.data.lifeAreas,
           currentContext: result.data.currentContext || null,
           discoveryQuestions: questions,
+          initialAnswers: [],
+          finalQuestions: [],
+          finalAnswers: [],
+          discoveryCompletedAt: null,
           questionsGenerated: calculatedAt,
         },
       }),

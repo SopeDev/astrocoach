@@ -27,10 +27,11 @@ Last updated: 2026-09-02
 - Added a real saving/calculation transition after birthplace submission and a localized chart-review screen showing source birth details, planetary and node positions, decimal longitudes, angles, and expandable house cusps for manual verification.
 - Added Chiron to exact and unknown-time chart calculations and upgraded the calculation transition to a full-screen, reduced-motion-aware celestial animation with moving stars, connecting constellation lines, and orbital motion.
 - Added initial-intent onboarding with selectable life areas and optional current context, moved chart calculation and its full-screen transition after that intake, generated 3–5 localized discovery questions from chart-plus-user context, and removed the technical chart review from the normal flow.
+- Refined Initial Discovery into a single-screen five-step flow: exactly three opening questions, persisted answers at a locked stage boundary, exactly two adaptive finalizing questions, within-stage back navigation, progress feedback, localized fallbacks, and persisted completion state.
 
 ## Remaining
 
-- Let the user respond to initial discovery questions and use those answers to begin a conversation.
+- Use completed Initial Discovery context to create and begin the first EXPLORE conversation.
 - Implement EXPLORE responses with structured internal signals.
 - Save and resume conversations.
 
@@ -46,4 +47,4 @@ Last updated: 2026-09-02
 
 ## Next planned slice
 
-Build the conversational initial-discovery flow: collect responses to the provisional questions, persist them, and use them to start the first EXPLORE conversation.
+Create the first EXPLORE conversation from the completed onboarding context and provide the mobile-first “What’s going on?” chat experience.

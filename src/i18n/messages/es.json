@@ -75,10 +75,23 @@
     }
   },
   "initialDiscovery": {
-    "back": "Volver a tus intereses",
     "title": "Algunos puntos para comenzar",
-    "description": "Estas preguntas son invitaciones, no conclusiones. Nos ayudan a descubrir qué encaja realmente con tu experiencia.",
-    "note": "Responder estas preguntas de forma conversacional será la próxima etapa. Tu carta permanece como contexto privado, no como un veredicto sobre ti."
+    "description": "Vamos una pregunta a la vez. Tus respuestas —no la carta— determinan qué preguntamos después.",
+    "step": "Pregunta",
+    "initialStage": "Entendiendo el panorama",
+    "finalStage": "Aclarando lo importante",
+    "answerLabel": "Tu respuesta",
+    "answerPlaceholder": "Escribe lo que te venga a la mente…",
+    "back": "Atrás",
+    "next": "Siguiente pregunta",
+    "prepareFinal": "Continuar",
+    "preparingFinal": "Pensando…",
+    "complete": "Terminar descubrimiento",
+    "saving": "Guardando…",
+    "answerRequired": "Escribe una respuesta antes de continuar.",
+    "serviceError": "No pudimos preparar el siguiente paso en este momento. Inténtalo de nuevo.",
+    "completedTitle": "Tu punto de partida está listo",
+    "completedDescription": "Gracias. Ya tenemos suficiente contexto vivido para comenzar a explorar sin tratar tu carta como una conclusión."
   },
   "chartReview": {
     "back": "Volver al lugar de nacimiento",

@@ -7,7 +7,8 @@ Last updated: 2026-09-02
 - The product direction is governed by `astrocoach_mvp_product_guide_v0.1.md`, `astrocoach_prompt_architecture_v0.1.md`, and the initial implementation brief.
 - Only EXPLORE mode is in the current implementation scope. The other documented modes remain future product direction.
 - Astrology acts primarily as an internal context and inquiry engine. It must not be presented as proof about the user.
-- Keep the technical natal-chart review route hidden from the normal onboarding flow. After initial intent, combine the chart, selected life areas, and optional current context to generate 3–5 provisional discovery questions that test relevance against lived experience.
+- Keep the technical natal-chart review route hidden from the normal onboarding flow. After initial intent, combine the chart, selected life areas, and optional current context to generate provisional discovery questions that test relevance against lived experience.
+- Use two-stage initial discovery: generate exactly three opening questions from chart and intent context, then exactly two finalizing questions from that context plus the first three answers. Users may revise within each stage, but generating question four closes the opening stage so adaptive follow-ups retain a stable source context.
 - Birth time is optional. Houses and angles must not be calculated or presented when it is unavailable.
 - Store birth dates as calendar dates and known birth times as minutes after midnight. A null birth time explicitly means unknown and must remain distinct from midnight.
 - Use the MIT-licensed Celestine engine, pinned to an exact version behind a project-owned adapter, for local natal calculations without an external API. Include Chiron, and use Placidus houses and Mean Lunar Nodes for exact-time charts. For unknown-time charts, calculate planets including Chiron at local noon as an explicitly uncertain reference and omit houses, angles, nodes, and aspects.
