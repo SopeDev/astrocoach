@@ -39,14 +39,46 @@
     "noResults": "No encontramos lugares que coincidan. Prueba con una ciudad cercana u otra escritura.",
     "searchError": "La búsqueda de ubicaciones no está disponible temporalmente. Inténtalo de nuevo.",
     "selectedLabel": "Seleccionado:",
-    "continue": "Guardar lugar de nacimiento",
-    "calculatingTitle": "Preparando tu carta",
-    "calculatingDescription": "Estamos guardando de forma segura tus datos de nacimiento y calculando tus posiciones planetarias.",
+    "continue": "Guardar y continuar",
     "saved": "Guardamos tu lugar de nacimiento y tu carta inicial está lista.",
     "errors": {
       "required": "Busca y selecciona un lugar de nacimiento de la lista.",
       "service": "No pudimos verificar ese lugar en este momento. Inténtalo de nuevo."
     }
+  },
+  "initialIntent": {
+    "back": "Volver al lugar de nacimiento",
+    "title": "¿Qué te trae por aquí?",
+    "description": "Elige las áreas que se sienten más relevantes ahora. Esto nos ayuda a comenzar con tu experiencia, no con suposiciones.",
+    "areas": {
+      "relationships": "Relaciones e intimidad",
+      "money": "Dinero y seguridad",
+      "career": "Carrera y propósito",
+      "habits": "Hábitos e impulsos",
+      "emotions": "Patrones emocionales",
+      "family": "Familia y pertenencia",
+      "confidence": "Confianza y autoestima",
+      "spirituality": "Espiritualidad y sentido",
+      "health": "Salud y vida diaria",
+      "selfUnderstanding": "Autoconocimiento general"
+    },
+    "contextLabel": "¿Qué está pasando en tu vida? (opcional)",
+    "contextPlaceholder": "Comparte tanto o tan poco como te resulte útil…",
+    "contextHint": "Una situación reciente, una incertidumbre o un pensamiento recurrente es un buen punto de partida.",
+    "continue": "Preparar mis preguntas",
+    "preparingTitle": "Conectando los puntos",
+    "preparingDescription": "Estamos preparando tu carta y combinándola con lo que te importa para encontrar buenos puntos de partida.",
+    "errors": {
+      "areas": "Elige al menos un área para continuar.",
+      "context": "Limita tu descripción a 2.000 caracteres.",
+      "service": "No pudimos preparar tus preguntas en este momento. Inténtalo de nuevo."
+    }
+  },
+  "initialDiscovery": {
+    "back": "Volver a tus intereses",
+    "title": "Algunos puntos para comenzar",
+    "description": "Estas preguntas son invitaciones, no conclusiones. Nos ayudan a descubrir qué encaja realmente con tu experiencia.",
+    "note": "Responder estas preguntas de forma conversacional será la próxima etapa. Tu carta permanece como contexto privado, no como un veredicto sobre ti."
   },
   "chartReview": {
     "back": "Volver al lugar de nacimiento",

@@ -3,7 +3,6 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { LoaderCircle, MapPin, Search } from "lucide-react";
 import { saveBirthLocation, type BirthLocationFormState } from "@/app/actions/birth-location";
-import { ChartCalculationScreen } from "@/components/chart-calculation-screen";
 import type { Locale } from "@/i18n/config";
 
 type LocationResult = {
@@ -22,8 +21,6 @@ type LocationMessages = {
   searchError: string;
   selectedLabel: string;
   continue: string;
-  calculatingTitle: string;
-  calculatingDescription: string;
   errors: { required: string; service: string };
 };
 
@@ -123,9 +120,6 @@ export function BirthLocationForm({ locale, messages, defaultLocation }: {
 
   return (
     <form action={formAction} className="space-y-6">
-      {pending ? (
-        <ChartCalculationScreen description={messages.calculatingDescription} title={messages.calculatingTitle} />
-      ) : null}
       <input name="geonameId" type="hidden" value={selected?.geonameId ?? ""} />
       <div className="relative">
         <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100" htmlFor="birthLocation">
@@ -180,7 +174,7 @@ export function BirthLocationForm({ locale, messages, defaultLocation }: {
 
       {selected ? <div className="rounded-xl bg-violet-50 p-4 text-sm text-violet-900 dark:bg-violet-950/50 dark:text-violet-100"><span className="font-semibold">{messages.selectedLabel}</span> {selected.label}</div> : null}
 
-      <button className="min-h-12 w-full cursor-pointer rounded-xl bg-violet-700 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-violet-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:cursor-wait disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} type="submit">{pending ? messages.calculatingTitle : messages.continue}</button>
+      <button className="min-h-12 w-full cursor-pointer rounded-xl bg-violet-700 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-violet-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:cursor-wait disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} type="submit">{messages.continue}</button>
     </form>
   );
 }

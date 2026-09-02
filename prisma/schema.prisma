@@ -36,8 +36,23 @@ model User {
   sessions      Session[]
   birthProfile  BirthProfile?
   natalChart    NatalChart?
+  initialIntent InitialIntent?
 
   @@map("users")
+}
+
+model InitialIntent {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String    @unique @map("user_id") @db.Uuid
+  lifeAreas          String[]  @map("life_areas")
+  currentContext     String?   @map("current_context") @db.Text
+  discoveryQuestions Json?     @map("discovery_questions")
+  questionsGenerated DateTime? @map("questions_generated_at") @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("initial_intents")
 }
 
 model BirthProfile {

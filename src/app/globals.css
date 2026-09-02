@@ -7,6 +7,11 @@
   --foreground: #172033;
   --glow-primary: rgb(124 58 237 / 0.12);
   --glow-secondary: rgb(37 99 235 / 0.1);
+  --chart-star: rgb(109 40 217);
+  --chart-star-glow: rgb(139 92 246 / 0.55);
+  --chart-line: rgb(124 58 237);
+  --chart-orbit-body: rgb(109 40 217);
+  --chart-orbit-glow: rgb(139 92 246 / 0.65);
 }
 
 .dark {
@@ -14,6 +19,11 @@
   --foreground: #eef2ff;
   --glow-primary: rgb(124 58 237 / 0.2);
   --glow-secondary: rgb(37 99 235 / 0.16);
+  --chart-star: rgb(221 214 254);
+  --chart-star-glow: rgb(167 139 250 / 0.9);
+  --chart-line: rgb(196 181 253);
+  --chart-orbit-body: rgb(216 180 254);
+  --chart-orbit-glow: rgb(192 132 252);
 }
 
 * {
@@ -52,13 +62,13 @@ a[href]:active {
 .chart-star {
   position: absolute;
   border-radius: 9999px;
-  background: rgb(221 214 254);
-  box-shadow: 0 0 10px rgb(167 139 250 / 0.9);
+  background: var(--chart-star);
+  box-shadow: 0 0 10px var(--chart-star-glow);
   animation: chart-twinkle 2.8s ease-in-out infinite;
 }
 
 .chart-constellation-line {
-  stroke: rgb(196 181 253);
+  stroke: var(--chart-line);
   stroke-width: 1;
   stroke-dasharray: 420;
   stroke-dashoffset: 420;
@@ -78,8 +88,8 @@ a[href]:active {
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 9999px;
-  background: rgb(216 180 254);
-  box-shadow: 0 0 16px rgb(192 132 252);
+  background: var(--chart-orbit-body);
+  box-shadow: 0 0 16px var(--chart-orbit-glow);
   content: "";
   animation: chart-orbit 3.2s linear infinite;
 }

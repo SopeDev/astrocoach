@@ -39,14 +39,46 @@
     "noResults": "No matching places found. Try a nearby city or a different spelling.",
     "searchError": "Location search is temporarily unavailable. Please try again.",
     "selectedLabel": "Selected:",
-    "continue": "Save birthplace",
-    "calculatingTitle": "Preparing your chart",
-    "calculatingDescription": "We’re securely saving your birth information and calculating your planetary positions.",
+    "continue": "Save and continue",
     "saved": "Your birthplace has been saved and your initial chart is ready.",
     "errors": {
       "required": "Search for and select a birthplace from the list.",
       "service": "We couldn’t verify that location right now. Please try again."
     }
+  },
+  "initialIntent": {
+    "back": "Back to birthplace",
+    "title": "What brings you here?",
+    "description": "Choose the areas that feel most relevant right now. This helps us begin with your lived experience, not assumptions.",
+    "areas": {
+      "relationships": "Relationships & intimacy",
+      "money": "Money & security",
+      "career": "Career & purpose",
+      "habits": "Habits & impulses",
+      "emotions": "Emotional patterns",
+      "family": "Family & belonging",
+      "confidence": "Confidence & self-worth",
+      "spirituality": "Spirituality & meaning",
+      "health": "Health & daily life",
+      "selfUnderstanding": "General self-understanding"
+    },
+    "contextLabel": "What is happening in your life? (optional)",
+    "contextPlaceholder": "Share as much or as little as feels useful…",
+    "contextHint": "A recent situation, uncertainty, or recurring thought is a good place to start.",
+    "continue": "Prepare my questions",
+    "preparingTitle": "Connecting the dots",
+    "preparingDescription": "We’re preparing your chart and combining it with what matters to you to find thoughtful places to begin.",
+    "errors": {
+      "areas": "Choose at least one area to continue.",
+      "context": "Keep your description under 2,000 characters.",
+      "service": "We couldn’t prepare your questions right now. Please try again."
+    }
+  },
+  "initialDiscovery": {
+    "back": "Back to your interests",
+    "title": "A few places to begin",
+    "description": "These questions are invitations, not conclusions. They help us learn what actually resonates with your experience.",
+    "note": "Answering these questions conversationally is the next slice. Your chart remains private background context rather than a verdict about you."
   },
   "chartReview": {
     "back": "Back to birthplace",

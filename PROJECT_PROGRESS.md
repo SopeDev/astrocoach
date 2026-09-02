@@ -26,15 +26,17 @@ Last updated: 2026-09-02
 - Added locally computed natal charts with pinned Celestine 0.2.1, a project-owned versioned data contract, input hashing and calculation provenance, Placidus houses for exact times, strict omission of time-dependent structures for unknown times, automatic stale-chart invalidation, and reference tests.
 - Added a real saving/calculation transition after birthplace submission and a localized chart-review screen showing source birth details, planetary and node positions, decimal longitudes, angles, and expandable house cusps for manual verification.
 - Added Chiron to exact and unknown-time chart calculations and upgraded the calculation transition to a full-screen, reduced-motion-aware celestial animation with moving stars, connecting constellation lines, and orbital motion.
+- Added initial-intent onboarding with selectable life areas and optional current context, moved chart calculation and its full-screen transition after that intake, generated 3–5 localized discovery questions from chart-plus-user context, and removed the technical chart review from the normal flow.
 
 ## Remaining
 
-- Capture a current concern and create a conversation.
+- Let the user respond to initial discovery questions and use those answers to begin a conversation.
 - Implement EXPLORE responses with structured internal signals.
 - Save and resume conversations.
 
 ## Known issues and open questions
 
+- Celestine 0.2.1 calculated Pluto at 13°48′59″ Capricorn for 2015-11-30 19:33 UTC, while Kepler 7.0 and NASA/JPL Horizons agree on approximately 14°02′ Capricorn. Celestine exposes no alternate high-precision or Swiss Ephemeris mode, so replacing or supplementing the planetary ephemeris is deferred until after the prototype flow is established.
 - The Prisma Postgres connection is currently shared by Production and Preview deployments. A separate preview database should be introduced before schema-changing preview deployments become routine.
 - GeoNames is configured for local birthplace lookup. The same `GEONAMES_USERNAME` must remain configured in each Vercel environment that serves the onboarding flow.
 - Celestine is young despite its substantial upstream tests. Keep project-owned reference fixtures and review upgrades deliberately rather than accepting automatic minor-version changes.
@@ -44,4 +46,4 @@ Last updated: 2026-09-02
 
 ## Next planned slice
 
-Build localized initial-intent onboarding: selectable life areas plus an optional description of what is currently happening, persisted for the authenticated user before starting the first EXPLORE conversation.
+Build the conversational initial-discovery flow: collect responses to the provisional questions, persist them, and use them to start the first EXPLORE conversation.
