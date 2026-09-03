@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { recognizeResponseSchema, recognizedPatternOffer } from "./recognize-contract";
+import {
+  applyCandidateEvaluation,
+  candidateEvaluationOffer,
+  candidateEvaluationPromptContext,
+  recognizeResponseSchema,
+  recognizedPatternOffer,
+} from "./recognize-contract";
 
 const acceptedResponse = {
   reply: "That wording seems to fit what you described.",
@@ -18,6 +24,15 @@ const acceptedResponse = {
   reasonForRecommendation: "The user validated the formulation.",
 };
 
+const awaitingCandidate = {
+  ...acceptedResponse,
+  reply: "I think we've landed on something specific here.",
+  recognitionStage: "CANDIDATE_EVALUATION",
+  userEvaluationStatus: "awaiting",
+  proposedMapAction: "NONE",
+  recommendedNextMode: "RECOGNIZE",
+};
+
 test("RECOGNIZE keeps its visible response separate from evaluation signals", () => {
   assert.equal(recognizeResponseSchema.safeParse(acceptedResponse).success, true);
 });
@@ -27,6 +42,54 @@ test("only an explicitly accepted formulation can be offered for My Map", () => 
   assert.equal(recognizedPatternOffer({ ...acceptedResponse, userEvaluationStatus: "partial" }), null);
   assert.equal(recognizedPatternOffer({ ...acceptedResponse, proposedMapAction: "NONE" }), null);
   assert.equal(recognizedPatternOffer({ ...acceptedResponse, recognitionStage: "CANDIDATE_EVALUATION" }), null);
+});
+
+test("an awaiting candidate produces application-owned evaluation controls", () => {
+  assert.deepEqual(candidateEvaluationOffer("message-1", awaitingCandidate), {
+    messageId: "message-1",
+    statement: awaitingCandidate.candidatePattern,
+  });
+  assert.equal(candidateEvaluationOffer("message-1", acceptedResponse), null);
+});
+
+test("YES_EXACTLY validates without another model turn and proceeds to the save offer", () => {
+  const evaluated = applyCandidateEvaluation(awaitingCandidate, "YES_EXACTLY");
+  assert.equal(evaluated?.recognitionStage, "VALIDATED");
+  assert.equal(evaluated?.userEvaluationStatus, "accepted");
+  assert.equal(evaluated?.proposedMapAction, "OFFER_SAVE");
+  assert.equal(recognizedPatternOffer(evaluated), awaitingCandidate.candidatePattern);
+  assert.equal(candidateEvaluationOffer("message-1", evaluated), null);
+});
+
+test("PARTLY preserves partial agreement and candidate context without validating", () => {
+  const evaluated = applyCandidateEvaluation(awaitingCandidate, "PARTLY");
+  assert.equal(evaluated?.recognitionStage, "CANDIDATE_EVALUATION");
+  assert.equal(evaluated?.userEvaluationStatus, "partial");
+  assert.equal(evaluated?.proposedMapAction, "NONE");
+  assert.deepEqual(candidateEvaluationPromptContext(evaluated), {
+    action: "PARTLY",
+    candidatePattern: awaitingCandidate.candidatePattern,
+    supportingObservations: awaitingCandidate.supportingObservations,
+  });
+});
+
+test("NO rejects the candidate and returns toward EXPLORE", () => {
+  const evaluated = applyCandidateEvaluation(awaitingCandidate, "NO");
+  assert.equal(evaluated?.recognitionStage, "REJECTED");
+  assert.equal(evaluated?.userEvaluationStatus, "rejected");
+  assert.equal(evaluated?.recommendedNextMode, "EXPLORE");
+  assert.equal(recognizedPatternOffer(evaluated), null);
+});
+
+test("LET_ME_EXPLAIN remains unevaluated and is distinct from PARTLY", () => {
+  const explain = applyCandidateEvaluation(awaitingCandidate, "LET_ME_EXPLAIN");
+  const partly = applyCandidateEvaluation(awaitingCandidate, "PARTLY");
+  assert.equal(explain?.recognitionStage, "CANDIDATE_EVALUATION");
+  assert.equal(explain?.userEvaluationStatus, "awaiting");
+  assert.equal(explain?.proposedMapAction, "NONE");
+  assert.equal(candidateEvaluationPromptContext(explain)?.action, "LET_ME_EXPLAIN");
+  assert.equal(candidateEvaluationPromptContext(partly)?.action, "PARTLY");
+  assert.equal(candidateEvaluationOffer("message-1", explain), null);
 });
 
 test("hypothesis testing can continue without inventing a candidate Pattern", () => {

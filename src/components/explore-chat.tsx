@@ -7,6 +7,7 @@ import Markdown from "react-markdown";
 import {
   acceptRecognitionTransition,
   declineRecognitionTransition,
+  evaluateRecognizeCandidate,
   retryExploreResponse,
   saveRecognizedPattern,
   sendExploreMessage,
@@ -16,6 +17,7 @@ import {
 } from "@/app/actions/explore";
 import type { Locale } from "@/i18n/config";
 import { audioFileExtension, MAX_RECORDING_SECONDS, MAX_TRANSCRIPT_CHARACTERS } from "@/lib/audio-transcription";
+import type { CandidateEvaluationAction, CandidateEvaluationOffer } from "@/lib/recognize-contract";
 
 type Messages = {
   title: string;
@@ -36,6 +38,12 @@ type Messages = {
   transitionAccept: string;
   lookingCloser: string;
   transitionDecline: string;
+  candidateEvaluationTitle: string;
+  candidateEvaluationDescription: string;
+  candidateYesExactly: string;
+  candidatePartly: string;
+  candidateNo: string;
+  candidateLetMeExplain: string;
   patternTitle: string;
   patternDescription: string;
   savePattern: string;
@@ -88,13 +96,14 @@ function AssistantMessageContent({ content }: { content: string }) {
   );
 }
 
-export function ExploreChat({ locale, initialConversationId, initialMessages, initialFailedMessageId, initialMode, initialTransitionOffered, initialPatternSaveOffer, initialClosed, messages, profileInitial }: {
+export function ExploreChat({ locale, initialConversationId, initialMessages, initialFailedMessageId, initialMode, initialTransitionOffered, initialCandidateEvaluationOffer, initialPatternSaveOffer, initialClosed, messages, profileInitial }: {
   locale: Locale;
   initialConversationId: string;
   initialMessages: ConversationMessage[];
   initialFailedMessageId: string | null;
   initialMode: ConversationMode;
   initialTransitionOffered: boolean;
+  initialCandidateEvaluationOffer: CandidateEvaluationOffer | null;
   initialPatternSaveOffer: PatternSaveOffer | null;
   initialClosed: boolean;
   messages: Messages;
@@ -106,11 +115,13 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   const [error, setError] = useState<"message" | "generation" | "action" | null>(initialFailedMessageId ? "generation" : null);
   const [mode, setMode] = useState<ConversationMode>(initialMode);
   const [transitionOffered, setTransitionOffered] = useState(initialTransitionOffered);
+  const [candidateEvaluationOffer, setCandidateEvaluationOffer] = useState(initialCandidateEvaluationOffer);
   const [patternSaveOffer, setPatternSaveOffer] = useState(initialPatternSaveOffer);
   const [closed, setClosed] = useState(initialClosed);
   const [patternSaved, setPatternSaved] = useState(initialClosed && Boolean(initialPatternSaveOffer));
   const [savingPattern, setSavingPattern] = useState(false);
   const [transitionPending, setTransitionPending] = useState(false);
+  const [evaluationPending, setEvaluationPending] = useState<CandidateEvaluationAction | null>(null);
   const [audioStatus, setAudioStatus] = useState<"idle" | "recording" | "transcribing">("idle");
   const [audioError, setAudioError] = useState<AudioError | null>(null);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
@@ -178,7 +189,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
       window.cancelAnimationFrame(firstFrame);
       if (secondFrame) window.cancelAnimationFrame(secondFrame);
     };
-  }, [closed, patternSaveOffer, patternSaved, pending, thread, transitionOffered]);
+  }, [candidateEvaluationOffer, closed, patternSaveOffer, patternSaved, pending, thread, transitionOffered]);
 
   async function transcribeRecording(blob: Blob) {
     setAudioStatus("transcribing");
@@ -289,6 +300,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
     });
     setMode(result.mode);
     setTransitionOffered(result.transitionOffered);
+    setCandidateEvaluationOffer(result.candidateEvaluationOffer);
     setPatternSaveOffer(result.patternSaveOffer);
   }
 
@@ -349,6 +361,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
           setThread((existing) => [...existing, result.assistantMessage]);
           setMode(result.mode);
           setTransitionOffered(false);
+          setCandidateEvaluationOffer(result.candidateEvaluationOffer);
           return;
         }
         setError("action");
@@ -356,6 +369,31 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
         setError("action");
       } finally {
         setTransitionPending(false);
+      }
+    });
+  }
+
+  function evaluateCandidate(action: CandidateEvaluationAction) {
+    if (!candidateEvaluationOffer || pending) return;
+    setError(null);
+    setEvaluationPending(action);
+    startTransition(async () => {
+      try {
+        const result = await evaluateRecognizeCandidate(locale, initialConversationId, candidateEvaluationOffer.messageId, action);
+        if (!result.ok) {
+          setError("action");
+          return;
+        }
+        setMode(result.mode);
+        setCandidateEvaluationOffer(result.candidateEvaluationOffer);
+        setPatternSaveOffer(result.patternSaveOffer);
+        if (action === "PARTLY" || action === "LET_ME_EXPLAIN" || action === "NO") {
+          window.requestAnimationFrame(() => window.requestAnimationFrame(() => composerInput.current?.focus()));
+        }
+      } catch {
+        setError("action");
+      } finally {
+        setEvaluationPending(null);
       }
     });
   }
@@ -426,16 +464,17 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
           {thread.length === 0 ? <div className="flex min-h-[45svh] flex-col justify-center text-center"><h2 className="text-balance text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">{messages.emptyTitle}</h2><p className="mx-auto mt-3 max-w-sm text-pretty leading-7 text-slate-600 dark:text-slate-300">{messages.emptyDescription}</p></div> : (
             <div className="space-y-5" aria-live="polite">
               {thread.map((message) => <article className={message.role === "user" ? "ml-auto max-w-[88%] rounded-2xl rounded-br-md bg-violet-700 px-4 py-3 text-white dark:bg-violet-600" : "mr-auto max-w-[92%] text-slate-800 dark:text-slate-100"} key={message.id} translate="no">{message.role === "user" ? <p className="whitespace-pre-wrap text-[0.98rem] leading-7">{message.content}</p> : <AssistantMessageContent content={message.content} />}</article>)}
-              {pending && !savingPattern && !transitionPending ? <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400"><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.thinking}</div> : null}
+              {pending && !savingPattern && !transitionPending && !evaluationPending ? <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400"><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.thinking}</div> : null}
               {failedMessageId && !pending ? <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-100"><p>{messages.generationError}</p><button className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-amber-300 px-4 py-2 font-semibold transition hover:bg-amber-100 dark:border-amber-800 dark:hover:bg-amber-950" onClick={retry} type="button"><RefreshCw aria-hidden="true" className="size-4" />{messages.retry}</button></div> : null}
               {transitionOffered && !failedMessageId ? <section className="rounded-3xl border border-violet-200 bg-violet-50 p-5 dark:border-violet-800 dark:bg-violet-950/45"><Sparkles aria-hidden="true" className="size-5 text-violet-700 dark:text-violet-300" /><h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{messages.transitionTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.transitionDescription}</p><div className="mt-4 grid gap-2"><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-4 py-3 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} onClick={acceptTransition} type="button">{transitionPending ? <><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.lookingCloser}</> : messages.transitionAccept}</button><button className="min-h-11 cursor-pointer rounded-xl px-4 py-2 font-semibold text-slate-600 transition hover:bg-white/70 disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-900/60" disabled={pending} onClick={declineTransition} type="button">{messages.transitionDecline}</button></div></section> : null}
+              {candidateEvaluationOffer && !failedMessageId ? <section aria-labelledby="candidate-evaluation-title" className="rounded-3xl border border-violet-200 bg-violet-50 p-5 dark:border-violet-800 dark:bg-violet-950/45"><Sparkles aria-hidden="true" className="size-5 text-violet-700 dark:text-violet-300" /><h2 className="mt-3 font-semibold text-slate-950 dark:text-white" id="candidate-evaluation-title">{messages.candidateEvaluationTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.candidateEvaluationDescription}</p><div className="mt-4 grid grid-cols-2 gap-2"><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-3 py-3 text-sm font-semibold text-white transition hover:bg-violet-800 active:scale-[0.98] disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} onClick={() => evaluateCandidate("YES_EXACTLY")} type="button">{evaluationPending === "YES_EXACTLY" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidateYesExactly}</button><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-violet-300 bg-white px-3 py-3 text-sm font-semibold text-violet-900 transition hover:bg-violet-100 active:scale-[0.98] disabled:opacity-60 dark:border-violet-700 dark:bg-slate-950 dark:text-violet-100 dark:hover:bg-violet-950" disabled={pending} onClick={() => evaluateCandidate("PARTLY")} type="button">{evaluationPending === "PARTLY" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidatePartly}</button><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900" disabled={pending} onClick={() => evaluateCandidate("NO")} type="button">{evaluationPending === "NO" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidateNo}</button><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900" disabled={pending} onClick={() => evaluateCandidate("LET_ME_EXPLAIN")} type="button">{evaluationPending === "LET_ME_EXPLAIN" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidateLetMeExplain}</button></div></section> : null}
               {patternSaveOffer ? <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900 dark:bg-emerald-950/40">{patternSaved ? <Check aria-hidden="true" className="size-5 text-emerald-700 dark:text-emerald-300" /> : <Bookmark aria-hidden="true" className="size-5 text-emerald-700 dark:text-emerald-300" />}<h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{patternSaved ? messages.patternSaved : messages.patternTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-700 dark:text-slate-200">{patternSaveOffer.statement}</p>{patternSaved ? <div className="mt-4 grid grid-cols-2 gap-2"><Link className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white" href={`/${locale}/map`}>{messages.viewMap}</Link><Link className="flex min-h-11 items-center justify-center rounded-xl border border-emerald-300 px-3 py-2 text-center text-sm font-semibold text-emerald-900 dark:border-emerald-800 dark:text-emerald-100" href={`/${locale}/home`}>{messages.returnHome}</Link></div> : <><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.patternDescription}</p><button className="mt-4 min-h-12 w-full cursor-pointer rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60" disabled={pending} onClick={savePattern} type="button">{savingPattern ? messages.savingPattern : messages.savePattern}</button></>}</section> : null}
               {error === "action" ? <p className="text-sm text-red-700 dark:text-red-300" role="alert">{messages.actionError}</p> : null}
             </div>
           )}
         </div>
 
-        {!closed && !transitionOffered ? (
+        {!closed && !transitionOffered && !candidateEvaluationOffer && !patternSaveOffer ? (
           <form className="sticky bottom-0 border-t border-slate-200/70 bg-[color:var(--background)]/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur dark:border-slate-800/80" onSubmit={submit}>
             {audioStatus === "recording" ? (
               <div className="flex min-h-14 items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 dark:border-red-900 dark:bg-red-950/45">

@@ -60,6 +60,7 @@ Last updated: 2026-09-03
 - Added authenticated transcript-first voice input to the conversation composer with mobile recording, cancel/stop controls, a two-minute limit, English/Spanish transcription hints, editable transcript insertion, format and size validation, localized failure states, and no audio persistence.
 - Strengthened the shared prompt around a holistic evolutionary/Kabbalistic astrological worldview, a trusted-friend voice, confident but corrigible interpretation, natural human correction, and explicit boundaries against astrology-only causation or consequential advice.
 - Added three concise shared conversation examples for synthesis, lived agreement, and genuine revision, plus regression scenarios covering holistic interpretation, evolutionary language, confidence, cadence, correction, causation, advice, deep style, and background style.
+- Moved RECOGNIZE candidate evaluation out of assistant prose and into persistent application controls for exact agreement, partial agreement, rejection, and explanation; exact agreement validates without another model call, while partial and unresolved explanations reopen chat with explicit structured candidate context.
 
 ## Remaining
 

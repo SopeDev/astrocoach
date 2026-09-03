@@ -10,7 +10,15 @@ import { exploreMessageSchema, titleFromExploreMessage } from "@/lib/explore-con
 import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
 import { shouldOfferRecognition } from "@/lib/mode-orchestration";
 import { generateRecognizeResponse } from "@/lib/recognize";
-import { recognizedPatternOffer } from "@/lib/recognize-contract";
+import {
+  applyCandidateEvaluation,
+  candidateEvaluationActionSchema,
+  candidateEvaluationOffer,
+  candidateEvaluationPromptContext,
+  recognizedPatternOffer,
+  type CandidateEvaluationAction,
+  type CandidateEvaluationOffer,
+} from "@/lib/recognize-contract";
 
 export type ConversationMode = "EXPLORE" | "RECOGNIZE";
 
@@ -25,7 +33,7 @@ export type ConversationMessage = {
 export type PatternSaveOffer = { messageId: string; statement: string };
 
 export type ConversationActionResult =
-  | { ok: true; conversationId: string; userMessage?: ConversationMessage; assistantMessage: ConversationMessage; mode: ConversationMode; transitionOffered: boolean; patternSaveOffer: PatternSaveOffer | null }
+  | { ok: true; conversationId: string; userMessage?: ConversationMessage; assistantMessage: ConversationMessage; mode: ConversationMode; transitionOffered: boolean; candidateEvaluationOffer: CandidateEvaluationOffer | null; patternSaveOffer: PatternSaveOffer | null }
   | { ok: false; error: "message"; conversationId?: undefined; userMessage?: undefined }
   | { ok: false; error: "generation"; conversationId: string; userMessage?: ConversationMessage };
 
@@ -47,6 +55,10 @@ function patternOfferFromMessage(message: { id: string; internalSignals: unknown
   return statement ? { messageId: message.id, statement } : null;
 }
 
+function evaluationOfferFromMessage(message: { id: string; internalSignals: unknown }) {
+  return candidateEvaluationOffer(message.id, message.internalSignals);
+}
+
 async function loadGenerationContext(userId: string, locale: Locale, conversationId: string, excludedMessageId?: string) {
   const [intent, natalChart, conversation, recentMessages, preferences] = await Promise.all([
     db.initialIntent.findUnique({ where: { userId } }),
@@ -62,14 +74,17 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
     const key = z.enum(LIFE_AREA_KEYS).safeParse(value);
     return key.success ? [messages.initialIntent.areas[key.data as LifeAreaKey]] : [];
   });
-  const thread = recentMessages.reverse().filter((message) => message.id !== excludedMessageId).map((message) => ({ role: message.role, content: message.content }));
-  return { intent, natalChart, conversation, thread, lifeAreas, preferences };
+  const generationMessages = recentMessages.reverse().filter((message) => message.id !== excludedMessageId);
+  const precedingMessage = generationMessages.at(-1);
+  const evaluationContext = precedingMessage?.role === "assistant" ? candidateEvaluationPromptContext(precedingMessage.internalSignals) : null;
+  const thread = generationMessages.map((message) => ({ role: message.role, content: message.content }));
+  return { intent, natalChart, conversation, thread, lifeAreas, preferences, evaluationContext };
 }
 
 async function generateReply(userId: string, locale: Locale, conversationId: string, userMessage: StoredMessage) {
   const context = await loadGenerationContext(userId, locale, conversationId, userMessage.id);
   const generated = context.conversation.mode === "RECOGNIZE"
-    ? await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, opening: false })
+    ? await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, opening: false, candidateEvaluationContext: context.evaluationContext })
     : await generateExploreResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content });
 
   const assistantMessage = await db.message.create({
@@ -100,7 +115,13 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
     },
   });
 
-  return { assistantMessage, mode, transitionOffered, patternSaveOffer: mode === "RECOGNIZE" ? patternOfferFromMessage(assistantMessage) : null };
+  return {
+    assistantMessage,
+    mode,
+    transitionOffered,
+    candidateEvaluationOffer: mode === "RECOGNIZE" ? evaluationOfferFromMessage(assistantMessage) : null,
+    patternSaveOffer: mode === "RECOGNIZE" ? patternOfferFromMessage(assistantMessage) : null,
+  };
 }
 
 export async function sendExploreMessage(locale: Locale, conversationId: string | null, content: string): Promise<ConversationActionResult> {
@@ -116,6 +137,8 @@ export async function sendExploreMessage(locale: Locale, conversationId: string 
   if (activeConversationId) {
     const conversation = await db.conversation.findFirst({ where: { id: activeConversationId, userId: user.id, status: "active" } });
     if (!conversation) return { ok: false, error: "message" };
+    const latestMessage = await db.message.findFirst({ where: { conversationId: activeConversationId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }] });
+    if (latestMessage && (evaluationOfferFromMessage(latestMessage) || patternOfferFromMessage(latestMessage))) return { ok: false, error: "message" };
     userMessage = await db.message.create({ data: { conversationId: activeConversationId, role: "user", mode: conversation.mode, content: parsed.data } });
     await db.conversation.update({ where: { id: activeConversationId }, data: { lastMessageAt: userMessage.createdAt } });
   } else {
@@ -126,7 +149,7 @@ export async function sendExploreMessage(locale: Locale, conversationId: string 
 
   try {
     const result = await generateReply(user.id, locale, activeConversationId, userMessage);
-    return { ok: true, conversationId: activeConversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(result.assistantMessage), mode: result.mode, transitionOffered: result.transitionOffered, patternSaveOffer: result.patternSaveOffer };
+    return { ok: true, conversationId: activeConversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(result.assistantMessage), mode: result.mode, transitionOffered: result.transitionOffered, candidateEvaluationOffer: result.candidateEvaluationOffer, patternSaveOffer: result.patternSaveOffer };
   } catch (error) {
     console.error("Conversation response generation failed", error);
     return { ok: false, error: "generation", conversationId: activeConversationId, userMessage: serializeMessage(userMessage) };
@@ -139,11 +162,11 @@ export async function retryExploreResponse(locale: Locale, conversationId: strin
   const userMessage = await db.message.findFirst({ where: { id: userMessageId, role: "user", conversation: { id: conversationId, userId: user.id, status: "active" } } });
   if (!userMessage) return { ok: false, error: "message" };
   const existingReply = await db.message.findUnique({ where: { inReplyToId: userMessage.id }, include: { conversation: true } });
-  if (existingReply) return { ok: true, conversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(existingReply), mode: existingReply.conversation.mode, transitionOffered: existingReply.conversation.transitionState === "OFFERED", patternSaveOffer: patternOfferFromMessage(existingReply) };
+  if (existingReply) return { ok: true, conversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(existingReply), mode: existingReply.conversation.mode, transitionOffered: existingReply.conversation.transitionState === "OFFERED", candidateEvaluationOffer: evaluationOfferFromMessage(existingReply), patternSaveOffer: patternOfferFromMessage(existingReply) };
 
   try {
     const result = await generateReply(user.id, locale, conversationId, userMessage);
-    return { ok: true, conversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(result.assistantMessage), mode: result.mode, transitionOffered: result.transitionOffered, patternSaveOffer: result.patternSaveOffer };
+    return { ok: true, conversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(result.assistantMessage), mode: result.mode, transitionOffered: result.transitionOffered, candidateEvaluationOffer: result.candidateEvaluationOffer, patternSaveOffer: result.patternSaveOffer };
   } catch (error) {
     console.error("Conversation response retry failed", error);
     return { ok: false, error: "generation", conversationId, userMessage: serializeMessage(userMessage) };
@@ -173,11 +196,52 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
       await transaction.conversation.update({ where: { id: conversationId }, data: { lastMessageAt: message.createdAt } });
       return message;
     });
-    return { ok: true as const, assistantMessage: serializeMessage(assistantMessage), mode: "RECOGNIZE" as const };
+    return { ok: true as const, assistantMessage: serializeMessage(assistantMessage), mode: "RECOGNIZE" as const, candidateEvaluationOffer: evaluationOfferFromMessage(assistantMessage) };
   } catch (error) {
     console.error("Starting RECOGNIZE failed", error);
     return { ok: false as const, error: "generation" as const };
   }
+}
+
+export async function evaluateRecognizeCandidate(locale: Locale, conversationId: string, sourceMessageId: string, action: CandidateEvaluationAction) {
+  if (!isLocale(locale)) return { ok: false as const };
+  const parsedAction = candidateEvaluationActionSchema.safeParse(action);
+  if (!parsedAction.success) return { ok: false as const };
+  const user = await requireCurrentUser(locale);
+
+  const result = await db.$transaction(async (transaction) => {
+    const conversation = await transaction.conversation.findFirst({
+      where: { id: conversationId, userId: user.id, mode: "RECOGNIZE", status: "active" },
+    });
+    const source = await transaction.message.findFirst({
+      where: { id: sourceMessageId, conversationId, role: "assistant", mode: "RECOGNIZE" },
+    });
+    const latestMessage = await transaction.message.findFirst({
+      where: { conversationId },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    });
+    if (!conversation || !source || latestMessage?.id !== source.id) return null;
+
+    const nextSignals = applyCandidateEvaluation(source.internalSignals, parsedAction.data);
+    if (!nextSignals) return null;
+    await transaction.message.update({ where: { id: source.id }, data: { internalSignals: nextSignals } });
+
+    const mode: ConversationMode = parsedAction.data === "NO" ? "EXPLORE" : "RECOGNIZE";
+    if (mode === "EXPLORE") {
+      await transaction.conversation.update({
+        where: { id: conversationId },
+        data: { mode, transitionState: "DISMISSED", transitionReferenceAt: new Date() },
+      });
+    }
+
+    return {
+      mode,
+      candidateEvaluationOffer: candidateEvaluationOffer(source.id, nextSignals),
+      patternSaveOffer: patternOfferFromMessage({ id: source.id, internalSignals: nextSignals }),
+    };
+  });
+
+  return result ? { ok: true as const, ...result } : { ok: false as const };
 }
 
 export async function saveRecognizedPattern(locale: Locale, conversationId: string, sourceMessageId: string) {

@@ -101,6 +101,14 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
     forbidden: ["Manufacturing a vague Pattern", "VALIDATED", "OFFER_SAVE"],
   },
   {
+    id: "recognize-candidate-evaluation-is-ui-owned",
+    mode: "RECOGNIZE",
+    setup: ["Distinct lived observations support a defensible candidate.", "No application evaluation has occurred yet."],
+    chartSignal: "A relevant synthesis adds developmental context but does not supply pattern evidence.",
+    expected: ["Present the candidate naturally in CANDIDATE_EVALUATION.", "Set userEvaluationStatus to awaiting and proposedMapAction to NONE.", "Let the application render evaluation controls."],
+    forbidden: ["Does this fit?", "Does this feel right?", "Would you like to save this?", "VALIDATED or accepted based on conversational inference"],
+  },
+  {
     id: "deep-no-forced-astrology",
     mode: "EXPLORE",
     setup: ["astrologyStyle is deep and familiarity is advanced.", "The latest exchange is fully understood and natal context adds no useful distinction."],

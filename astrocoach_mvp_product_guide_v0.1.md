@@ -296,9 +296,9 @@ A typical Pattern lifecycle is:
 2. EXPLORE gathers observations and context.
 3. The system detects possible recurrence.
 4. A Candidate Pattern is formed.
-5. RECOGNIZE presents the proposition to the user.
-6. User confirms, rejects, narrows, splits, or edits it.
-7. If accepted, it becomes part of My Map.
+5. RECOGNIZE presents the proposition naturally without asking for confirmation in its prose.
+6. Application controls let the user accept it exactly, mark it partial, reject it, or explain before evaluating.
+7. If explicitly accepted, a separate application action can add it to My Map.
 8. The user chooses what to do next.
 
 After recognition, the user may:
