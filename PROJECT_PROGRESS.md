@@ -61,6 +61,7 @@ Last updated: 2026-09-03
 - Strengthened the shared prompt around a holistic evolutionary/Kabbalistic astrological worldview, a trusted-friend voice, confident but corrigible interpretation, natural human correction, and explicit boundaries against astrology-only causation or consequential advice.
 - Added three concise shared conversation examples for synthesis, lived agreement, and genuine revision, plus regression scenarios covering holistic interpretation, evolutionary language, confidence, cadence, correction, causation, advice, deep style, and background style.
 - Moved RECOGNIZE candidate evaluation out of assistant prose and into persistent application controls for exact agreement, partial agreement, rejection, and explanation; exact agreement validates without another model call, while partial and unresolved explanations reopen chat with explicit structured candidate context.
+- Refined the shared and EXPLORE prompts from a real relationship conversation: AstroCoach now validates experience without endorsing every conclusion, calibrates challenge without debate, handles absent people without mind-reading or automatic redirection, requires new value from repeated astrology, retires framings the user already knows, and reserves DEEP_EXPLORE for a recognized user-selected object. Recent structured response approaches are now supplied to generation to help prevent corrective streaks.
 
 ## Remaining
 
@@ -83,4 +84,4 @@ Last updated: 2026-09-03
 
 ## Next planned slice
 
-Manually exercise all four RECOGNIZE candidate-evaluation paths—including reload restoration and revised-candidate re-evaluation—then verify voice transcription on iPhone and Android. After that, run the expanded prompt regression set against the configured model, tune only observed failures, and defer Pattern editing or DEEP_EXPLORE until the current handoffs are stable.
+Run the expanded prompt regression set against the configured model, including the new attunement-versus-agreement, absent-person, astrology-repetition, debate-streak, and mode-boundary cases. Then manually exercise all four RECOGNIZE candidate-evaluation paths and voice transcription on iPhone and Android before adding Pattern editing or DEEP_EXPLORE.

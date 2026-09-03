@@ -6,7 +6,7 @@ import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { requireCurrentUser } from "@/lib/auth-user";
 import { generateExploreResponse } from "@/lib/explore";
-import { exploreMessageSchema, titleFromExploreMessage } from "@/lib/explore-contract";
+import { exploreMessageSchema, exploreSignalsSchema, titleFromExploreMessage } from "@/lib/explore-contract";
 import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
 import { shouldOfferRecognition } from "@/lib/mode-orchestration";
 import { generateRecognizeResponse } from "@/lib/recognize";
@@ -77,15 +77,22 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
   const generationMessages = recentMessages.reverse().filter((message) => message.id !== excludedMessageId);
   const precedingMessage = generationMessages.at(-1);
   const evaluationContext = precedingMessage?.role === "assistant" ? candidateEvaluationPromptContext(precedingMessage.internalSignals) : null;
+  const recentResponseApproaches = generationMessages
+    .filter((message) => message.role === "assistant" && message.mode === "EXPLORE")
+    .slice(-4)
+    .flatMap((message) => {
+      const parsed = exploreSignalsSchema.safeParse(message.internalSignals);
+      return parsed.success ? [parsed.data.responseApproach] : [];
+    });
   const thread = generationMessages.map((message) => ({ role: message.role, content: message.content }));
-  return { intent, natalChart, conversation, thread, lifeAreas, preferences, evaluationContext };
+  return { intent, natalChart, conversation, thread, lifeAreas, preferences, evaluationContext, recentResponseApproaches };
 }
 
 async function generateReply(userId: string, locale: Locale, conversationId: string, userMessage: StoredMessage) {
   const context = await loadGenerationContext(userId, locale, conversationId, userMessage.id);
   const generated = context.conversation.mode === "RECOGNIZE"
     ? await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, opening: false, candidateEvaluationContext: context.evaluationContext })
-    : await generateExploreResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, candidateEvaluationContext: context.evaluationContext });
+    : await generateExploreResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, candidateEvaluationContext: context.evaluationContext, recentResponseApproaches: context.recentResponseApproaches });
 
   const assistantMessage = await db.message.create({
     data: { conversationId, role: "assistant", mode: context.conversation.mode, content: generated.reply, internalSignals: generated.signals, model: generated.model, responseId: generated.responseId, inReplyToId: userMessage.id },
