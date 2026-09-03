@@ -164,7 +164,7 @@
     "signOut": "Sign out"
   },
   "explore": {
-    "title": "Explore",
+    "title": "AstroCoach",
     "closerTitle": "Looking at a possible pattern",
     "emptyTitle": "What’s going on?",
     "emptyDescription": "Start wherever feels most useful. You can share something that happened, a feeling, a decision, or simply what’s been on your mind.",
@@ -180,6 +180,7 @@
     "transitionTitle": "Something may be taking shape",
     "transitionDescription": "There may be a recurring thread in what you’ve shared. You can look at it more closely or keep exploring for now.",
     "transitionAccept": "Look at it more closely",
+    "lookingCloser": "Looking more closely…",
     "transitionDecline": "Keep exploring",
     "patternTitle": "Keep what you recognized?",
     "patternDescription": "Save it to My Map so you can return to it later.",

@@ -254,7 +254,7 @@ Nothing in My Map should be treated as permanent truth.
 
 The MVP currently defines four cognitive modes.
 
-Detailed prompt behavior is specified separately in `astrocoach_prompt_architecture_v0.1.md`.
+Detailed prompt behavior is specified separately in `astrocoach_prompt_architecture_v0.2.md`.
 
 ### EXPLORE
 

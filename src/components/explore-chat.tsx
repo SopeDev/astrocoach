@@ -3,6 +3,7 @@
 import { FormEvent, KeyboardEvent, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { ArrowLeft, Bookmark, Check, LoaderCircle, RefreshCw, Send, Sparkles } from "lucide-react";
+import Markdown from "react-markdown";
 import {
   acceptRecognitionTransition,
   declineRecognitionTransition,
@@ -32,6 +33,7 @@ type Messages = {
   transitionTitle: string;
   transitionDescription: string;
   transitionAccept: string;
+  lookingCloser: string;
   transitionDecline: string;
   patternTitle: string;
   patternDescription: string;
@@ -42,6 +44,23 @@ type Messages = {
   returnHome: string;
   actionError: string;
 };
+
+function AssistantMessageContent({ content }: { content: string }) {
+  return (
+    <Markdown components={{
+      p: ({ children }) => <p className="mb-3 text-[0.98rem] leading-7 last:mb-0">{children}</p>,
+      strong: ({ children }) => <strong className="font-semibold text-slate-950 dark:text-white">{children}</strong>,
+      ul: ({ children }) => <ul className="mb-3 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>,
+      ol: ({ children }) => <ol className="mb-3 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>,
+      li: ({ children }) => <li className="text-[0.98rem] leading-7">{children}</li>,
+      a: ({ children, href }) => <a className="font-medium text-violet-700 underline underline-offset-2 dark:text-violet-300" href={href} rel="noreferrer" target="_blank">{children}</a>,
+      img: ({ alt }) => <span>{alt ?? ""}</span>,
+      h1: ({ children }) => <p className="mb-3 font-semibold last:mb-0">{children}</p>,
+      h2: ({ children }) => <p className="mb-3 font-semibold last:mb-0">{children}</p>,
+      h3: ({ children }) => <p className="mb-3 font-semibold last:mb-0">{children}</p>,
+    }}>{content}</Markdown>
+  );
+}
 
 export function ExploreChat({ locale, initialConversationId, initialMessages, initialFailedMessageId, initialMode, initialTransitionOffered, initialPatternSaveOffer, initialClosed, messages, profileInitial }: {
   locale: Locale;
@@ -65,6 +84,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   const [closed, setClosed] = useState(initialClosed);
   const [patternSaved, setPatternSaved] = useState(initialClosed && Boolean(initialPatternSaveOffer));
   const [savingPattern, setSavingPattern] = useState(false);
+  const [transitionPending, setTransitionPending] = useState(false);
   const [pending, startTransition] = useTransition();
   const hasScrolledOnLoad = useRef(false);
   const composerInput = useRef<HTMLTextAreaElement>(null);
@@ -164,6 +184,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   function acceptTransition() {
     if (pending) return;
     setError(null);
+    setTransitionPending(true);
     startTransition(async () => {
       try {
         const result = await acceptRecognitionTransition(locale, initialConversationId);
@@ -176,6 +197,8 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
         setError("action");
       } catch {
         setError("action");
+      } finally {
+        setTransitionPending(false);
       }
     });
   }
@@ -237,17 +260,17 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
         <div className="flex-1 py-6">
           {thread.length === 0 ? <div className="flex min-h-[45svh] flex-col justify-center text-center"><h2 className="text-balance text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">{messages.emptyTitle}</h2><p className="mx-auto mt-3 max-w-sm text-pretty leading-7 text-slate-600 dark:text-slate-300">{messages.emptyDescription}</p></div> : (
             <div className="space-y-5" aria-live="polite">
-              {thread.map((message) => <article className={message.role === "user" ? "ml-auto max-w-[88%] rounded-2xl rounded-br-md bg-violet-700 px-4 py-3 text-white dark:bg-violet-600" : "mr-auto max-w-[92%] text-slate-800 dark:text-slate-100"} key={message.id} translate="no"><p className="whitespace-pre-wrap text-[0.98rem] leading-7">{message.content}</p></article>)}
-              {pending && !savingPattern ? <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400"><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.thinking}</div> : null}
+              {thread.map((message) => <article className={message.role === "user" ? "ml-auto max-w-[88%] rounded-2xl rounded-br-md bg-violet-700 px-4 py-3 text-white dark:bg-violet-600" : "mr-auto max-w-[92%] text-slate-800 dark:text-slate-100"} key={message.id} translate="no">{message.role === "user" ? <p className="whitespace-pre-wrap text-[0.98rem] leading-7">{message.content}</p> : <AssistantMessageContent content={message.content} />}</article>)}
+              {pending && !savingPattern && !transitionPending ? <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400"><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.thinking}</div> : null}
               {failedMessageId && !pending ? <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-100"><p>{messages.generationError}</p><button className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-amber-300 px-4 py-2 font-semibold transition hover:bg-amber-100 dark:border-amber-800 dark:hover:bg-amber-950" onClick={retry} type="button"><RefreshCw aria-hidden="true" className="size-4" />{messages.retry}</button></div> : null}
-              {transitionOffered && !failedMessageId ? <section className="rounded-3xl border border-violet-200 bg-violet-50 p-5 dark:border-violet-800 dark:bg-violet-950/45"><Sparkles aria-hidden="true" className="size-5 text-violet-700 dark:text-violet-300" /><h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{messages.transitionTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.transitionDescription}</p><div className="mt-4 grid gap-2"><button className="min-h-12 cursor-pointer rounded-xl bg-violet-700 px-4 py-3 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} onClick={acceptTransition} type="button">{messages.transitionAccept}</button><button className="min-h-11 cursor-pointer rounded-xl px-4 py-2 font-semibold text-slate-600 transition hover:bg-white/70 disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-900/60" disabled={pending} onClick={declineTransition} type="button">{messages.transitionDecline}</button></div></section> : null}
+              {transitionOffered && !failedMessageId ? <section className="rounded-3xl border border-violet-200 bg-violet-50 p-5 dark:border-violet-800 dark:bg-violet-950/45"><Sparkles aria-hidden="true" className="size-5 text-violet-700 dark:text-violet-300" /><h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{messages.transitionTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.transitionDescription}</p><div className="mt-4 grid gap-2"><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-4 py-3 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} onClick={acceptTransition} type="button">{transitionPending ? <><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.lookingCloser}</> : messages.transitionAccept}</button><button className="min-h-11 cursor-pointer rounded-xl px-4 py-2 font-semibold text-slate-600 transition hover:bg-white/70 disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-900/60" disabled={pending} onClick={declineTransition} type="button">{messages.transitionDecline}</button></div></section> : null}
               {patternSaveOffer ? <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900 dark:bg-emerald-950/40">{patternSaved ? <Check aria-hidden="true" className="size-5 text-emerald-700 dark:text-emerald-300" /> : <Bookmark aria-hidden="true" className="size-5 text-emerald-700 dark:text-emerald-300" />}<h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{patternSaved ? messages.patternSaved : messages.patternTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-700 dark:text-slate-200">{patternSaveOffer.statement}</p>{patternSaved ? <div className="mt-4 grid grid-cols-2 gap-2"><Link className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white" href={`/${locale}/map`}>{messages.viewMap}</Link><Link className="flex min-h-11 items-center justify-center rounded-xl border border-emerald-300 px-3 py-2 text-center text-sm font-semibold text-emerald-900 dark:border-emerald-800 dark:text-emerald-100" href={`/${locale}/home`}>{messages.returnHome}</Link></div> : <><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.patternDescription}</p><button className="mt-4 min-h-12 w-full cursor-pointer rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60" disabled={pending} onClick={savePattern} type="button">{savingPattern ? messages.savingPattern : messages.savePattern}</button></>}</section> : null}
               {error === "action" ? <p className="text-sm text-red-700 dark:text-red-300" role="alert">{messages.actionError}</p> : null}
             </div>
           )}
         </div>
 
-        {!closed ? <form className="sticky bottom-0 border-t border-slate-200/70 bg-[color:var(--background)]/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur dark:border-slate-800/80" onSubmit={submit}><label className="sr-only" htmlFor="explore-message">{messages.inputLabel}</label><div className="flex items-end gap-3"><textarea className="min-h-12 flex-1 resize-none overflow-y-hidden rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-white" disabled={pending || Boolean(failedMessageId)} id="explore-message" maxLength={4000} onChange={(event) => { setDraft(event.target.value); if (event.target.value.trim()) setError(null); }} onKeyDown={handleKeyDown} placeholder={messages.inputPlaceholder} ref={composerInput} rows={1} value={draft} /><button aria-label={messages.send} className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-violet-700 text-white shadow-sm transition hover:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending || Boolean(failedMessageId) || !draft.trim()} type="submit"><Send aria-hidden="true" className="size-5" /></button></div>{error === "message" ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">{messages.messageError}</p> : null}</form> : null}
+        {!closed && !transitionOffered ? <form className="sticky bottom-0 border-t border-slate-200/70 bg-[color:var(--background)]/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur dark:border-slate-800/80" onSubmit={submit}><label className="sr-only" htmlFor="explore-message">{messages.inputLabel}</label><div className="flex items-end gap-3"><textarea className="min-h-12 flex-1 resize-none overflow-y-hidden rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-white" disabled={pending || Boolean(failedMessageId)} id="explore-message" maxLength={4000} onChange={(event) => { setDraft(event.target.value); if (event.target.value.trim()) setError(null); }} onKeyDown={handleKeyDown} placeholder={messages.inputPlaceholder} ref={composerInput} rows={1} value={draft} /><button aria-label={messages.send} className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-violet-700 text-white shadow-sm transition hover:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending || Boolean(failedMessageId) || !draft.trim()} type="submit"><Send aria-hidden="true" className="size-5" /></button></div>{error === "message" ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">{messages.messageError}</p> : null}</form> : null}
       </div>
     </main>
   );

@@ -4,7 +4,7 @@ Last updated: 2026-09-02
 
 ## Product scope
 
-- The product direction is governed by `astrocoach_mvp_product_guide_v0.1.md`, `astrocoach_prompt_architecture_v0.1.md`, and the initial implementation brief.
+- The product direction is governed by `astrocoach_mvp_product_guide_v0.1.md`, `astrocoach_prompt_architecture_v0.2.md`, and the initial implementation brief.
 - EXPLORE and RECOGNIZE are implemented in the current product loop. DEEP_EXPLORE and INTEGRATE remain future product direction.
 - Begin EXPLORE with a fresh “What’s going on?” message while completed onboarding remains private background context rather than appearing as chat history. Persist each user message before generation, store the visible reply separately from structured internal signals, and show an explicit retry state instead of substituting a generic fallback response when chat generation fails.
 - Astrology acts primarily as an internal context and inquiry engine. It must not be presented as proof about the user.
@@ -12,6 +12,7 @@ Last updated: 2026-09-02
 - Keep the technical natal-chart review route hidden from the normal onboarding flow. After initial intent, combine the chart, selected life areas, and optional current context to generate provisional discovery questions that test relevance against lived experience.
 - Use two-stage initial discovery: generate exactly three opening questions from chart and intent context, then exactly two finalizing questions from that context plus the first three answers. Users may revise within each stage, but generating question four closes the opening stage so adaptive follow-ups retain a stable source context.
 - Treat cognitive-mode changes as application-owned and user-controlled. EXPLORE readiness must be supported by multiple recent structured signals; the interface offers a plain-language choice rather than changing modes automatically. Declining an invitation requires new lived evidence before it can be offered again.
+- Keep cognitive mode names internal. The chat header remains “AstroCoach” and may use plain contextual subtitles, while a pending mode-transition invitation temporarily replaces the regular composer with an explicit user choice.
 - In RECOGNIZE, present one small recurring relationship tentatively and let the user accept, reject, narrow, or reword it. Only explicit user validation can produce a save action, and saving to My Map always requires a separate user choice.
 - Birth time is optional. Houses and angles must not be calculated or presented when it is unavailable.
 - Store birth dates as calendar dates and known birth times as minutes after midnight. A null birth time explicitly means unknown and must remain distinct from midnight.

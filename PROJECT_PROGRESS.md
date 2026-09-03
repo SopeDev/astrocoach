@@ -4,6 +4,7 @@ Last updated: 2026-09-02
 
 ## Implemented
 
+- Adopted `astrocoach_prompt_architecture_v0.2.md` as the authoritative mode and prompt specification and aligned project references accordingly.
 - Reviewed the authoritative product guide, prompt architecture, and initial implementation brief.
 - Established a Next.js App Router and TypeScript application scaffold.
 - Added Tailwind CSS, a responsive calm visual shell, and system/light/dark theme support.
@@ -47,6 +48,7 @@ Last updated: 2026-09-02
 - Made conversation pages reliably reach the true document bottom on initial load and after user messages, AstroCoach responses, retries, transition invitations, and Pattern-save state changes.
 - Made the conversation composer grow and shrink with its text, capped at one-third of the viewport before switching to internal scrolling.
 - Added an English/Spanish selector to Account that updates the saved user preference, locale cookie, and localized route together; limited implicit locale synchronization to first sign-in and protected stored chat bubbles from browser page translation.
+- Made the EXPLORE-to-RECOGNIZE invitation an exclusive decision point, replaced the technical chat-mode title with a stable AstroCoach header and contextual subtitle, and added safe Markdown rendering for assistant replies.
 
 ## Remaining
 
