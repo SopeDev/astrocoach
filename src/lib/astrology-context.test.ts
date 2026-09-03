@@ -10,6 +10,8 @@ test("shared astrology prompt preserves the worldview and its evidence boundarie
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /primary symbolic and developmental framework/i);
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /evolutionary and Kabbalistic/i);
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /ASTROLOGY PROPOSES; LIVED EXPERIENCE DECIDES/);
+  assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /Keep this epistemic standard private/i);
+  assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /Do not routinely announce the evolutionary\/Kabbalistic framework/i);
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /does not by itself establish[\s\S]*causation/i);
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /consequential financial, medical, legal, relationship, or career action/i);
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /privateInterpretationContext/);
@@ -18,6 +20,7 @@ test("shared astrology prompt preserves the worldview and its evidence boundarie
 
 test("shared voice and examples encode human correction and holistic synthesis", () => {
   assert.match(ASTROCOACH_VOICE_INSTRUCTIONS, /trusted friend/i);
+  assert.match(ASTROCOACH_VOICE_INSTRUCTIONS, /Begin with the substance/i);
   assert.match(ASTROCOACH_VOICE_INSTRUCTIONS, /without automatically turning each one into a question/i);
   assert.match(ASTROCOACH_VOICE_INSTRUCTIONS, /visibly update the reading/i);
   assert.match(ASTROLOGY_CONVERSATION_EXAMPLES, /Holistic interpretation/);

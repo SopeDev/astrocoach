@@ -31,6 +31,8 @@ test("prompt regression set covers the observed conversational failures", () => 
       "astrology-holistic-synthesis",
       "astrology-evolutionary-language",
       "astrology-confident-corrigible",
+      "astrology-methodology-stays-private",
+      "background-new-reexplanation-stays-ordinary",
       "astrology-human-correction-language",
       "astrology-no-event-causation",
       "astrology-no-consequential-advice",
