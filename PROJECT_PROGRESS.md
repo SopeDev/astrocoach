@@ -53,6 +53,9 @@ Last updated: 2026-09-03
 - Made natal context operational in both EXPLORE and RECOGNIZE by requiring a private account of how symbolism changed the inquiry while preserving background visibility and lived experience as the only evidence.
 - Added staged RECOGNIZE hypothesis testing for competing explanations and broadened claims before Candidate Pattern presentation, with backward compatibility for existing accepted save offers.
 - Added six provider-independent prompt regression scenarios covering cadence, material astrological influence, lived contradiction, recognition discrimination, broadened scope, and no forced Pattern.
+- Added independent astrology familiarity and communication-style preferences with persistent user-level defaults, localized mobile-first onboarding controls after birth information, and editable Account controls.
+- Passed both astrology preferences into initial and adaptive discovery, EXPLORE, and RECOGNIZE while centralizing the shared visibility, vocabulary, material-relevance, and lived-evidence rules.
+- Expanded prompt regression coverage across background, balanced, explained, and deep visibility; new and advanced familiarity; contradiction handling; and no forced astrology.
 
 ## Remaining
 
