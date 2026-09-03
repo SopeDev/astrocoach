@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { Temporal } from "@js-temporal/polyfill";
-import { calculateChart, calculatePlanets, type BirthData, type ChartPlanet } from "celestine";
+import { calculateChart, type BirthData, type ChartPlanet } from "celestine";
 
 export const NATAL_ENGINE = "celestine";
 export const NATAL_ENGINE_VERSION = "0.2.1";
-export const NATAL_SCHEMA_VERSION = 1;
+export const NATAL_SCHEMA_VERSION = 2;
 export const NATAL_HOUSE_SYSTEM = "placidus" as const;
 export const NATAL_NODE_METHOD = "mean" as const;
 export const NATAL_INCLUDE_CHIRON = true;
@@ -59,6 +59,18 @@ function mapPlanet(planet: ChartPlanet, includeHouse: boolean) {
   };
 }
 
+function mapNode(node: { name: string; type: string; longitude: number; signName: string; degree: number; minute: number; house: number }, includeHouse: boolean) {
+  return {
+    name: node.name,
+    type: node.type,
+    longitude: node.longitude,
+    sign: node.signName,
+    degree: node.degree,
+    minute: node.minute,
+    ...(includeHouse ? { house: node.house } : {}),
+  };
+}
+
 export function calculateNatalChart(input: NatalCalculationInput) {
   const birth = chartBirthData(input);
   const timeKnown = input.birthTimeMinutes !== null;
@@ -70,17 +82,17 @@ export function calculateNatalChart(input: NatalCalculationInput) {
     timezoneId: input.timezoneId,
     referenceTime: timeKnown ? "exact" : "local-noon",
     houseSystem: timeKnown ? NATAL_HOUSE_SYSTEM : null,
-    nodeMethod: timeKnown ? NATAL_NODE_METHOD : null,
+    nodeMethod: NATAL_NODE_METHOD,
     includeChiron: NATAL_INCLUDE_CHIRON,
   };
   const inputHash = createHash("sha256").update(JSON.stringify(normalizedInput)).digest("hex");
 
   if (!timeKnown) {
-    const planets = calculatePlanets(birth, {
+    const chart = calculateChart(birth, {
       includeAsteroids: false,
       includeChiron: NATAL_INCLUDE_CHIRON,
       includeLilith: false,
-      includeNodes: false,
+      includeNodes: NATAL_NODE_METHOD,
       includeLots: false,
       includePatterns: false,
     });
@@ -92,15 +104,15 @@ export function calculateNatalChart(input: NatalCalculationInput) {
       data: {
         schemaVersion: NATAL_SCHEMA_VERSION,
         input: normalizedInput,
-        planets: planets.map((planet) => mapPlanet(planet, false)),
-        nodes: [],
+        planets: chart.planets.map((planet) => mapPlanet(planet, false)),
+        nodes: chart.nodes.map((node) => mapNode(node, false)),
         aspects: [],
         angles: null,
         houses: null,
         uncertainty: {
           time: "unknown",
           referenceTime: "local-noon",
-          note: "Planetary positions use local noon as a neutral reference. Houses, angles, and aspects are intentionally omitted.",
+          note: "Planetary and lunar node positions use local noon as a neutral reference. Houses, angles, and aspects are intentionally omitted.",
         },
       },
     };
@@ -124,15 +136,7 @@ export function calculateNatalChart(input: NatalCalculationInput) {
       schemaVersion: NATAL_SCHEMA_VERSION,
       input: normalizedInput,
       planets: chart.planets.map((planet) => mapPlanet(planet, true)),
-      nodes: chart.nodes.map((node) => ({
-        name: node.name,
-        type: node.type,
-        longitude: node.longitude,
-        sign: node.signName,
-        degree: node.degree,
-        minute: node.minute,
-        house: node.house,
-      })),
+      nodes: chart.nodes.map((node) => mapNode(node, true)),
       aspects: chart.aspects.all.map((aspect) => ({
         body1: aspect.body1,
         body2: aspect.body2,

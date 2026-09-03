@@ -9,6 +9,7 @@ import { generateExploreResponse } from "@/lib/explore";
 import { exploreMessageSchema, exploreSignalsSchema, titleFromExploreMessage } from "@/lib/explore-contract";
 import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
 import { shouldOfferRecognition } from "@/lib/mode-orchestration";
+import { calculateNatalChart, NATAL_ENGINE, NATAL_ENGINE_VERSION, NATAL_SCHEMA_VERSION } from "@/lib/natal-chart";
 import { generateRecognizeResponse } from "@/lib/recognize";
 import {
   applyCandidateEvaluation,
@@ -60,15 +61,41 @@ function evaluationOfferFromMessage(message: { id: string; internalSignals: unkn
 }
 
 async function loadGenerationContext(userId: string, locale: Locale, conversationId: string, excludedMessageId?: string) {
-  const [intent, natalChart, conversation, recentMessages, preferences] = await Promise.all([
+  const [intent, storedNatalChart, birthProfile, conversation, recentMessages, preferences] = await Promise.all([
     db.initialIntent.findUnique({ where: { userId } }),
     db.natalChart.findUnique({ where: { userId } }),
+    db.birthProfile.findUnique({ where: { userId } }),
     db.conversation.findFirst({ where: { id: conversationId, userId } }),
     db.message.findMany({ where: { conversationId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 25 }),
     db.user.findUnique({ where: { id: userId }, select: { astrologyFamiliarity: true, astrologyStyle: true } }),
   ]);
 
-  if (!intent?.discoveryCompletedAt || !natalChart || !conversation || !preferences) throw new Error("Completed conversation context is unavailable");
+  if (!intent?.discoveryCompletedAt || !storedNatalChart || !birthProfile || !conversation || !preferences) throw new Error("Completed conversation context is unavailable");
+  let natalChart = storedNatalChart;
+  if (storedNatalChart.schemaVersion !== NATAL_SCHEMA_VERSION) {
+    if (birthProfile.latitude === null || birthProfile.longitude === null || !birthProfile.timezoneId) throw new Error("Birth profile is incomplete");
+    const calculation = calculateNatalChart({
+      birthDate: birthProfile.birthDate,
+      birthTimeMinutes: birthProfile.birthTimeMinutes,
+      latitude: Number(birthProfile.latitude),
+      longitude: Number(birthProfile.longitude),
+      timezoneId: birthProfile.timezoneId,
+    });
+    natalChart = await db.natalChart.update({
+      where: { id: storedNatalChart.id },
+      data: {
+        engine: NATAL_ENGINE,
+        engineVersion: NATAL_ENGINE_VERSION,
+        schemaVersion: NATAL_SCHEMA_VERSION,
+        inputHash: calculation.inputHash,
+        timeAccuracy: calculation.timeAccuracy,
+        houseSystem: calculation.houseSystem,
+        sourceProfileUpdated: birthProfile.updatedAt,
+        calculatedAt: new Date(),
+        data: calculation.data,
+      },
+    });
+  }
   const messages = getDictionary(locale);
   const lifeAreas = intent.lifeAreas.flatMap((value) => {
     const key = z.enum(LIFE_AREA_KEYS).safeParse(value);

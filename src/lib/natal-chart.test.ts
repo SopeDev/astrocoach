@@ -32,7 +32,7 @@ test("calculates a deterministic exact-time chart near published J2000 positions
   assert.ok(moon && Math.abs(moon.longitude - 223.3187) < 0.01);
 });
 
-test("unknown-time charts omit all time-dependent structures", () => {
+test("unknown-time charts retain noon-reference node signs but omit time-dependent structures", () => {
   const chart = calculateNatalChart({ ...referenceInput, birthTimeMinutes: null });
 
   assert.equal(chart.timeAccuracy, "unknown");
@@ -41,10 +41,12 @@ test("unknown-time charts omit all time-dependent structures", () => {
   assert.equal(chart.data.houses, null);
   assert.equal(chart.data.angles, null);
   assert.deepEqual(chart.data.aspects, []);
-  assert.deepEqual(chart.data.nodes, []);
+  assert.equal(chart.data.nodes.length, 2);
+  assert.ok(chart.data.nodes.every((node) => !("house" in node)));
+  assert.ok(chart.data.nodes.every((node) => typeof node.sign === "string"));
   assert.ok(chart.data.planets.some((planet) => planet.name === "Chiron"));
   assert.ok(chart.data.planets.every((planet) => !("house" in planet)));
-  assert.match(chart.data.uncertainty?.note ?? "", /local noon/i);
+  assert.match(chart.data.uncertainty?.note ?? "", /lunar node positions use local noon/i);
 });
 
 test("historical timezone offsets affect the normalized calculation input", () => {

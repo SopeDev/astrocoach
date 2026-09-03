@@ -11,6 +11,7 @@ import {
   privateChartContext,
 } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
+import { lunarNodeInterpretationContext } from "@/lib/astrological-interpretations";
 import { getServerEnv } from "@/lib/env";
 import { exploreResponseSchema, type ExploreSignals } from "@/lib/explore-contract";
 import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
@@ -96,6 +97,7 @@ export async function generateExploreResponse({
         initialDescription: currentContext,
         onboardingExchanges,
         privateNatalContext: privateChartContext(natalChart),
+        privateInterpretationContext: lunarNodeInterpretationContext(natalChart),
         astrologyFamiliarity,
         astrologyStyle,
       },

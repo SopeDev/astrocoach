@@ -1,0 +1,448 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "astrological-interpretations.json",
+  "lunar_nodes": {
+    "aries_libra": {
+      "north_node": "Aries",
+      "south_node": "Libra",
+      "familiar_pattern": {
+        "summary": "May prioritize relationships and harmony at the expense of a clear sense of self.",
+        "possible_expressions": [
+          "Difficulty making independent decisions",
+          "Seeking identity or validation through others",
+          "Confusing other people's needs with personal needs",
+          "Avoiding conflict at personal cost"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop initiative, independence, courage, and self-trust.",
+        "growth_possibilities": [
+          "Act on personal convictions",
+          "Recognize an independent inner voice",
+          "Build a stronger sense of identity",
+          "Help others without needing approval"
+        ]
+      }
+    },
+    "taurus_scorpio": {
+      "north_node": "Taurus",
+      "south_node": "Scorpio",
+      "familiar_pattern": {
+        "summary": "May be accustomed to emotional intensity, crisis, and relationships shaped by mistrust or power struggles.",
+        "possible_expressions": [
+          "Expecting life to remain intense",
+          "Holding on to old hurt or resentment",
+          "Becoming defensive when feeling threatened",
+          "Turning unexpressed intensity into anger or self-defeating behavior"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop self-worth, patience, steadiness, and values that create lasting peace.",
+        "growth_possibilities": [
+          "Release old emotional wounds",
+          "Clarify personal values",
+          "Build stability without depending on crisis",
+          "Connect desire with love and care",
+          "Cultivate patience and groundedness"
+        ]
+      }
+    },
+    "gemini_sagittarius": {
+      "north_node": "Gemini",
+      "south_node": "Sagittarius",
+      "familiar_pattern": {
+        "summary": "May rely on firm beliefs or broad conclusions while overlooking nuance and other viewpoints.",
+        "possible_expressions": [
+          "Rigid or overly certain opinions",
+          "Speaking bluntly or without enough context",
+          "Resistance to narrow environments or authority",
+          "Prioritizing freedom over dialogue"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop curiosity, tact, flexibility, and responsive communication.",
+        "growth_possibilities": [
+          "See situations through other people's eyes",
+          "Listen before reaching a conclusion",
+          "Expand perspective through conversation",
+          "Communicate insight in an accessible way"
+        ]
+      }
+    },
+    "cancer_capricorn": {
+      "north_node": "Cancer",
+      "south_node": "Capricorn",
+      "familiar_pattern": {
+        "summary": "May rely heavily on control, competence, status, or reason while keeping emotional needs at a distance.",
+        "possible_expressions": [
+          "Difficulty tolerating mistakes or perceived disrespect",
+          "Judging life mainly through reason",
+          "Prioritizing work or responsibility over emotional connection",
+          "Using severity or control for protection"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop emotional openness, care, belonging, and compassionate family bonds.",
+        "growth_possibilities": [
+          "Make room for sensitivity and emotion",
+          "Cultivate compassion and forgiveness",
+          "Soften pride and rigidity",
+          "Allow care to be given and received"
+        ]
+      }
+    },
+    "leo_aquarius": {
+      "north_node": "Leo",
+      "south_node": "Aquarius",
+      "familiar_pattern": {
+        "summary": "May feel safer observing from a distance, serving the group, or remaining detached from personal desire and recognition.",
+        "possible_expressions": [
+          "Emotional or physical detachment",
+          "Ignoring personal needs",
+          "Hiding behind intellectual distance",
+          "Difficulty sustaining intimate commitment"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop warmth, creative confidence, embodied pleasure, and the courage to be personally visible.",
+        "growth_possibilities": [
+          "Pay attention to the body and its needs",
+          "Express pleasure and affection",
+          "Balance personal desires with collective needs",
+          "Strengthen creative discipline",
+          "Discover and share personal talents"
+        ]
+      }
+    },
+    "virgo_pisces": {
+      "north_node": "Virgo",
+      "south_node": "Pisces",
+      "familiar_pattern": {
+        "summary": "May become absorbed in uncertainty, idealism, or diffuse emotion and struggle to engage clearly with practical reality.",
+        "possible_expressions": [
+          "Confusion, guilt, or fear",
+          "Difficulty maintaining boundaries and structure",
+          "Depending on others for direction",
+          "Escaping when reality feels overwhelming"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop discernment, order, practical skill, and the ability to turn intuition into useful action.",
+        "growth_possibilities": [
+          "Create clear routines and methods",
+          "Distinguish intuition from fear or fantasy",
+          "Stay present with practical details",
+          "Bring ideals into concrete form",
+          "Offer grounded service"
+        ]
+      }
+    },
+    "libra_aries": {
+      "north_node": "Libra",
+      "south_node": "Aries",
+      "familiar_pattern": {
+        "summary": "May default to independence, urgency, or self-protection without fully considering other people's needs.",
+        "possible_expressions": [
+          "Acting before listening",
+          "Treating disagreement as a threat",
+          "Relying only on personal strength",
+          "Struggling with patience and compromise"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop cooperation, reciprocity, patience, and fairness in relationships.",
+        "growth_possibilities": [
+          "Pause before reacting",
+          "Listen to and consider others",
+          "Choose conflicts worth pursuing",
+          "Share strength and resources",
+          "Create fair exchanges"
+        ]
+      }
+    },
+    "scorpio_taurus": {
+      "north_node": "Scorpio",
+      "south_node": "Taurus",
+      "familiar_pattern": {
+        "summary": "May hold tightly to possessions, comfort, familiar values, or emotional security and resist necessary change.",
+        "possible_expressions": [
+          "Strong material or emotional attachments",
+          "Fear of scarcity or abandonment",
+          "Resistance to disruption",
+          "Overreliance on comfort, pleasure, or possessions"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop emotional depth, adaptability, and the courage to release what no longer supports growth.",
+        "growth_possibilities": [
+          "Loosen attachment to control and possession",
+          "Face fears of loss or scarcity",
+          "Accept inner transformation",
+          "Learn through trust and shared experience",
+          "Build resilience for change"
+        ]
+      }
+    },
+    "sagittarius_gemini": {
+      "north_node": "Sagittarius",
+      "south_node": "Gemini",
+      "familiar_pattern": {
+        "summary": "May scatter attention across information, stories, and possibilities without developing a clear direction.",
+        "possible_expressions": [
+          "Restless curiosity",
+          "Indecision and shifting perspectives",
+          "Avoiding responsibility through distraction",
+          "Accumulating information without integrating it"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop direction, conviction, perseverance, and wisdom grounded in a larger purpose.",
+        "growth_possibilities": [
+          "Choose depth over constant stimulation",
+          "Commit to a meaningful direction",
+          "Turn knowledge into lived wisdom",
+          "Use discernment to make clear decisions"
+        ]
+      }
+    },
+    "capricorn_cancer": {
+      "north_node": "Capricorn",
+      "south_node": "Cancer",
+      "familiar_pattern": {
+        "summary": "May seek safety through dependence, family roles, or familiar emotional responses that make adult autonomy difficult.",
+        "possible_expressions": [
+          "Depending on others for direction or protection",
+          "Difficulty releasing childhood roles",
+          "Using withdrawal or emotional pressure when afraid",
+          "Avoiding responsibility when overwhelmed"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop maturity, responsibility, consistency, and the authority to direct one's own life.",
+        "growth_possibilities": [
+          "Take responsibility for personal choices",
+          "Create opportunities through steady effort",
+          "Build discipline and self-respect",
+          "Move toward a purposeful adult role"
+        ]
+      }
+    },
+    "aquarius_leo": {
+      "north_node": "Aquarius",
+      "south_node": "Leo",
+      "familiar_pattern": {
+        "summary": "May seek personal recognition or control in love and struggle when attention is not centered on the self.",
+        "possible_expressions": [
+          "Power struggles in relationships",
+          "Jealousy or dramatic reactions",
+          "Trying to control loved ones",
+          "Withdrawing when recognition is unavailable"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop spacious love, shared purpose, teamwork, and respect for other people's freedom.",
+        "growth_possibilities": [
+          "Release the need to control",
+          "Let loved ones be themselves",
+          "Build relationships around freedom and trust",
+          "Contribute personal gifts to a wider cause",
+          "Cultivate a humanitarian perspective"
+        ]
+      }
+    },
+    "pisces_virgo": {
+      "north_node": "Pisces",
+      "south_node": "Virgo",
+      "familiar_pattern": {
+        "summary": "May pursue perfection, order, and control so intensely that life becomes dominated by criticism, worry, or frustration.",
+        "possible_expressions": [
+          "Excessive perfectionism",
+          "Focusing on flaws",
+          "Persistent worry and self-criticism",
+          "Difficulty trusting what cannot be controlled"
+        ]
+      },
+      "developmental_direction": {
+        "summary": "Develop intuition, flexibility, inner peace, compassion, and trust in life's movement.",
+        "growth_possibilities": [
+          "Release unnecessary control",
+          "Distinguish what matters from what is temporary",
+          "Respond flexibly to uncertainty",
+          "Soften judgment with compassion",
+          "Balance discernment with trust"
+        ]
+      }
+    }
+  },
+  "lunar_nodes_houses": {
+    "house_1_house_7": {
+      "north_node_house": 1,
+      "south_node_house": 7,
+      "familiar_pattern": {
+        "summary": "May define identity through relationships and allow other people's opinions to shape the sense of self.",
+        "possible_expressions": [
+          "Losing personal direction while pleasing others",
+          "Fear that independence will hurt someone",
+          "Habitual submission or self-sacrifice",
+          "Strong desire to reclaim individuality"
+        ]
+      },
+      "developmental_direction": "Develop an independent identity while balancing personal needs with the needs of others."
+    },
+    "house_2_house_8": {
+      "north_node_house": 2,
+      "south_node_house": 8,
+      "familiar_pattern": {
+        "summary": "May become entangled in other people's values, resources, crises, or expectations instead of relying on a personal foundation.",
+        "possible_expressions": [
+          "Testing other people's boundaries or values",
+          "Blaming others for instability",
+          "Depending on shared resources or emotional intensity",
+          "Difficulty identifying personal priorities"
+        ]
+      },
+      "developmental_direction": "Build personal values, self-reliance, and material or emotional stability without depending on other people's efforts."
+    },
+    "house_3_house_9": {
+      "north_node_house": 3,
+      "south_node_house": 9,
+      "familiar_pattern": {
+        "summary": "May favor abstract wisdom, belief, or distant perspectives over ordinary conversation and direct exchange.",
+        "possible_expressions": [
+          "Fear that close involvement will limit freedom",
+          "Remaining in theory instead of practical dialogue",
+          "Difficulty adapting knowledge to the listener",
+          "Underdeveloped tact in everyday communication"
+        ]
+      },
+      "developmental_direction": "Bring knowledge into daily life through curiosity, tact, listening, and clear communication."
+    },
+    "house_4_house_10": {
+      "north_node_house": 4,
+      "south_node_house": 10,
+      "familiar_pattern": {
+        "summary": "May identify strongly with achievement, authority, or a public role while protecting the private self from view.",
+        "possible_expressions": [
+          "Loneliness beneath public competence",
+          "Focusing heavily on mission or reputation",
+          "Showing the role rather than the inner person",
+          "Seeking recognition or parental approval"
+        ]
+      },
+      "developmental_direction": "Build inner security, emotional belonging, and self-recognition that do not depend on an audience."
+    },
+    "house_5_house_11": {
+      "north_node_house": 5,
+      "south_node_house": 11,
+      "familiar_pattern": {
+        "summary": "May remain in ideas, collective concerns, or imagined futures rather than taking the personal risk of creative expression.",
+        "possible_expressions": [
+          "A highly inventive but impractical mind",
+          "Becoming trapped in thought",
+          "Observing life from a distance",
+          "Difficulty opening up in intimate relationships"
+        ]
+      },
+      "developmental_direction": "Bring dreams into reality through personal creativity, play, affection, and heartfelt self-expression."
+    },
+    "house_6_house_12": {
+      "north_node_house": 6,
+      "south_node_house": 12,
+      "familiar_pattern": {
+        "summary": "May retreat into private reflection, diffuse fear, or feeling unseen instead of engaging practical responsibilities.",
+        "possible_expressions": [
+          "Feeling that care goes unappreciated",
+          "Confusion about how to be useful",
+          "Interpreting difficulty through helplessness",
+          "Unconscious fear shaping daily life"
+        ]
+      },
+      "developmental_direction": "Create grounded routines, take practical responsibility, and turn compassion into useful service."
+    },
+    "house_7_house_1": {
+      "north_node_house": 7,
+      "south_node_house": 1,
+      "familiar_pattern": {
+        "summary": "May rely on independence and personal instinct so strongly that partnership feels limiting or unsafe.",
+        "possible_expressions": [
+          "Difficulty depending on or consulting others",
+          "Approaching partnership as a loss of freedom",
+          "Prioritizing personal action over reciprocity",
+          "Holding back full commitment"
+        ]
+      },
+      "developmental_direction": "Learn mutuality, cooperation, and wholehearted sharing while preserving healthy autonomy."
+    },
+    "house_8_house_2": {
+      "north_node_house": 8,
+      "south_node_house": 2,
+      "familiar_pattern": {
+        "summary": "May base safety on possessions, fixed values, or having enough and resist the vulnerability of change and sharing.",
+        "possible_expressions": [
+          "Possessiveness",
+          "Equating security with accumulation",
+          "Choosing quantity over quality",
+          "Difficulty revising long-held values"
+        ]
+      },
+      "developmental_direction": "Develop discipline around desire and learn to transform personal values through trust, intimacy, and shared experience."
+    },
+    "house_9_house_3": {
+      "north_node_house": 9,
+      "south_node_house": 3,
+      "familiar_pattern": {
+        "summary": "May become caught in details, conversations, and competing information without reaching a stable larger view.",
+        "possible_expressions": [
+          "Fear of being misunderstood",
+          "Replaying previous conversations",
+          "Restless curiosity",
+          "Difficulty deciding without more information"
+        ]
+      },
+      "developmental_direction": "Step back from mental noise and develop a coherent perspective, guiding philosophy, and trust in broader understanding."
+    },
+    "house_10_house_4": {
+      "north_node_house": 10,
+      "south_node_house": 4,
+      "familiar_pattern": {
+        "summary": "May feel absorbed by family needs, history, or emotional obligations that limit individual direction.",
+        "possible_expressions": [
+          "Feeling that family demands too much time",
+          "Being caught between desire and obligation",
+          "Difficulty separating from inherited roles",
+          "A recurring urge to escape and be free"
+        ]
+      },
+      "developmental_direction": "Develop maturity, public purpose, and the capacity to provide structure without remaining confined by family dynamics."
+    },
+    "house_11_house_5": {
+      "north_node_house": 11,
+      "south_node_house": 5,
+      "familiar_pattern": {
+        "summary": "May seek identity and validation through romance, admiration, or being personally special.",
+        "possible_expressions": [
+          "Treating relationships as extensions of the ego",
+          "Strong need to be loved or admired",
+          "Wanting relationships to receive recognition",
+          "Becoming overinvolved in personal drama"
+        ]
+      },
+      "developmental_direction": "Develop friendship, shared ideals, and participation in community without needing to remain at the center."
+    },
+    "house_12_house_6": {
+      "north_node_house": 12,
+      "south_node_house": 6,
+      "familiar_pattern": {
+        "summary": "May depend on perfection, criticism, order, or constant improvement to feel safe.",
+        "possible_expressions": [
+          "Harsh standards for self or others",
+          "Constantly organizing the environment",
+          "Focusing on flaws and problems",
+          "Trying to control uncertainty through routines"
+        ]
+      },
+      "developmental_direction": "Develop inner spaciousness, trust, compassion, and the ability to move with uncertainty instead of controlling every detail."
+    }
+  }
+}

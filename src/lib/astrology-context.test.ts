@@ -12,6 +12,8 @@ test("shared astrology prompt preserves the worldview and its evidence boundarie
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /ASTROLOGY PROPOSES; LIVED EXPERIENCE DECIDES/);
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /does not by itself establish[\s\S]*causation/i);
   assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /consequential financial, medical, legal, relationship, or career action/i);
+  assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /privateInterpretationContext/);
+  assert.match(ASTROLOGY_COMMUNICATION_INSTRUCTIONS, /hypotheses, not known traits/i);
 });
 
 test("shared voice and examples encode human correction and holistic synthesis", () => {
