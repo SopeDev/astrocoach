@@ -39,7 +39,7 @@ export type CandidateEvaluationOffer = {
 };
 
 export type CandidateEvaluationPromptContext = {
-  action: "PARTLY" | "LET_ME_EXPLAIN";
+  action: "PARTLY" | "NO" | "LET_ME_EXPLAIN";
   candidatePattern: string;
   supportingObservations: string[];
 };
@@ -61,7 +61,7 @@ export function candidateEvaluationPromptContext(value: unknown): CandidateEvalu
   const parsed = recognizeStoredSignalsSchema.safeParse(value);
   if (!parsed.success || !parsed.data.candidatePattern) return null;
   const action = parsed.data.candidateEvaluation?.action;
-  if (action !== "PARTLY" && action !== "LET_ME_EXPLAIN") return null;
+  if (action !== "PARTLY" && action !== "NO" && action !== "LET_ME_EXPLAIN") return null;
   return { action, candidatePattern: parsed.data.candidatePattern, supportingObservations: parsed.data.supportingObservations };
 }
 

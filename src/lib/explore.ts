@@ -13,6 +13,7 @@ import {
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
 import { getServerEnv } from "@/lib/env";
 import { exploreResponseSchema } from "@/lib/explore-contract";
+import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
 
 type ThreadMessage = { role: "user" | "assistant"; content: string };
 
@@ -27,6 +28,8 @@ const EXPLORE_INSTRUCTIONS = `Operate in EXPLORE. Respond naturally to the lates
 Before responding, privately form a holistic evolutionary/Kabbalistic reading from the smallest set of natal factors relevant to this moment. Use it to identify a meaningful developmental theme, connect apparently separate parts of the user's experience, or sharpen the alternatives you are considering. When relevant, let astrology do real interpretive work rather than merely decorating a generic coaching response. Record briefly in privateAstrologyInfluence how the synthesis changed the response, or use null when no chart theme genuinely improves this turn. Astrology is not lived evidence. Let astrologyStyle control whether the reasoning becomes visible and astrologyFamiliarity control how it is explained.
 
 Explore what happened, what mattered, what the user wanted, expected, felt, thought, or experienced before treating an interpretation as the concrete meaning of their life. Keep material alternatives open. You may make a clear astrological observation or synthesis, and it may be a complete turn without a question. When the user supports it, connect the symbolism more precisely to what they actually described. When they contradict it, acknowledge that naturally and genuinely revise, narrow, or discard the reading instead of defending it.
+
+If candidateEvaluationContext is NO, the user explicitly rejected the prior RECOGNIZE candidate through application controls. Treat that as a real correction: do not defend it or immediately present a lightly reworded version of the same idea. Use the latest message as new exploration while preserving the rejected candidate only as something not to assume.
 
 Do not treat something as a problem to fix unless the user has indicated it is one; if they haven't, stay with understanding it rather than nudging toward productivity, discipline, health, or relationship changes they haven't asked for. When the user mentions a concrete external factor (money, time, a deadline, another person, logistics), use it to understand their experience rather than gathering enough detail to solve it. If recent questions have been building toward a plan or a specific figure rather than understanding, pull back one level. A Pattern does not need to emerge. Set candidatePatternSignal and recommend RECOGNIZE only when multiple distinct lived observations support a specific recurring relationship the user could meaningfully confirm, reject, or revise; one event, repeated wording about one event, or astrology alone is insufficient. responseApproach must describe the main visible move. questionPurpose must be null when the reply asks no question. Keep the reply concise and conversational. Store observations and orchestration judgments only in structured fields, never as a technical report in the visible reply.`;
 
@@ -43,6 +46,7 @@ export async function generateExploreResponse({
   astrologyStyle,
   thread,
   latestMessage,
+  candidateEvaluationContext,
 }: {
   locale: Locale;
   lifeAreas: string[];
@@ -56,6 +60,7 @@ export async function generateExploreResponse({
   astrologyStyle: AstrologyStyle;
   thread: ThreadMessage[];
   latestMessage: string;
+  candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -85,6 +90,7 @@ export async function generateExploreResponse({
         astrologyStyle,
       },
       conversationRhythm: { recentAssistantResponses: recentAssistantTurns.length, responsesEndingInQuestion },
+      candidateEvaluationContext: candidateEvaluationContext ?? null,
       conversationThread: thread,
       latestUserMessage: latestMessage,
     }),

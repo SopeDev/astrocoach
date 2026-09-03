@@ -79,6 +79,7 @@ test("NO rejects the candidate and returns toward EXPLORE", () => {
   assert.equal(evaluated?.userEvaluationStatus, "rejected");
   assert.equal(evaluated?.recommendedNextMode, "EXPLORE");
   assert.equal(recognizedPatternOffer(evaluated), null);
+  assert.equal(candidateEvaluationPromptContext(evaluated)?.action, "NO");
 });
 
 test("LET_ME_EXPLAIN remains unevaluated and is distinct from PARTLY", () => {

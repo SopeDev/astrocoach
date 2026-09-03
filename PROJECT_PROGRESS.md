@@ -83,4 +83,4 @@ Last updated: 2026-09-03
 
 ## Next planned slice
 
-Manually verify voice transcription on iPhone and Android, then run the expanded prompt regression set against the configured model—especially holistic synthesis, confident correction, cadence, causation boundaries, and RECOGNIZE evidence handling. Tune only observed failures before adding Pattern editing or DEEP_EXPLORE.
+Manually exercise all four RECOGNIZE candidate-evaluation paths—including reload restoration and revised-candidate re-evaluation—then verify voice transcription on iPhone and Android. After that, run the expanded prompt regression set against the configured model, tune only observed failures, and defer Pattern editing or DEEP_EXPLORE until the current handoffs are stable.
