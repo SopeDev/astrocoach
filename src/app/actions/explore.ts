@@ -68,7 +68,7 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
 async function generateReply(userId: string, locale: Locale, conversationId: string, userMessage: StoredMessage) {
   const context = await loadGenerationContext(userId, locale, conversationId, userMessage.id);
   const generated = context.conversation.mode === "RECOGNIZE"
-    ? await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, thread: context.thread, latestMessage: userMessage.content, opening: false })
+    ? await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, thread: context.thread, latestMessage: userMessage.content, opening: false })
     : await generateExploreResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, thread: context.thread, latestMessage: userMessage.content });
 
   const assistantMessage = await db.message.create({
@@ -164,7 +164,7 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
   if (context.conversation.status !== "active" || context.conversation.mode !== "EXPLORE" || context.conversation.transitionState !== "OFFERED") return { ok: false as const, error: "message" as const };
 
   try {
-    const generated = await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, thread: context.thread, latestMessage: null, opening: true });
+    const generated = await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, thread: context.thread, latestMessage: null, opening: true });
     const assistantMessage = await db.$transaction(async (transaction) => {
       const updated = await transaction.conversation.updateMany({ where: { id: conversationId, userId: user.id, mode: "EXPLORE", status: "active", transitionState: "OFFERED" }, data: { mode: "RECOGNIZE", transitionState: "IDLE", transitionReferenceAt: new Date() } });
       if (updated.count !== 1) throw new Error("Recognition transition is no longer available");

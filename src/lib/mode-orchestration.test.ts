@@ -5,6 +5,9 @@ import { shouldOfferRecognition } from "./mode-orchestration";
 function signal(overrides: Record<string, unknown> = {}) {
   return {
     currentMode: "EXPLORE",
+    responseApproach: "CONNECT",
+    questionPurpose: null,
+    privateAstrologyInfluence: null,
     understandingStatus: "clearer",
     importantObservations: [],
     unresolvedQuestions: [],

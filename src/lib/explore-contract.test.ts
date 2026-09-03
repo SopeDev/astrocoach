@@ -6,6 +6,9 @@ test("EXPLORE output keeps the visible reply separate from valid internal signal
   const result = exploreResponseSchema.safeParse({
     reply: "What felt most important about that moment?",
     currentMode: "EXPLORE",
+    responseApproach: "QUESTION",
+    questionPurpose: "Clarify what mattered most.",
+    privateAstrologyInfluence: null,
     understandingStatus: "opening",
     importantObservations: ["The user described a recent decision."],
     unresolvedQuestions: ["What outcome were they hoping for?"],

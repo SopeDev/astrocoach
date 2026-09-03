@@ -4,6 +4,9 @@ export const exploreMessageSchema = z.string().trim().min(1).max(4000);
 
 export const exploreSignalsSchema = z.object({
   currentMode: z.literal("EXPLORE"),
+  responseApproach: z.enum(["REFLECT", "CONTRAST", "CONNECT", "COMPETING_INTERPRETATION", "QUESTION", "OPEN_SPACE"]),
+  questionPurpose: z.string().max(300).nullable(),
+  privateAstrologyInfluence: z.string().max(500).nullable(),
   understandingStatus: z.enum(["opening", "developing", "clearer", "sufficient"]),
   importantObservations: z.array(z.string().max(300)).max(6),
   unresolvedQuestions: z.array(z.string().max(300)).max(5),

@@ -1,6 +1,6 @@
 # Project Decisions
 
-Last updated: 2026-09-02
+Last updated: 2026-09-03
 
 ## Product scope
 
@@ -14,6 +14,9 @@ Last updated: 2026-09-02
 - Treat cognitive-mode changes as application-owned and user-controlled. EXPLORE readiness must be supported by multiple recent structured signals; the interface offers a plain-language choice rather than changing modes automatically. Declining an invitation requires new lived evidence before it can be offered again.
 - Keep cognitive mode names internal. The chat header remains “AstroCoach” and may use plain contextual subtitles, while a pending mode-transition invitation temporarily replaces the regular composer with an explicit user choice.
 - In RECOGNIZE, present one small recurring relationship tentatively and let the user accept, reject, narrow, or reword it. Only explicit user validation can produce a save action, and saving to My Map always requires a separate user choice.
+- EXPLORE must vary its conversational move and ask a question only when the answer would materially improve understanding; serial question and multiple-choice cadence is explicitly discouraged.
+- RECOGNIZE may begin with a focused hypothesis-testing stage when competing explanations remain material. A Candidate Pattern is presented only after lived evidence supports the smallest defensible relationship, and broadened scope requires an independent example or cross-context contrast.
+- Natal context is supplied privately to both EXPLORE and RECOGNIZE with a background visibility style. It may change the inquiry or distinction being tested, but never counts toward evidence or user validation. The style field is intentionally internal so future visibility preferences can be added without changing epistemic rules.
 - Birth time is optional. Houses and angles must not be calculated or presented when it is unavailable.
 - Store birth dates as calendar dates and known birth times as minutes after midnight. A null birth time explicitly means unknown and must remain distinct from midnight.
 - Use the MIT-licensed Celestine engine, pinned to an exact version behind a project-owned adapter, for local natal calculations without an external API. Include Chiron, and use Placidus houses and Mean Lunar Nodes for exact-time charts. For unknown-time charts, calculate planets including Chiron at local noon as an explicitly uncertain reference and omit houses, angles, nodes, and aspects.

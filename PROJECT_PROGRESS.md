@@ -1,6 +1,6 @@
 # Project Progress
 
-Last updated: 2026-09-02
+Last updated: 2026-09-03
 
 ## Implemented
 
@@ -49,11 +49,15 @@ Last updated: 2026-09-02
 - Made the conversation composer grow and shrink with its text, capped at one-third of the viewport before switching to internal scrolling.
 - Added an English/Spanish selector to Account that updates the saved user preference, locale cookie, and localized route together; limited implicit locale synchronization to first sign-in and protected stored chat bubbles from browser page translation.
 - Made the EXPLORE-to-RECOGNIZE invitation an exclusive decision point, replaced the technical chat-mode title with a stable AstroCoach header and contextual subtitle, and added safe Markdown rendering for assistant replies.
+- Refined EXPLORE away from interview-like question cadence with explicit response-move metadata, recent-question rhythm context, and a higher threshold for asking another question.
+- Made natal context operational in both EXPLORE and RECOGNIZE by requiring a private account of how symbolism changed the inquiry while preserving background visibility and lived experience as the only evidence.
+- Added staged RECOGNIZE hypothesis testing for competing explanations and broadened claims before Candidate Pattern presentation, with backward compatibility for existing accepted save offers.
+- Added six provider-independent prompt regression scenarios covering cadence, material astrological influence, lived contradiction, recognition discrimination, broadened scope, and no forced Pattern.
 
 ## Remaining
 
 - Add conversation-management details such as conversation titles and archival or deletion behavior after the core navigation is evaluated.
-- Evaluate EXPLORE readiness and RECOGNIZE accuracy with representative conversations, especially premature invitations, partial agreement, rejection, and revised wording.
+- Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness and RECOGNIZE accuracy, especially cadence, premature invitations, partial agreement, rejection, and revised wording.
 - Add Pattern detail, editing, archival, and provenance views after validating that saved formulations are useful.
 - Implement DEEP_EXPLORE only after recognized Patterns and their handoff behavior are stable.
 
@@ -70,4 +74,4 @@ Last updated: 2026-09-02
 
 ## Next planned slice
 
-Manually evaluate the complete EXPLORE → invitation → RECOGNIZE → My Map path with strong, weak, rejected, and partly accepted candidate Patterns. Refine readiness thresholds and prompt behavior from observed failures before adding Pattern editing or DEEP_EXPLORE.
+Manually evaluate the refined EXPLORE → invitation → hypothesis testing → Candidate Pattern → My Map path against the six regression scenarios. Tune only failures observed with the configured model before adding Pattern editing or DEEP_EXPLORE.

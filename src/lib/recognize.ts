@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import type { Locale } from "@/i18n/config";
+import { DEFAULT_ASTROLOGY_STYLE, privateChartContext } from "@/lib/astrology-context";
 import { CORE_INSTRUCTIONS } from "@/lib/explore";
 import { getServerEnv } from "@/lib/env";
 import { recognizeResponseSchema } from "@/lib/recognize-contract";
@@ -16,7 +17,13 @@ function exchanges(questions: unknown, answers: unknown) {
   return parsedQuestions.map((question, index) => ({ question, answer: parsedAnswers[index] ?? "" }));
 }
 
-const RECOGNIZE_INSTRUCTIONS = `Operate in RECOGNIZE. Determine whether the user's lived evidence supports a small, specific recurring relationship and formulate it collaboratively. Describe a relationship such as "when X happens, I tend to Y," never a fixed identity. Be tentative, specific, and easy to correct. Only propose a Pattern from multiple genuinely distinct lived observations, not repeated descriptions of one event, and keep its scope as narrow as the evidence actually supports; describe it as an observed connection, not an established cause. Briefly connect the proposition to distinct experiences the user actually reported, then invite evaluation. Do not use astrology as evidence. If the user rejects the proposition, accept that without defending it, set userEvaluationStatus to rejected, and recommend EXPLORE. If it partly fits, help narrow or reword it and remain in RECOGNIZE. Mark userEvaluationStatus as accepted only when the user clearly validates the substance of the formulation. Set proposedMapAction to OFFER_SAVE only after clear acceptance; otherwise use NONE. Do not prescribe a solution or behavioral intervention.`;
+const RECOGNIZE_INSTRUCTIONS = `Operate in RECOGNIZE. Determine whether the user's lived evidence supports a small, specific recurring relationship and formulate it collaboratively. Before proposing a Pattern, identify plausible competing explanations and test the strongest unresolved variable when its answer could materially change the formulation. When the user broadens a possible pattern beyond the examples already discussed, seek one independent lived example or cross-context contrast before persisting that broader scope. Do not prolong testing when the evidence already discriminates clearly, and do not force a Pattern when none is defensible.
+
+During HYPOTHESIS_TESTING, candidatePattern must be null, userEvaluationStatus must be awaiting or uncertain, and proposedMapAction must be NONE. Ask at most one concise discriminating question, or reflect the unresolved distinction when a question is not yet useful. A user's answer to a testing question is evidence, not acceptance of a Pattern that has not yet been presented. Once the smallest defensible relationship is supported, move to CANDIDATE_EVALUATION, describe it as "when X happens, I tend to Y" rather than a fixed identity, briefly connect it to distinct lived observations, and invite the user to confirm, reject, or revise it.
+
+Privately inspect natal context for a symbolic theme that could help distinguish competing explanations or suggest a useful cross-domain test. Record a brief note in privateAstrologyInfluence, or null if it adds nothing. Astrology may shape where to look but never counts as evidence, never raises evidenceStrength, and remains invisible with background astrologyStyle unless the user explicitly asks.
+
+If the user rejects a presented proposition, accept that without defending it, use REJECTED, and recommend EXPLORE. If it partly fits, narrow or reword it and remain in CANDIDATE_EVALUATION. Use VALIDATED and mark accepted only when the user clearly validates the substance of a pattern that was already presented. Set OFFER_SAVE only for that VALIDATED state; otherwise NONE. Do not prescribe a solution or behavioral intervention.`;
 
 export async function generateRecognizeResponse({
   locale,
@@ -26,6 +33,7 @@ export async function generateRecognizeResponse({
   initialAnswers,
   finalQuestions,
   finalAnswers,
+  natalChart,
   thread,
   latestMessage,
   opening,
@@ -37,6 +45,7 @@ export async function generateRecognizeResponse({
   initialAnswers: unknown;
   finalQuestions: unknown;
   finalAnswers: unknown;
+  natalChart: unknown;
   thread: ThreadMessage[];
   latestMessage: string | null;
   opening: boolean;
@@ -45,8 +54,8 @@ export async function generateRecognizeResponse({
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
 
   const openingConstraint = opening
-    ? "This is the first RECOGNIZE response. Formulate one candidate pattern, present it tentatively, and ask the user what fits or does not. Set userEvaluationStatus to awaiting and proposedMapAction to NONE."
-    : "Respond to the user's evaluation of the candidate pattern. Preserve their wording where it improves accuracy, and update the candidatePattern field to the best current formulation.";
+    ? "This is the first RECOGNIZE response. Do not automatically formulate a candidate. First decide whether a material competing explanation remains unresolved. If so, begin with HYPOTHESIS_TESTING and one discriminating question. If the existing lived evidence already resolves the important alternatives, present the smallest defensible candidate in CANDIDATE_EVALUATION."
+    : "Continue from the actual recognition stage shown by the conversation. Do not mistake an answer to hypothesis testing for acceptance. Preserve the user's wording where it improves accuracy, and only broaden scope after independent lived evidence supports it.";
 
   const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
     model: env.OPENAI_MODEL,
@@ -60,6 +69,8 @@ export async function generateRecognizeResponse({
           ...exchanges(initialQuestions, initialAnswers),
           ...exchanges(finalQuestions, finalAnswers),
         ],
+        privateNatalContext: privateChartContext(natalChart),
+        astrologyStyle: DEFAULT_ASTROLOGY_STYLE,
       },
       conversationThread: thread,
       latestUserMessage: latestMessage,
