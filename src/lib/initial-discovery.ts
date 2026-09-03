@@ -86,7 +86,7 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
   try {
     const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
       model: env.OPENAI_MODEL,
-      instructions: `${sharedInstructions(context.locale)} Generate exactly three initial discovery questions. Together they should establish a broad but personalized first picture and cover different dimensions rather than variations of one theme. Move from accessible lived experience toward slightly deeper inquiry. Do not ask for information already present in the user's context. Chart symbolism may only help select hypotheses worth testing.`,
+      instructions: `${sharedInstructions(context.locale)} Generate exactly three initial discovery questions. Together they should establish a broad but personalized first picture and cover different dimensions rather than variations of one theme. Move from accessible lived experience toward slightly deeper inquiry. Do not ask for information already present in the user's context. Chart symbolism may select hypotheses worth testing; present that influence according to astrologyStyle without turning a question into a conclusion.`,
       input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
       text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
     });

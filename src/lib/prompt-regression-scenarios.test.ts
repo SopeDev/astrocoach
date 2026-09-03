@@ -8,10 +8,16 @@ test("prompt regression set covers the observed conversational failures", () => 
     [
       "explore-varied-cadence",
       "explore-chart-changes-inquiry",
+      "discovery-balanced-natural-mention",
+      "discovery-explained-tentative-reason",
+      "explore-deep-relevant-detail",
+      "familiarity-new-accessible",
+      "familiarity-advanced-no-basics",
       "explore-lived-contradiction-wins",
       "recognize-discriminate-before-candidate",
       "recognize-test-broadened-scope",
       "recognize-no-forced-pattern",
+      "deep-no-forced-astrology",
     ],
   );
   for (const scenario of PROMPT_REGRESSION_SCENARIOS) {
