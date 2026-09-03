@@ -22,6 +22,24 @@ enum Theme {
   @@map("theme")
 }
 
+enum AstrologyFamiliarity {
+  new
+  basic
+  familiar
+  advanced
+
+  @@map("astrology_familiarity")
+}
+
+enum AstrologyStyle {
+  background
+  balanced
+  explained
+  deep
+
+  @@map("astrology_style")
+}
+
 enum ConversationMode {
   EXPLORE
   RECOGNIZE
@@ -53,22 +71,24 @@ enum MessageRole {
 }
 
 model User {
-  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String?        @map("display_name")
-  email         String?        @unique
-  emailVerified DateTime?      @map("email_verified") @db.Timestamptz(6)
-  image         String?
-  locale        Locale         @default(en)
-  theme         Theme          @default(system)
-  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
-  accounts      Account[]
-  sessions      Session[]
-  birthProfile  BirthProfile?
-  natalChart    NatalChart?
-  initialIntent InitialIntent?
-  conversations Conversation[]
-  patterns      Pattern[]
+  id                   String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String?              @map("display_name")
+  email                String?              @unique
+  emailVerified        DateTime?            @map("email_verified") @db.Timestamptz(6)
+  image                String?
+  locale               Locale               @default(en)
+  theme                Theme                @default(system)
+  astrologyFamiliarity AstrologyFamiliarity @default(basic) @map("astrology_familiarity")
+  astrologyStyle       AstrologyStyle       @default(balanced) @map("astrology_style")
+  createdAt            DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  accounts             Account[]
+  sessions             Session[]
+  birthProfile         BirthProfile?
+  natalChart           NatalChart?
+  initialIntent        InitialIntent?
+  conversations        Conversation[]
+  patterns             Pattern[]
 
   @@map("users")
 }

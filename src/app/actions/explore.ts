@@ -48,28 +48,29 @@ function patternOfferFromMessage(message: { id: string; internalSignals: unknown
 }
 
 async function loadGenerationContext(userId: string, locale: Locale, conversationId: string, excludedMessageId?: string) {
-  const [intent, natalChart, conversation, recentMessages] = await Promise.all([
+  const [intent, natalChart, conversation, recentMessages, preferences] = await Promise.all([
     db.initialIntent.findUnique({ where: { userId } }),
     db.natalChart.findUnique({ where: { userId } }),
     db.conversation.findFirst({ where: { id: conversationId, userId } }),
     db.message.findMany({ where: { conversationId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 25 }),
+    db.user.findUnique({ where: { id: userId }, select: { astrologyFamiliarity: true, astrologyStyle: true } }),
   ]);
 
-  if (!intent?.discoveryCompletedAt || !natalChart || !conversation) throw new Error("Completed conversation context is unavailable");
+  if (!intent?.discoveryCompletedAt || !natalChart || !conversation || !preferences) throw new Error("Completed conversation context is unavailable");
   const messages = getDictionary(locale);
   const lifeAreas = intent.lifeAreas.flatMap((value) => {
     const key = z.enum(LIFE_AREA_KEYS).safeParse(value);
     return key.success ? [messages.initialIntent.areas[key.data as LifeAreaKey]] : [];
   });
   const thread = recentMessages.reverse().filter((message) => message.id !== excludedMessageId).map((message) => ({ role: message.role, content: message.content }));
-  return { intent, natalChart, conversation, thread, lifeAreas };
+  return { intent, natalChart, conversation, thread, lifeAreas, preferences };
 }
 
 async function generateReply(userId: string, locale: Locale, conversationId: string, userMessage: StoredMessage) {
   const context = await loadGenerationContext(userId, locale, conversationId, userMessage.id);
   const generated = context.conversation.mode === "RECOGNIZE"
-    ? await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, thread: context.thread, latestMessage: userMessage.content, opening: false })
-    : await generateExploreResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, thread: context.thread, latestMessage: userMessage.content });
+    ? await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, opening: false })
+    : await generateExploreResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content });
 
   const assistantMessage = await db.message.create({
     data: { conversationId, role: "assistant", mode: context.conversation.mode, content: generated.reply, internalSignals: generated.signals, model: generated.model, responseId: generated.responseId, inReplyToId: userMessage.id },
@@ -164,7 +165,7 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
   if (context.conversation.status !== "active" || context.conversation.mode !== "EXPLORE" || context.conversation.transitionState !== "OFFERED") return { ok: false as const, error: "message" as const };
 
   try {
-    const generated = await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, thread: context.thread, latestMessage: null, opening: true });
+    const generated = await generateRecognizeResponse({ locale, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalChart: context.natalChart.data, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: null, opening: true });
     const assistantMessage = await db.$transaction(async (transaction) => {
       const updated = await transaction.conversation.updateMany({ where: { id: conversationId, userId: user.id, mode: "EXPLORE", status: "active", transitionState: "OFFERED" }, data: { mode: "RECOGNIZE", transitionState: "IDLE", transitionReferenceAt: new Date() } });
       if (updated.count !== 1) throw new Error("Recognition transition is no longer available");

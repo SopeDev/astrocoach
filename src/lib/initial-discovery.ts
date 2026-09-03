@@ -4,6 +4,8 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import type { Locale } from "@/i18n/config";
+import { ASTROLOGY_COMMUNICATION_INSTRUCTIONS } from "@/lib/astrology-context";
+import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
 import { getServerEnv } from "@/lib/env";
 
 const initialQuestionSetSchema = z.object({
@@ -32,6 +34,8 @@ type DiscoveryContext = {
   areaLabels: string[];
   currentContext: string | null;
   chart: DiscoveryChartData;
+  astrologyFamiliarity: AstrologyFamiliarity;
+  astrologyStyle: AstrologyStyle;
 };
 
 function chartSummary(chart: DiscoveryChartData) {
@@ -45,7 +49,7 @@ function chartSummary(chart: DiscoveryChartData) {
 }
 
 function sharedInstructions(locale: Locale) {
-  return `Write in ${locale === "es" ? "Spanish" : "English"}. AstroCoach uses astrology privately as a lens for inquiry, never as evidence about a person. The user's lived experience is authoritative. Questions must be concise, natural, nonjudgmental, meaningfully distinct, and understandable without astrology knowledge. Never mention planets, signs, houses, aspects, nodes, placements, transits, or other astrological terminology. Never assume a selected area is a problem, imply diagnosis, or state a chart-derived hypothesis as fact. Prefer concrete inquiry about recent experiences, wants, needs, expectations, tensions, and uncertainty. Do not create a Pattern, Insight, recommendation, Practice, or intervention.`;
+  return `Write in ${locale === "es" ? "Spanish" : "English"}. Questions must be concise, natural, nonjudgmental, meaningfully distinct, and presented according to the supplied astrologyStyle and astrologyFamiliarity. The preferences affect presentation only; chart symbolism should inform question selection at every style. Never assume a selected area is a problem, imply diagnosis, or state a chart-derived hypothesis as fact. Prefer concrete inquiry about recent experiences, wants, needs, expectations, tensions, and uncertainty. Do not create a Pattern, Insight, recommendation, Practice, or intervention.\n\n${ASTROLOGY_COMMUNICATION_INSTRUCTIONS}`;
 }
 
 function fallbackInitialQuestions(locale: Locale, areas: string[], context: string | null) {
@@ -83,7 +87,7 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
     const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
       model: env.OPENAI_MODEL,
       instructions: `${sharedInstructions(context.locale)} Generate exactly three initial discovery questions. Together they should establish a broad but personalized first picture and cover different dimensions rather than variations of one theme. Move from accessible lived experience toward slightly deeper inquiry. Do not ask for information already present in the user's context. Chart symbolism may only help select hypotheses worth testing.`,
-      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
+      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
       text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
     });
 
@@ -107,7 +111,7 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
     const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
       model: env.OPENAI_MODEL,
       instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing questions after examining the three initial exchanges. These are not generic extra questions. Identify the highest-value remaining uncertainties, contradictions, assumptions, competing explanations, or missing context. Treat the answers as more authoritative than chart symbolism. Do not repeat anything already answered. Prefer questions that distinguish between plausible understandings and materially improve the initial picture.`,
-      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
+      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
       text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
     });
 

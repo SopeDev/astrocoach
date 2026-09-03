@@ -6,15 +6,18 @@ import { db } from "@/db/client";
 import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
+import { astrologyFamiliaritySchema, astrologyStyleSchema } from "@/lib/astrology-preferences";
 import { generateInitialDiscoveryQuestions } from "@/lib/initial-discovery";
 import { LIFE_AREA_KEYS } from "@/lib/life-areas";
 import { calculateNatalChart, NATAL_ENGINE, NATAL_ENGINE_VERSION, NATAL_SCHEMA_VERSION } from "@/lib/natal-chart";
 
-export type InitialIntentFormState = { error?: "areas" | "context" | "service" };
+export type InitialIntentFormState = { error?: "areas" | "context" | "astrology" | "service" };
 
 const intentSchema = z.object({
   lifeAreas: z.array(z.enum(LIFE_AREA_KEYS)).min(1).max(LIFE_AREA_KEYS.length),
   currentContext: z.string().trim().max(2000),
+  astrologyFamiliarity: astrologyFamiliaritySchema,
+  astrologyStyle: astrologyStyleSchema,
 });
 
 export async function saveInitialIntent(
@@ -27,11 +30,14 @@ export async function saveInitialIntent(
   const result = intentSchema.safeParse({
     lifeAreas: formData.getAll("lifeAreas"),
     currentContext: formData.get("currentContext") ?? "",
+    astrologyFamiliarity: formData.get("astrologyFamiliarity"),
+    astrologyStyle: formData.get("astrologyStyle"),
   });
 
   if (!result.success) {
     const contextInvalid = result.error.issues.some((issue) => issue.path[0] === "currentContext");
-    return { error: contextInvalid ? "context" : "areas" };
+    const astrologyInvalid = result.error.issues.some((issue) => issue.path[0] === "astrologyFamiliarity" || issue.path[0] === "astrologyStyle");
+    return { error: contextInvalid ? "context" : astrologyInvalid ? "astrology" : "areas" };
   }
 
   const user = await requireCurrentUser(locale);
@@ -57,12 +63,18 @@ export async function saveInitialIntent(
       areaLabels,
       currentContext: result.data.currentContext || null,
       chart: calculation.data,
+      astrologyFamiliarity: result.data.astrologyFamiliarity,
+      astrologyStyle: result.data.astrologyStyle,
     });
     const remainingTransitionTime = Math.max(0, 2800 - (Date.now() - startedAt));
     await new Promise((resolve) => setTimeout(resolve, remainingTransitionTime));
     const calculatedAt = new Date();
 
     await db.$transaction([
+      db.user.update({
+        where: { id: user.id },
+        data: { astrologyFamiliarity: result.data.astrologyFamiliarity, astrologyStyle: result.data.astrologyStyle },
+      }),
       db.natalChart.upsert({
         where: { userId: user.id },
         create: {

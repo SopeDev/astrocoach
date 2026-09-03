@@ -71,8 +71,30 @@
     "errors": {
       "areas": "Choose at least one area to continue.",
       "context": "Keep your description under 2,000 characters.",
+      "astrology": "Choose how you’d like AstroCoach to talk with you about astrology.",
       "service": "We couldn’t prepare your questions right now. Please try again."
     }
+  },
+  "astrologyPreferences": {
+    "onboardingTitle": "Make the conversation feel like yours",
+    "onboardingDescription": "Tell us how you’d like astrology to show up. You can change this later.",
+    "familiarityQuestion": "How familiar are you with astrology?",
+    "familiarity": {
+      "new": "I'm new to it",
+      "basic": "I know the basics",
+      "familiar": "I'm pretty familiar",
+      "advanced": "I'm very familiar"
+    },
+    "styleQuestion": "How much astrology would you like AstroCoach to include in your conversations?",
+    "styles": {
+      "background": { "label": "Keep it mostly in the background", "description": "Use my chart to guide the conversation, but usually keep the astrology behind the scenes." },
+      "balanced": { "label": "Mention it when useful", "description": "Bring up relevant astrological connections when they add something useful." },
+      "explained": { "label": "Explain the connections", "description": "Tell me which parts of my chart are informing the exploration and explain why they may be relevant." },
+      "deep": { "label": "Go deep", "description": "Use astrological language freely and explore relevant placements, houses, aspects, and transits in depth." }
+    },
+    "saving": "Saving…",
+    "saved": "Astrology preferences saved.",
+    "saveError": "We couldn't save those preferences. Try again."
   },
   "initialDiscovery": {
     "title": "A few places to begin",
@@ -158,6 +180,8 @@
     "appearance": "Appearance",
     "appearanceDescription": "Choose how AstroCoach looks on this device and save the preference to your account.",
     "themes": { "system": "System", "light": "Light", "dark": "Dark", "saving": "Saving…", "saved": "Appearance saved.", "saveError": "We couldn't save that change. Try again." },
+    "astrology": "Astrology",
+    "astrologyDescription": "Choose how AstroCoach speaks with you about astrology. Your chart still informs the conversation at every setting.",
     "language": "Language",
     "languageDescription": "Choose the language AstroCoach uses for the app and future responses.",
     "selected": "selected",

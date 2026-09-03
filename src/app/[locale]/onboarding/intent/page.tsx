@@ -36,7 +36,17 @@ export default async function InitialIntentPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="mt-8 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm backdrop-blur sm:p-7 dark:border-slate-800 dark:bg-slate-950/60">
-          <InitialIntentForm defaults={intent ? { lifeAreas: intent.lifeAreas, currentContext: intent.currentContext } : undefined} locale={locale} messages={messages.initialIntent} />
+          <InitialIntentForm
+            astrologyMessages={messages.astrologyPreferences}
+            defaults={{
+              lifeAreas: intent?.lifeAreas ?? [],
+              currentContext: intent?.currentContext ?? null,
+              astrologyFamiliarity: user.astrologyFamiliarity,
+              astrologyStyle: user.astrologyStyle,
+            }}
+            locale={locale}
+            messages={messages.initialIntent}
+          />
         </div>
       </section>
     </main>

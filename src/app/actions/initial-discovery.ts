@@ -51,6 +51,8 @@ export async function prepareFinalDiscoveryQuestions(locale: Locale, answers: st
       areaLabels,
       currentContext: intent.currentContext,
       chart: natalChart.data as unknown as DiscoveryChartData,
+      astrologyFamiliarity: user.astrologyFamiliarity,
+      astrologyStyle: user.astrologyStyle,
       initialQuestions: initialQuestions.data,
       initialAnswers: parsedAnswers.data,
     });

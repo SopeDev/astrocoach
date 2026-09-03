@@ -71,8 +71,30 @@
     "errors": {
       "areas": "Elige al menos un área para continuar.",
       "context": "Limita tu descripción a 2.000 caracteres.",
+      "astrology": "Elige cómo quieres que AstroCoach hable contigo sobre astrología.",
       "service": "No pudimos preparar tus preguntas en este momento. Inténtalo de nuevo."
     }
+  },
+  "astrologyPreferences": {
+    "onboardingTitle": "Haz que la conversación se sienta tuya",
+    "onboardingDescription": "Cuéntanos cómo quieres que aparezca la astrología. Puedes cambiarlo más adelante.",
+    "familiarityQuestion": "¿Qué tan familiarizado estás con la astrología?",
+    "familiarity": {
+      "new": "Soy nuevo en esto",
+      "basic": "Conozco lo básico",
+      "familiar": "Estoy bastante familiarizado",
+      "advanced": "Conozco bastante de astrología"
+    },
+    "styleQuestion": "¿Cuánta astrología te gustaría que AstroCoach incluya en tus conversaciones?",
+    "styles": {
+      "background": { "label": "Déjala principalmente en segundo plano", "description": "Usa mi carta para orientar la conversación, pero normalmente mantén la astrología detrás de escena." },
+      "balanced": { "label": "Menciónala cuando sea útil", "description": "Menciona conexiones astrológicas relevantes cuando aporten algo útil." },
+      "explained": { "label": "Explícame las conexiones", "description": "Dime qué partes de mi carta están orientando la exploración y explica por qué podrían ser relevantes." },
+      "deep": { "label": "Profundiza", "description": "Usa lenguaje astrológico libremente y explora en profundidad posiciones, casas, aspectos y tránsitos relevantes." }
+    },
+    "saving": "Guardando…",
+    "saved": "Preferencias de astrología guardadas.",
+    "saveError": "No pudimos guardar esas preferencias. Inténtalo de nuevo."
   },
   "initialDiscovery": {
     "title": "Algunos puntos para comenzar",
@@ -158,6 +180,8 @@
     "appearance": "Apariencia",
     "appearanceDescription": "Elige cómo se ve AstroCoach en este dispositivo y guarda la preferencia en tu cuenta.",
     "themes": { "system": "Sistema", "light": "Claro", "dark": "Oscuro", "saving": "Guardando…", "saved": "Apariencia guardada.", "saveError": "No pudimos guardar ese cambio. Inténtalo de nuevo." },
+    "astrology": "Astrología",
+    "astrologyDescription": "Elige cómo AstroCoach habla contigo sobre astrología. Tu carta orienta la conversación en cualquiera de las opciones.",
     "language": "Idioma",
     "languageDescription": "Elige el idioma que AstroCoach usa en la aplicación y en respuestas futuras.",
     "selected": "seleccionado",
