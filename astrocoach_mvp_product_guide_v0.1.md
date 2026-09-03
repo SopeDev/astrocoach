@@ -460,7 +460,7 @@ The system should not flatten speculation and user-confirmed knowledge into the 
 
 ## 15. Prompt Architecture
 
-The recommended prompt stack and full mode specifications are defined in `astrocoach_prompt_architecture_v0.1.md`.
+The recommended prompt stack and full mode specifications are defined in `astrocoach_prompt_architecture_v0.2.md`.
 
 The application owns mode orchestration. The model may recommend a next mode, but it should not arbitrarily redefine its own operating mode mid-response.
 
