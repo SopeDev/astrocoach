@@ -2,7 +2,7 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { ArrowLeft, Bookmark, Check, LoaderCircle, RefreshCw, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, Bookmark, Check, LoaderCircle, Mic, RefreshCw, Send, Sparkles, Square, X } from "lucide-react";
 import Markdown from "react-markdown";
 import {
   acceptRecognitionTransition,
@@ -15,6 +15,7 @@ import {
   type PatternSaveOffer,
 } from "@/app/actions/explore";
 import type { Locale } from "@/i18n/config";
+import { audioFileExtension, MAX_RECORDING_SECONDS, MAX_TRANSCRIPT_CHARACTERS } from "@/lib/audio-transcription";
 
 type Messages = {
   title: string;
@@ -43,7 +44,32 @@ type Messages = {
   viewMap: string;
   returnHome: string;
   actionError: string;
+  recordAudio: string;
+  recording: string;
+  stopRecording: string;
+  cancelRecording: string;
+  transcribingAudio: string;
+  audioUnsupported: string;
+  microphoneDenied: string;
+  transcriptionError: string;
+  noSpeech: string;
+  audioTooLarge: string;
+  transcriptTooLong: string;
 };
+
+type AudioError = "unsupported" | "permission" | "transcription" | "noSpeech" | "tooLarge" | "transcriptTooLong";
+
+const RECORDING_MIME_TYPES = [
+  "audio/webm;codecs=opus",
+  "audio/mp4;codecs=mp4a.40.2",
+  "audio/mp4",
+  "audio/webm",
+  "audio/ogg;codecs=opus",
+] as const;
+
+function formatRecordingTime(seconds: number) {
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
 
 function AssistantMessageContent({ content }: { content: string }) {
   return (
@@ -85,9 +111,39 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   const [patternSaved, setPatternSaved] = useState(initialClosed && Boolean(initialPatternSaveOffer));
   const [savingPattern, setSavingPattern] = useState(false);
   const [transitionPending, setTransitionPending] = useState(false);
+  const [audioStatus, setAudioStatus] = useState<"idle" | "recording" | "transcribing">("idle");
+  const [audioError, setAudioError] = useState<AudioError | null>(null);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [pending, startTransition] = useTransition();
   const hasScrolledOnLoad = useRef(false);
   const composerInput = useRef<HTMLTextAreaElement>(null);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const mediaStream = useRef<MediaStream | null>(null);
+  const audioChunks = useRef<Blob[]>([]);
+  const discardRecording = useRef(false);
+  const recordingInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const recordingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function clearRecordingTimers() {
+    if (recordingInterval.current) clearInterval(recordingInterval.current);
+    if (recordingTimeout.current) clearTimeout(recordingTimeout.current);
+    recordingInterval.current = null;
+    recordingTimeout.current = null;
+  }
+
+  function releaseMicrophone() {
+    mediaStream.current?.getTracks().forEach((track) => track.stop());
+    mediaStream.current = null;
+    clearRecordingTimers();
+  }
+
+  useEffect(() => () => {
+    discardRecording.current = true;
+    if (mediaRecorder.current?.state === "recording") mediaRecorder.current.stop();
+    mediaStream.current?.getTracks().forEach((track) => track.stop());
+    if (recordingInterval.current) clearInterval(recordingInterval.current);
+    if (recordingTimeout.current) clearTimeout(recordingTimeout.current);
+  }, []);
 
   useLayoutEffect(() => {
     const textarea = composerInput.current;
@@ -124,6 +180,107 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
     };
   }, [closed, patternSaveOffer, patternSaved, pending, thread, transitionOffered]);
 
+  async function transcribeRecording(blob: Blob) {
+    setAudioStatus("transcribing");
+    setAudioError(null);
+    const formData = new FormData();
+    formData.append("audio", blob, `recording.${audioFileExtension(blob.type)}`);
+    formData.append("locale", locale);
+
+    try {
+      const response = await fetch("/api/transcriptions", { method: "POST", body: formData });
+      const result = await response.json() as { text?: string; error?: string };
+      if (!response.ok || !result.text) {
+        const nextError: AudioError = result.error === "no_speech" ? "noSpeech"
+          : result.error === "too_large" ? "tooLarge"
+            : result.error === "transcript_too_long" ? "transcriptTooLong"
+              : "transcription";
+        setAudioError(nextError);
+        return;
+      }
+
+      const combinedDraft = draft.trim() ? `${draft.trim()} ${result.text}` : result.text;
+      if (combinedDraft.length > MAX_TRANSCRIPT_CHARACTERS) {
+        setAudioError("transcriptTooLong");
+        return;
+      }
+
+      setDraft(combinedDraft);
+      window.requestAnimationFrame(() => composerInput.current?.focus());
+    } catch {
+      setAudioError("transcription");
+    } finally {
+      setAudioStatus("idle");
+    }
+  }
+
+  async function startRecording() {
+    if (pending || failedMessageId || audioStatus !== "idle") return;
+    setAudioError(null);
+
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setAudioError("unsupported");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStream.current = stream;
+      const mimeType = RECORDING_MIME_TYPES.find((value) => MediaRecorder.isTypeSupported(value));
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType, audioBitsPerSecond: 48_000 } : { audioBitsPerSecond: 48_000 });
+      mediaRecorder.current = recorder;
+      audioChunks.current = [];
+      discardRecording.current = false;
+
+      recorder.addEventListener("dataavailable", (event) => {
+        if (event.data.size > 0) audioChunks.current.push(event.data);
+      });
+      recorder.addEventListener("stop", () => {
+        const shouldDiscard = discardRecording.current;
+        const blob = new Blob(audioChunks.current, { type: recorder.mimeType || mimeType || "audio/webm" });
+        audioChunks.current = [];
+        mediaRecorder.current = null;
+        discardRecording.current = true;
+        releaseMicrophone();
+        if (shouldDiscard) {
+          setAudioStatus("idle");
+          return;
+        }
+        void transcribeRecording(blob);
+      }, { once: true });
+      recorder.addEventListener("error", () => {
+        releaseMicrophone();
+        setAudioStatus("idle");
+        setAudioError("transcription");
+      }, { once: true });
+
+      recorder.start(1000);
+      setRecordingSeconds(0);
+      setAudioStatus("recording");
+      recordingInterval.current = setInterval(() => setRecordingSeconds((seconds) => seconds + 1), 1000);
+      recordingTimeout.current = setTimeout(() => {
+        if (recorder.state === "recording") recorder.stop();
+      }, MAX_RECORDING_SECONDS * 1000);
+    } catch {
+      releaseMicrophone();
+      setAudioError("permission");
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorder.current?.state !== "recording") return;
+    clearRecordingTimers();
+    setAudioStatus("transcribing");
+    mediaRecorder.current.stop();
+  }
+
+  function cancelRecording() {
+    if (mediaRecorder.current?.state !== "recording") return;
+    discardRecording.current = true;
+    clearRecordingTimers();
+    mediaRecorder.current.stop();
+  }
+
   function applyResult(result: Extract<Awaited<ReturnType<typeof sendExploreMessage>>, { ok: true }>, optimisticId?: string) {
     setThread((existing) => {
       const withoutOptimistic = optimisticId ? existing.filter((message) => message.id !== optimisticId) : existing;
@@ -138,7 +295,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   function submit(event?: FormEvent) {
     event?.preventDefault();
     const content = draft.trim();
-    if (!content || pending || failedMessageId || closed) {
+    if (!content || pending || failedMessageId || closed || audioStatus !== "idle") {
       if (!content) setError("message");
       return;
     }
@@ -247,6 +404,14 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
     }
   }
 
+  const audioErrorMessage = audioError === "unsupported" ? messages.audioUnsupported
+    : audioError === "permission" ? messages.microphoneDenied
+      : audioError === "noSpeech" ? messages.noSpeech
+        : audioError === "tooLarge" ? messages.audioTooLarge
+          : audioError === "transcriptTooLong" ? messages.transcriptTooLong
+            : audioError === "transcription" ? messages.transcriptionError
+              : null;
+
   return (
     <main className="flex min-h-svh flex-col bg-[var(--background)] text-[var(--foreground)]">
       <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-[color:var(--background)]/90 px-5 py-4 backdrop-blur dark:border-slate-800/80">
@@ -270,7 +435,30 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
           )}
         </div>
 
-        {!closed && !transitionOffered ? <form className="sticky bottom-0 border-t border-slate-200/70 bg-[color:var(--background)]/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur dark:border-slate-800/80" onSubmit={submit}><label className="sr-only" htmlFor="explore-message">{messages.inputLabel}</label><div className="flex items-end gap-3"><textarea className="min-h-12 flex-1 resize-none overflow-y-hidden rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-white" disabled={pending || Boolean(failedMessageId)} id="explore-message" maxLength={4000} onChange={(event) => { setDraft(event.target.value); if (event.target.value.trim()) setError(null); }} onKeyDown={handleKeyDown} placeholder={messages.inputPlaceholder} ref={composerInput} rows={1} value={draft} /><button aria-label={messages.send} className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-violet-700 text-white shadow-sm transition hover:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending || Boolean(failedMessageId) || !draft.trim()} type="submit"><Send aria-hidden="true" className="size-5" /></button></div>{error === "message" ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">{messages.messageError}</p> : null}</form> : null}
+        {!closed && !transitionOffered ? (
+          <form className="sticky bottom-0 border-t border-slate-200/70 bg-[color:var(--background)]/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur dark:border-slate-800/80" onSubmit={submit}>
+            {audioStatus === "recording" ? (
+              <div className="flex min-h-14 items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 dark:border-red-900 dark:bg-red-950/45">
+                <span className="size-2.5 shrink-0 animate-pulse rounded-full bg-red-600" />
+                <span className="min-w-0 flex-1 text-sm font-semibold text-red-900 dark:text-red-100">{messages.recording} · {formatRecordingTime(recordingSeconds)} / {formatRecordingTime(MAX_RECORDING_SECONDS)}</span>
+                <button aria-label={messages.cancelRecording} className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl text-red-800 transition hover:bg-red-100 active:scale-95 dark:text-red-200 dark:hover:bg-red-900/60" onClick={cancelRecording} type="button"><X aria-hidden="true" className="size-5" /></button>
+                <button aria-label={messages.stopRecording} className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-red-600 text-white shadow-sm transition hover:bg-red-700 active:scale-95" onClick={stopRecording} type="button"><Square aria-hidden="true" className="size-4 fill-current" /></button>
+              </div>
+            ) : (
+              <>
+                <label className="sr-only" htmlFor="explore-message">{messages.inputLabel}</label>
+                <div className="flex items-end gap-2 sm:gap-3">
+                  <textarea className="min-h-12 flex-1 resize-none overflow-y-hidden rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-white" disabled={pending || audioStatus === "transcribing" || Boolean(failedMessageId)} id="explore-message" maxLength={MAX_TRANSCRIPT_CHARACTERS} onChange={(event) => { setDraft(event.target.value); setAudioError(null); if (event.target.value.trim()) setError(null); }} onKeyDown={handleKeyDown} placeholder={messages.inputPlaceholder} ref={composerInput} rows={1} value={draft} />
+                  <button aria-label={audioStatus === "transcribing" ? messages.transcribingAudio : messages.recordAudio} className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-95 disabled:cursor-wait disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" disabled={pending || audioStatus === "transcribing" || Boolean(failedMessageId)} onClick={startRecording} type="button">{audioStatus === "transcribing" ? <LoaderCircle aria-hidden="true" className="size-5 animate-spin" /> : <Mic aria-hidden="true" className="size-5" />}</button>
+                  <button aria-label={messages.send} className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-violet-700 text-white shadow-sm transition hover:bg-violet-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending || audioStatus === "transcribing" || Boolean(failedMessageId) || !draft.trim()} type="submit"><Send aria-hidden="true" className="size-5" /></button>
+                </div>
+              </>
+            )}
+            {audioStatus === "transcribing" ? <p className="mt-2 text-sm text-slate-500 dark:text-slate-400" role="status">{messages.transcribingAudio}</p> : null}
+            {audioErrorMessage ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">{audioErrorMessage}</p> : null}
+            {error === "message" ? <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">{messages.messageError}</p> : null}
+          </form>
+        ) : null}
       </div>
     </main>
   );

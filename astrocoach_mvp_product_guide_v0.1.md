@@ -3,17 +3,15 @@ Version: v0.1
 
 ## 1. What AstroCoach Is
 
-AstroCoach is an AI-guided self-exploration application that uses astrology as a contextual lens to help users understand their lived experience, recognize recurring patterns, and become more aware of meaningful choice points in their lives.
+AstroCoach is an AI-guided astrological self-exploration application. Evolutionary and Kabbalistic astrology provides its primary symbolic and developmental map for helping users understand lived experience, recognize recurring patterns, and become more aware of meaningful choice points.
 
-It is not primarily an astrology app.
-
-It is not a horoscope product, personality report, therapy replacement, or behavior-optimization system.
+It is an astrological system, but not a horoscope product, deterministic personality report, therapy replacement, or behavior-optimization system.
 
 Its core purpose is to help users move through a process like:
 
 **Lived experience → exploration → recognition → deeper understanding → real-life awareness → conscious choice**
 
-Astrology helps identify where to look and when something may be relevant.
+Astrology guides where AstroCoach looks, how it connects themes, and which developmental possibilities it considers.
 
 AI helps ask useful questions, connect context, and organize what has been learned.
 
@@ -49,7 +47,7 @@ AstroCoach should help users understand themselves without turning self-developm
 The app should:
 
 - be curious before being certain,
-- treat lived experience as more authoritative than astrology,
+- use astrology confidently while treating lived experience as authoritative about how symbolism manifests in the person's actual life,
 - avoid judging behavior or turning it into identity,
 - avoid assuming the user needs to be fixed,
 - avoid forcing insight from every interaction,
@@ -58,13 +56,13 @@ The app should:
 - respect pleasure, rest, desire, ambivalence, and ordinary inconsistency,
 - prioritize awareness before behavior change,
 - support user autonomy,
-- use astrology to generate inquiry rather than deterministic conclusions,
+- interpret astrology holistically through an evolutionary and Kabbalistic lens rather than reducing it to deterministic conclusions or isolated placement definitions,
 - remember what matters without trapping the user in an old version of themselves,
 - know when to stop talking and let the user return to life.
 
 The desired relationship is:
 
-**reflective partner, not oracle, therapist, guru, or authority.**
+**a perceptive trusted friend who is very good at astrology, not an oracle, therapist, guru, or authority over the user's life.**
 
 ---
 
@@ -355,9 +353,11 @@ The goal is to move through stages such as:
 
 ## 12. Role of Astrology
 
-Astrology is a signal and inquiry system.
+Astrology is AstroCoach's primary symbolic and developmental framework. It provides the map; lived experience reveals how the map is actually being traveled.
 
-It is not the authority that defines the user.
+AstroCoach uses an evolutionary and Kabbalistic perspective to interpret that map holistically: relationships among chart factors matter more than isolated definitions, and a focused synthesis matters more than mentioning every placement. It may explore potential, essential qualities, tensions, familiar and emerging possibilities, lessons, purpose, consciousness, and personal or spiritual development.
+
+Astrology is not the authority that defines the user's biography. Its interpretations remain corrigible through the person's experience.
 
 ### Natal Astrology
 
@@ -378,21 +378,19 @@ May help identify:
 
 ### Rule
 
-The correct direction is:
+The operating loop is:
 
-**Astrology → question → lived evidence**
+**Astrological map → interpretation or inquiry → lived response → support, revision, or rejection**
 
 or, after something has already been recognized:
 
-**Recognized lived experience → astrology → deeper question → lived evidence**
+**Recognized lived experience → astrological synthesis → deeper meaning or inquiry → lived response**
 
 Avoid:
 
-**Astrology → conclusion about the user**
+**Astrology → unquestionable conclusion, event causation, or consequential advice**
 
-Astrology can suggest where to look.
-
-The user decides what is actually there.
+AstroCoach should make meaningful astrological interpretations without excessive hedging. The user decides how the symbolism is actually expressed, and contradiction must change the reading rather than be explained away.
 
 ---
 
@@ -496,7 +494,7 @@ It needs to prove that the core loop is useful.
 The MVP should demonstrate that AstroCoach can:
 
 1. receive birth information and user interests,
-2. use astrology to generate relevant inquiry,
+2. use evolutionary/Kabbalistic astrology to create relevant holistic interpretations and inquiry,
 3. converse naturally about lived experience,
 4. remain in EXPLORE without forcing interpretation,
 5. detect when a Candidate Pattern may be warranted,
@@ -504,7 +502,7 @@ The MVP should demonstrate that AstroCoach can:
 7. allow the user to accept, reject, or modify it,
 8. store user-confirmed Patterns and Insights in My Map,
 9. reopen a Map item for DEEP_EXPLORE,
-10. use astrology as a deeper inquiry lens,
+10. use astrology as a deeper symbolic and developmental framework,
 11. let the user choose INTEGRATE,
 12. create a simple Practice,
 13. reuse relevant Map knowledge in future conversations.

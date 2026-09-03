@@ -56,6 +56,10 @@ Last updated: 2026-09-03
 - Added independent astrology familiarity and communication-style preferences with persistent user-level defaults, localized mobile-first onboarding controls after birth information, and editable Account controls.
 - Passed both astrology preferences into initial and adaptive discovery, EXPLORE, and RECOGNIZE while centralizing the shared visibility, vocabulary, material-relevance, and lived-evidence rules.
 - Expanded prompt regression coverage across background, balanced, explained, and deep visibility; new and advanced familiarity; contradiction handling; and no forced astrology.
+- Made the root language-selection screen session-aware so authenticated users go directly to Home or their unfinished onboarding stage using their saved locale.
+- Added authenticated transcript-first voice input to the conversation composer with mobile recording, cancel/stop controls, a two-minute limit, English/Spanish transcription hints, editable transcript insertion, format and size validation, localized failure states, and no audio persistence.
+- Strengthened the shared prompt around a holistic evolutionary/Kabbalistic astrological worldview, a trusted-friend voice, confident but corrigible interpretation, natural human correction, and explicit boundaries against astrology-only causation or consequential advice.
+- Added three concise shared conversation examples for synthesis, lived agreement, and genuine revision, plus regression scenarios covering holistic interpretation, evolutionary language, confidence, cadence, correction, causation, advice, deep style, and background style.
 
 ## Remaining
 
@@ -63,6 +67,7 @@ Last updated: 2026-09-03
 - Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness and RECOGNIZE accuracy, especially cadence, premature invitations, partial agreement, rejection, and revised wording.
 - Add Pattern detail, editing, archival, and provenance views after validating that saved formulations are useful.
 - Implement DEEP_EXPLORE only after recognized Patterns and their handoff behavior are stable.
+- Manually verify microphone permission, recording, cancellation, and transcription on an installed iPhone and Android PWA.
 
 ## Known issues and open questions
 
@@ -77,4 +82,4 @@ Last updated: 2026-09-03
 
 ## Next planned slice
 
-Manually evaluate the refined EXPLORE → invitation → hypothesis testing → Candidate Pattern → My Map path against the six regression scenarios. Tune only failures observed with the configured model before adding Pattern editing or DEEP_EXPLORE.
+Manually verify voice transcription on iPhone and Android, then run the expanded prompt regression set against the configured model—especially holistic synthesis, confident correction, cadence, causation boundaries, and RECOGNIZE evidence handling. Tune only observed failures before adding Pattern editing or DEEP_EXPLORE.

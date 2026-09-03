@@ -4,7 +4,7 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import type { Locale } from "@/i18n/config";
-import { ASTROLOGY_COMMUNICATION_INSTRUCTIONS } from "@/lib/astrology-context";
+import { ASTROCOACH_VOICE_INSTRUCTIONS, ASTROLOGY_COMMUNICATION_INSTRUCTIONS } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
 import { getServerEnv } from "@/lib/env";
 
@@ -49,7 +49,7 @@ function chartSummary(chart: DiscoveryChartData) {
 }
 
 function sharedInstructions(locale: Locale) {
-  return `Write in ${locale === "es" ? "Spanish" : "English"}. Questions must be concise, natural, nonjudgmental, meaningfully distinct, and presented according to the supplied astrologyStyle and astrologyFamiliarity. The preferences affect presentation only; chart symbolism should inform question selection at every style. Never assume a selected area is a problem, imply diagnosis, or state a chart-derived hypothesis as fact. Prefer concrete inquiry about recent experiences, wants, needs, expectations, tensions, and uncertainty. Do not create a Pattern, Insight, recommendation, Practice, or intervention.\n\n${ASTROLOGY_COMMUNICATION_INSTRUCTIONS}`;
+  return `Write in ${locale === "es" ? "Spanish" : "English"}. Questions must be concise, natural, nonjudgmental, meaningfully distinct, and presented according to the supplied astrologyStyle and astrologyFamiliarity. The preferences affect presentation only; the holistic astrological framework should inform question selection at every style. Never assume a selected area is a problem, imply diagnosis, or state a chart-derived interpretation as lived fact. Prefer concrete inquiry about recent experiences, wants, needs, expectations, tensions, and uncertainty. Do not create a Pattern, Insight, recommendation, Practice, or intervention.\n\n${ASTROLOGY_COMMUNICATION_INSTRUCTIONS}\n\n${ASTROCOACH_VOICE_INSTRUCTIONS}`;
 }
 
 function fallbackInitialQuestions(locale: Locale, areas: string[], context: string | null) {

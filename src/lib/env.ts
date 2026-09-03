@@ -4,6 +4,7 @@ const serverEnvSchema = z.object({
   DATABASE_URL: z.string().url(),
   OPENAI_API_KEY: z.string().min(1).optional(),
   OPENAI_MODEL: z.string().min(1).default("gpt-5.6-luna"),
+  OPENAI_TRANSCRIBE_MODEL: z.string().min(1).default("gpt-transcribe"),
   GEONAMES_USERNAME: z.string().min(1).optional(),
 });
 
@@ -16,6 +17,7 @@ export function getServerEnv() {
       process.env.astro_POSTGRES_URL,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY || undefined,
     OPENAI_MODEL: process.env.OPENAI_MODEL || undefined,
+    OPENAI_TRANSCRIBE_MODEL: process.env.OPENAI_TRANSCRIBE_MODEL || undefined,
     GEONAMES_USERNAME: process.env.GEONAMES_USERNAME || undefined,
   });
 }

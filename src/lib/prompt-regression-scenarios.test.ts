@@ -18,6 +18,12 @@ test("prompt regression set covers the observed conversational failures", () => 
       "recognize-test-broadened-scope",
       "recognize-no-forced-pattern",
       "deep-no-forced-astrology",
+      "astrology-holistic-synthesis",
+      "astrology-evolutionary-language",
+      "astrology-confident-corrigible",
+      "astrology-human-correction-language",
+      "astrology-no-event-causation",
+      "astrology-no-consequential-advice",
     ],
   );
   for (const scenario of PROMPT_REGRESSION_SCENARIOS) {

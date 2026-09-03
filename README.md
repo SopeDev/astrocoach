@@ -1,6 +1,6 @@
 # AstroCoach
 
-AstroCoach is a responsive, bilingual self-exploration application that uses astrology as a contextual inquiry lens. The current prototype scope is limited to EXPLORE mode.
+AstroCoach is a responsive, bilingual astrological self-exploration application informed by evolutionary and Kabbalistic astrology. The current prototype implements the EXPLORE and RECOGNIZE conversation modes while grounding interpretations in the user's lived experience.
 
 ## Local setup
 

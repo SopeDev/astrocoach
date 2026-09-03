@@ -1,13 +1,19 @@
 import { Languages, MoonStar } from "lucide-react";
+import { redirect } from "next/navigation";
 import { selectLanguage } from "@/app/actions/onboarding";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { getCurrentUser } from "@/lib/auth-user";
+import { getUserLandingPath } from "@/lib/user-landing";
 
 const languageOptions = [
   { locale: "en", name: "English", description: "Continue in English" },
   { locale: "es", name: "Español", description: "Continuar en español" },
 ] as const;
 
-export default function LanguageSelectionPage() {
+export default async function LanguageSelectionPage() {
+  const user = await getCurrentUser();
+  if (user) redirect(await getUserLandingPath(user.locale, user.id));
+
   return (
     <main className="relative flex min-h-svh items-center justify-center overflow-hidden px-5 py-14 sm:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,var(--glow-primary),transparent_34%),radial-gradient(circle_at_bottom_right,var(--glow-secondary),transparent_32%)]" />
