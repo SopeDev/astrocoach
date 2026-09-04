@@ -10,6 +10,15 @@ import { astrologyFamiliaritySchema, astrologyStyleSchema } from "@/lib/astrolog
 import { generateInitialDiscoveryQuestions } from "@/lib/initial-discovery";
 import { LIFE_AREA_KEYS } from "@/lib/life-areas";
 import { calculateNatalChart, NATAL_ENGINE, NATAL_ENGINE_VERSION, NATAL_SCHEMA_VERSION } from "@/lib/natal-chart";
+import {
+  interpretationIsCurrent,
+  natalInterpretationDocumentSchema,
+  NATAL_INTERPRETATION_SCHEMA_VERSION,
+} from "@/lib/natal-interpretation";
+import {
+  prepareNatalInterpretation,
+  type PreparedNatalInterpretation,
+} from "@/lib/natal-interpretation-generation";
 
 export type InitialIntentFormState = { error?: "areas" | "context" | "astrology" | "service" };
 
@@ -41,7 +50,10 @@ export async function saveInitialIntent(
   }
 
   const user = await requireCurrentUser(locale);
-  const profile = await db.birthProfile.findUnique({ where: { userId: user.id } });
+  const [profile, existingInterpretation] = await Promise.all([
+    db.birthProfile.findUnique({ where: { userId: user.id } }),
+    db.natalInterpretation.findUnique({ where: { userId: user.id } }),
+  ]);
 
   if (!profile?.latitude || !profile.longitude || !profile.timezoneId) {
     redirect(`/${locale}/onboarding/birth-location`);
@@ -56,13 +68,29 @@ export async function saveInitialIntent(
       longitude: Number(profile.longitude),
       timezoneId: profile.timezoneId,
     });
+    const reusingInterpretation = Boolean(
+      existingInterpretation
+      && interpretationIsCurrent(existingInterpretation.data, calculation.inputHash),
+    );
+    const preparedInterpretation: PreparedNatalInterpretation = reusingInterpretation
+      ? {
+          document: natalInterpretationDocumentSchema.parse(existingInterpretation!.data),
+          generationMethod: existingInterpretation!.generationMethod as PreparedNatalInterpretation["generationMethod"],
+          model: existingInterpretation!.model,
+        }
+      : await prepareNatalInterpretation({
+          chart: calculation.data,
+          inputHash: calculation.inputHash,
+          timeAccuracy: calculation.timeAccuracy,
+        });
     const messages = getDictionary(locale);
     const areaLabels = result.data.lifeAreas.map((key) => messages.initialIntent.areas[key]);
     const questions = await generateInitialDiscoveryQuestions({
       locale,
+      lifeAreaKeys: result.data.lifeAreas,
       areaLabels,
       currentContext: result.data.currentContext || null,
-      chart: calculation.data,
+      natalInterpretation: preparedInterpretation.document,
       astrologyFamiliarity: result.data.astrologyFamiliarity,
       astrologyStyle: result.data.astrologyStyle,
     });
@@ -70,12 +98,12 @@ export async function saveInitialIntent(
     await new Promise((resolve) => setTimeout(resolve, remainingTransitionTime));
     const calculatedAt = new Date();
 
-    await db.$transaction([
-      db.user.update({
+    await db.$transaction(async (transaction) => {
+      await transaction.user.update({
         where: { id: user.id },
         data: { astrologyFamiliarity: result.data.astrologyFamiliarity, astrologyStyle: result.data.astrologyStyle },
-      }),
-      db.natalChart.upsert({
+      });
+      const natalChart = await transaction.natalChart.upsert({
         where: { userId: user.id },
         create: {
           userId: user.id, engine: NATAL_ENGINE, engineVersion: NATAL_ENGINE_VERSION,
@@ -89,8 +117,30 @@ export async function saveInitialIntent(
           timeAccuracy: calculation.timeAccuracy, houseSystem: calculation.houseSystem,
           sourceProfileUpdated: profile.updatedAt, calculatedAt, data: calculation.data,
         },
-      }),
-      db.initialIntent.upsert({
+      });
+      await transaction.natalInterpretation.upsert({
+        where: { userId: user.id },
+        create: {
+          userId: user.id,
+          natalChartId: natalChart.id,
+          schemaVersion: NATAL_INTERPRETATION_SCHEMA_VERSION,
+          sourceChartInputHash: calculation.inputHash,
+          generationMethod: preparedInterpretation.generationMethod,
+          model: preparedInterpretation.model,
+          data: preparedInterpretation.document,
+          generatedAt: calculatedAt,
+        },
+        update: {
+          natalChartId: natalChart.id,
+          schemaVersion: NATAL_INTERPRETATION_SCHEMA_VERSION,
+          sourceChartInputHash: calculation.inputHash,
+          generationMethod: preparedInterpretation.generationMethod,
+          model: preparedInterpretation.model,
+          data: preparedInterpretation.document,
+          ...(!reusingInterpretation ? { generatedAt: calculatedAt } : {}),
+        },
+      });
+      await transaction.initialIntent.upsert({
         where: { userId: user.id },
         create: {
           userId: user.id,
@@ -115,8 +165,8 @@ export async function saveInitialIntent(
           orientationCompletedAt: null,
           questionsGenerated: calculatedAt,
         },
-      }),
-    ]);
+      });
+    });
   } catch (error) {
     console.error("Preparing initial discovery failed", error);
     return { error: "service" };

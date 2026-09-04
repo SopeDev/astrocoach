@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "Libro Cosmobiología - 2014.docx",
+  "kind": "house_archetype",
+  "entries": [
+    {
+      "id": "house.1", "kind": "house_archetype", "factors": { "house": 1 },
+      "topics": ["identity", "beginnings", "self_presentation", "agency", "embodiment"],
+      "interpretation": {
+        "core_meaning": "The first house describes the field of emergence: how someone enters experience, presents an immediate self, and begins acting as a distinct embodied person.",
+        "possible_expressions": ["The manner of approaching unfamiliar situations", "The first impression made through presence and behavior", "Instinctive ways of initiating action"],
+        "developmental_direction": "Develop a way of entering life that feels personally authentic while remaining responsive to the environment and the people encountered there."
+      }
+    },
+    {
+      "id": "house.2", "kind": "house_archetype", "factors": { "house": 2 },
+      "topics": ["values", "resources", "money", "talents", "self_worth", "stability"],
+      "interpretation": {
+        "core_meaning": "The second house describes the field in which resources, values, capability, and a sense of sufficiency take concrete form.",
+        "possible_expressions": ["The relationship with money and material resources", "Talents or capacities that can be cultivated", "What creates a sense of stability and personal value"],
+        "developmental_direction": "Build resources in ways that reflect genuine values while distinguishing inner worth from what is owned, earned, or externally recognized."
+      }
+    },
+    {
+      "id": "house.3", "kind": "house_archetype", "factors": { "house": 3 },
+      "topics": ["communication", "learning", "local_environment", "siblings", "perception"],
+      "interpretation": {
+        "core_meaning": "The third house describes the field of everyday perception, learning, communication, and exchange with the immediate environment.",
+        "possible_expressions": ["How information is gathered and shared", "Experiences with siblings, peers, or neighbors", "The movement among local places, ideas, and practical skills"],
+        "developmental_direction": "Develop flexible and attentive communication that connects immediate observations with a broader understanding rather than treating familiar assumptions as complete."
+      }
+    },
+    {
+      "id": "house.4", "kind": "house_archetype", "factors": { "house": 4 },
+      "topics": ["home", "family", "roots", "privacy", "emotional_foundation"],
+      "interpretation": {
+        "core_meaning": "The fourth house describes the private foundation of life: home, roots, family inheritance, and the inner base to which someone returns.",
+        "possible_expressions": ["The emotional meaning of home and privacy", "Inherited family patterns and sources of belonging", "The conditions needed for inner rootedness"],
+        "developmental_direction": "Create an inner and outer home that honors origin without requiring the past or inherited family roles to determine present identity."
+      }
+    },
+    {
+      "id": "house.5", "kind": "house_archetype", "factors": { "house": 5 },
+      "topics": ["creativity", "play", "romance", "children", "self_expression", "joy"],
+      "interpretation": {
+        "core_meaning": "The fifth house describes the field of creative self-expression, play, pleasure, romance, and what is brought into life as a personal creation.",
+        "possible_expressions": ["Artistic or dramatic expression", "Play, courtship, and chosen forms of enjoyment", "Relationships with children or personally generative projects"],
+        "developmental_direction": "Risk wholehearted creation and enjoyment without making attention, performance, or a particular outcome the condition for creative worth."
+      }
+    },
+    {
+      "id": "house.6", "kind": "house_archetype", "factors": { "house": 6 },
+      "topics": ["daily_life", "work", "service", "routines", "health", "skill"],
+      "interpretation": {
+        "core_meaning": "The sixth house describes the field of daily work, service, routines, skill development, and practical stewardship of the body and ordinary life.",
+        "possible_expressions": ["Work habits and relationships with coworkers", "Repeated practices that support wellbeing", "The refinement of useful skills through service"],
+        "developmental_direction": "Create sustainable practices that support meaningful contribution without reducing life to duty, productivity, correction, or perfect control."
+      }
+    },
+    {
+      "id": "house.7", "kind": "house_archetype", "factors": { "house": 7 },
+      "topics": ["relationships", "partnership", "agreements", "conflict", "reciprocity"],
+      "interpretation": {
+        "core_meaning": "The seventh house describes the field of one-to-one relationship, partnership, agreement, and encounters with an equal other whose perspective cannot be absorbed into one's own.",
+        "possible_expressions": ["Close personal or professional partnerships", "Commitments, contracts, and negotiated agreements", "Qualities encountered through attraction or conflict with others"],
+        "developmental_direction": "Develop reciprocity that preserves both participation and difference, using relationship as a meeting rather than a substitute for personal agency."
+      }
+    },
+    {
+      "id": "house.8", "kind": "house_archetype", "factors": { "house": 8 },
+      "topics": ["intimacy", "shared_resources", "power", "loss", "transformation", "trust"],
+      "interpretation": {
+        "core_meaning": "The eighth house describes the field of intimacy, shared resources, power, loss, and transformations that arise when personal control is no longer sufficient.",
+        "possible_expressions": ["Emotional and sexual intimacy", "Shared money, obligations, or inheritances", "Processes of ending, grief, exposure, and regeneration"],
+        "developmental_direction": "Enter mutual dependence with honesty, consent, and appropriate boundaries while allowing necessary change to transform attachment and power."
+      }
+    },
+    {
+      "id": "house.9", "kind": "house_archetype", "factors": { "house": 9 },
+      "topics": ["meaning", "beliefs", "higher_learning", "travel", "worldview", "teaching"],
+      "interpretation": {
+        "core_meaning": "The ninth house describes the field in which experience is organized into a worldview through higher learning, philosophy, spiritual inquiry, teaching, and encounters beyond the familiar world.",
+        "possible_expressions": ["Advanced study or sustained inquiry", "Travel and engagement with unfamiliar cultures", "The development and communication of ethical, philosophical, or spiritual meaning"],
+        "developmental_direction": "Let conviction remain teachable, allowing direct experience and other perspectives to deepen rather than merely confirm an established worldview."
+      }
+    },
+    {
+      "id": "house.10", "kind": "house_archetype", "factors": { "house": 10 },
+      "topics": ["vocation", "public_life", "authority", "reputation", "responsibility", "achievement"],
+      "interpretation": {
+        "core_meaning": "The tenth house describes the field of vocation, public responsibility, reputation, achievement, and the relationship with authority in the wider world.",
+        "possible_expressions": ["The kind of contribution made publicly", "Experiences of leadership, accountability, or professional direction", "How sustained effort becomes visible and socially consequential"],
+        "developmental_direction": "Build public authority around a meaningful contribution rather than allowing status, expectation, or reputation to replace an internally chosen direction."
+      }
+    },
+    {
+      "id": "house.11", "kind": "house_archetype", "factors": { "house": 11 },
+      "topics": ["friendship", "community", "networks", "future", "collective_goals", "belonging"],
+      "interpretation": {
+        "core_meaning": "The eleventh house describes the field of friendship, networks, collective aims, and participation in futures that no individual creates alone.",
+        "possible_expressions": ["Friendships organized around shared interests", "Participation in groups, communities, or movements", "Long-range hopes and contributions to collective life"],
+        "developmental_direction": "Join collective possibility without surrendering personal discernment or treating belonging to a group as a substitute for intimate relationship."
+      }
+    },
+    {
+      "id": "house.12", "kind": "house_archetype", "factors": { "house": 12 },
+      "topics": ["inner_life", "solitude", "unconscious", "compassion", "spirituality", "closure"],
+      "interpretation": {
+        "core_meaning": "The twelfth house describes the field of inner life, solitude, closure, compassion, and material that operates beyond ordinary conscious control or social visibility.",
+        "possible_expressions": ["Restoration through retreat, contemplation, or spiritual practice", "Contact with dreams, imagination, and unrecognized patterns", "Service or compassion offered outside public recognition"],
+        "developmental_direction": "Bring hidden experience into compassionate awareness and workable form without romanticizing suffering, isolation, sacrifice, or escape."
+      }
+    }
+  ]
+}

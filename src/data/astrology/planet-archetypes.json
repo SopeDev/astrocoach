@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "Libro Cosmobiología - 2014.docx",
+  "kind": "planet_archetype",
+  "entries": [
+    {
+      "id": "planet.sun", "kind": "planet_archetype", "factors": { "planet": "Sun" },
+      "topics": ["identity", "purpose", "vitality", "creativity", "authority"],
+      "interpretation": {
+        "core_meaning": "The Sun symbolizes the conscious center of identity: the will to exist as oneself, create, and direct life toward a personally meaningful purpose.",
+        "possible_expressions": ["Seeking a recognizable form of self-expression", "Developing confidence through purposeful action", "Wanting one's contribution to be seen and valued"],
+        "developmental_direction": "Let personal radiance arise from integrity and creative participation rather than making recognition, dominance, or a fixed self-image the measure of worth."
+      }
+    },
+    {
+      "id": "planet.moon", "kind": "planet_archetype", "factors": { "planet": "Moon" },
+      "topics": ["emotions", "security", "memory", "care", "belonging"],
+      "interpretation": {
+        "core_meaning": "The Moon symbolizes emotional needs, instinctive responses, memory, and the inner conditions that create safety, nourishment, and belonging.",
+        "possible_expressions": ["Responding from learned emotional patterns", "Seeking familiar forms of comfort and protection", "Caring for oneself and others through instinctive attention"],
+        "developmental_direction": "Build forms of care and belonging that can evolve with present experience rather than remaining governed only by habit, memory, or fear of losing safety."
+      }
+    },
+    {
+      "id": "planet.mercury", "kind": "planet_archetype", "factors": { "planet": "Mercury" },
+      "topics": ["thinking", "communication", "learning", "perception", "connection"],
+      "interpretation": {
+        "core_meaning": "Mercury symbolizes perception, thought, language, and the mental connections through which experience is named, compared, learned, and communicated.",
+        "possible_expressions": ["Gathering and organizing information", "Translating experience into words or concepts", "Developing techniques through observation and practice"],
+        "developmental_direction": "Use intelligence to create clear, responsive exchange while allowing curiosity and new information to revise an established interpretation."
+      }
+    },
+    {
+      "id": "planet.venus", "kind": "planet_archetype", "factors": { "planet": "Venus" },
+      "topics": ["affection", "attraction", "relationships", "pleasure", "values", "beauty"],
+      "interpretation": {
+        "core_meaning": "Venus symbolizes attraction, affection, pleasure, and the personal values that draw someone toward people, experiences, and forms of beauty.",
+        "possible_expressions": ["Giving and receiving affection", "Recognizing what feels beautiful or worthy of care", "Creating affinity, cooperation, and shared enjoyment"],
+        "developmental_direction": "Develop forms of connection that allow genuine appreciation and mutuality without using harmony, desirability, or approval to avoid necessary differences."
+      }
+    },
+    {
+      "id": "planet.mars", "kind": "planet_archetype", "factors": { "planet": "Mars" },
+      "topics": ["action", "assertion", "desire", "courage", "conflict", "agency"],
+      "interpretation": {
+        "core_meaning": "Mars symbolizes the force to act, pursue desire, defend boundaries, compete, and preserve the integrity of an individual direction.",
+        "possible_expressions": ["Initiating action under pressure", "Expressing anger or direct desire", "Testing strength through effort, risk, or competition"],
+        "developmental_direction": "Turn raw force into conscious agency that can protect and pursue without requiring domination, unnecessary conflict, or the denial of another person's will."
+      }
+    },
+    {
+      "id": "planet.jupiter", "kind": "planet_archetype", "factors": { "planet": "Jupiter" },
+      "topics": ["growth", "meaning", "beliefs", "wisdom", "abundance", "integration"],
+      "interpretation": {
+        "core_meaning": "Jupiter symbolizes expansion, meaning, and the impulse to integrate experience into a larger understanding of life. It looks for possibility beyond present limits.",
+        "possible_expressions": ["Growing through exploration and education", "Finding coherence through philosophy, faith, or broad perspective", "Encouraging confidence, generosity, and opportunity"],
+        "developmental_direction": "Let expansion mature into inclusive wisdom by balancing confidence and abundance with proportion, detail, and accountability."
+      }
+    },
+    {
+      "id": "planet.saturn", "kind": "planet_archetype", "factors": { "planet": "Saturn" },
+      "topics": ["limits", "responsibility", "discipline", "time", "authority", "maturity"],
+      "interpretation": {
+        "core_meaning": "Saturn symbolizes form, limits, time, responsibility, and the maturation that comes through sustained engagement with reality and consequence.",
+        "possible_expressions": ["Building competence through disciplined effort", "Taking obligations and boundaries seriously", "Encountering delay as a demand for stronger structure"],
+        "developmental_direction": "Develop internal authority and durable form without letting fear, severity, or social expectation define the full range of what is possible."
+      }
+    },
+    {
+      "id": "planet.uranus", "kind": "planet_archetype", "factors": { "planet": "Uranus" },
+      "topics": ["change", "freedom", "innovation", "awakening", "individuality", "systems"],
+      "interpretation": {
+        "core_meaning": "Uranus symbolizes awakening, discontinuity, and the impulse to free life from forms that have become obsolete. It reveals alternatives to inherited assumptions.",
+        "possible_expressions": ["Recognizing an unconventional possibility", "Breaking a pattern that restricts autonomy", "Introducing change through invention, disruption, or collective insight"],
+        "developmental_direction": "Make freedom and originality usable by connecting disruption with continuity, relationship, and responsibility for what follows."
+      }
+    },
+    {
+      "id": "planet.neptune", "kind": "planet_archetype", "factors": { "planet": "Neptune" },
+      "topics": ["imagination", "spirituality", "compassion", "idealization", "surrender", "boundaries"],
+      "interpretation": {
+        "core_meaning": "Neptune symbolizes imagination, compassion, idealization, and experiences that soften the apparent boundary between the individual and a larger whole.",
+        "possible_expressions": ["Perceiving symbolic or emotional undercurrents", "Seeking unity through art, spirituality, love, or service", "Longing for an ideal beyond ordinary limitation"],
+        "developmental_direction": "Give openness and inspiration enough discernment, embodiment, and boundaries to become compassionate participation rather than confusion, projection, or disappearance."
+      }
+    },
+    {
+      "id": "planet.pluto", "kind": "planet_archetype", "factors": { "planet": "Pluto" },
+      "topics": ["transformation", "power", "loss", "regeneration", "depth", "control"],
+      "interpretation": {
+        "core_meaning": "Pluto symbolizes concentrated power, irreversible change, and the process through which an exhausted form ends so that buried vitality can be reclaimed.",
+        "possible_expressions": ["Confronting material hidden beneath ordinary awareness", "Passing through endings that reorganize identity or power", "Developing resilience and regenerative capacity"],
+        "developmental_direction": "Relate to power consciously and transparently, allowing necessary endings without making control, crisis, secrecy, or destruction the source of strength."
+      }
+    },
+    {
+      "id": "planet.chiron", "kind": "planet_archetype", "factors": { "planet": "Chiron" },
+      "topics": ["vulnerability", "healing", "wisdom", "integration", "mentorship", "compassion"],
+      "interpretation": {
+        "core_meaning": "Chiron symbolizes a place where vulnerability can become a source of insight, compassion, and the capacity to accompany pain without pretending it can always be erased.",
+        "possible_expressions": ["Developing wisdom through sustained contact with a tender limitation", "Recognizing pain in others with unusual immediacy", "Teaching or helping from experience rather than distance"],
+        "developmental_direction": "Integrate vulnerability without making suffering an identity or assuming that personal pain creates an obligation to heal everyone else."
+      }
+    }
+  ]
+}

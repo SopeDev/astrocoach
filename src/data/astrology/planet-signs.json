@@ -1,0 +1,1097 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "Libro Cosmobiología - 2014.docx",
+  "kind": "planet_sign",
+  "entries": [
+    {
+      "id": "planet_sign.sun.aries", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Aries" },
+      "topics": ["identity", "initiative", "courage", "leadership"],
+      "interpretation": {
+        "core_meaning": "The Sun in Aries develops identity through initiative, direct experience, and the courage to begin. Vitality grows when there is room to act independently and meet life firsthand.",
+        "possible_expressions": ["Starting projects or opening new paths", "Speaking and acting with directness", "Recovering momentum quickly after setbacks"],
+        "developmental_direction": "Develop self-assertion that can include patience, continuity, and awareness of other people's agency."
+      }
+    },
+    {
+      "id": "planet_sign.sun.taurus", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Taurus" },
+      "topics": ["identity", "values", "stability", "persistence"],
+      "interpretation": {
+        "core_meaning": "The Sun in Taurus develops identity through steadiness, embodiment, and the patient creation of something dependable. Personal values and tangible results can become central sources of purpose.",
+        "possible_expressions": ["Sustaining work after others lose interest", "Building security through consistent effort", "Taking time to decide what is genuinely worthwhile"],
+        "developmental_direction": "Let persistence serve living values while remaining flexible enough to release forms, possessions, or routines that have stopped supporting growth."
+      }
+    },
+    {
+      "id": "planet_sign.sun.gemini", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Gemini" },
+      "topics": ["identity", "communication", "curiosity", "learning"],
+      "interpretation": {
+        "core_meaning": "The Sun in Gemini develops identity through curiosity, communication, and making connections among people and ideas. Variety can keep the sense of self alive and mentally engaged.",
+        "possible_expressions": ["Learning through conversation and comparison", "Adapting language to different audiences", "Exploring several interests or perspectives"],
+        "developmental_direction": "Turn accumulated information into understanding by choosing where to stay, deepen, and follow an idea through."
+      }
+    },
+    {
+      "id": "planet_sign.sun.cancer", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Cancer" },
+      "topics": ["identity", "belonging", "care", "emotional_security"],
+      "interpretation": {
+        "core_meaning": "The Sun in Cancer develops identity through care, emotional belonging, and the creation of a protected inner base. Purpose may be closely tied to what feels personally rooted and worth nurturing.",
+        "possible_expressions": ["Creating continuity through family or chosen community", "Protecting people, memories, or places that matter", "Leading through sensitivity to emotional needs"],
+        "developmental_direction": "Build security that supports honest self-expression without making protection, attachment, or indirectness the only ways to handle vulnerability."
+      }
+    },
+    {
+      "id": "planet_sign.sun.leo", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Leo" },
+      "topics": ["identity", "creativity", "visibility", "leadership"],
+      "interpretation": {
+        "core_meaning": "The Sun in Leo develops identity through creative self-expression, warmth, and the experience of making a personal contribution visible. Recognition can affirm the impulse to create and lead from the heart.",
+        "possible_expressions": ["Bringing confidence or playfulness into a group", "Taking responsibility for a creative vision", "Offering encouragement and generous attention"],
+        "developmental_direction": "Create from an inner sense of worth so that visibility can be shared rather than becoming dependent on applause or control."
+      }
+    },
+    {
+      "id": "planet_sign.sun.virgo", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Virgo" },
+      "topics": ["identity", "discernment", "service", "craft"],
+      "interpretation": {
+        "core_meaning": "The Sun in Virgo develops identity through discernment, practical contribution, and the refinement of skills. Purpose can emerge through noticing what would make a system, craft, or service more useful.",
+        "possible_expressions": ["Improving processes through close observation", "Taking pride in competent and careful work", "Helping through concrete, well-considered action"],
+        "developmental_direction": "Let discernment support participation rather than allowing perfectionism or constant correction to postpone meaningful action."
+      }
+    },
+    {
+      "id": "planet_sign.sun.libra", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Libra" },
+      "topics": ["identity", "relationships", "fairness", "harmony"],
+      "interpretation": {
+        "core_meaning": "The Sun in Libra develops identity through relationship, proportion, and awareness of more than one point of view. A sense of purpose may grow through creating fairness, beauty, or workable cooperation.",
+        "possible_expressions": ["Mediating among different interests", "Refining choices through dialogue", "Creating environments with social or aesthetic balance"],
+        "developmental_direction": "Form a clear personal position within relationship so that harmony does not require indecision or the abandonment of personal needs."
+      }
+    },
+    {
+      "id": "planet_sign.sun.scorpio", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Scorpio" },
+      "topics": ["identity", "depth", "transformation", "power"],
+      "interpretation": {
+        "core_meaning": "The Sun in Scorpio develops identity through depth, emotional truth, and encounters that require genuine transformation. Superficial answers may feel insufficient when something important is at stake.",
+        "possible_expressions": ["Investigating what is hidden beneath appearances", "Committing intensely to people or purposes", "Rebuilding after endings or major changes"],
+        "developmental_direction": "Use perceptiveness and intensity for honest renewal while loosening the need to control outcomes, test loyalty, or remain attached to old injuries."
+      }
+    },
+    {
+      "id": "planet_sign.sun.sagittarius", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Sagittarius" },
+      "topics": ["identity", "meaning", "freedom", "exploration"],
+      "interpretation": {
+        "core_meaning": "The Sun in Sagittarius develops identity through exploration, meaning, and an expanding view of life. Purpose may be renewed by learning, teaching, travel, or engagement with a larger horizon.",
+        "possible_expressions": ["Seeking principles that connect experience into a larger picture", "Sharing enthusiasm, humor, or perspective", "Taking risks in order to learn directly"],
+        "developmental_direction": "Give freedom and conviction enough discipline, nuance, and follow-through to become lived wisdom rather than an endless search for the next horizon."
+      }
+    },
+    {
+      "id": "planet_sign.sun.capricorn", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Capricorn" },
+      "topics": ["identity", "responsibility", "achievement", "authority"],
+      "interpretation": {
+        "core_meaning": "The Sun in Capricorn develops identity through responsibility, purposeful effort, and the gradual construction of something that can endure. Competence and earned authority may carry deep personal meaning.",
+        "possible_expressions": ["Working toward long-range goals", "Accepting responsibility when structure is needed", "Measuring progress through tangible accomplishment"],
+        "developmental_direction": "Let ambition serve an authentic purpose without making productivity, status, or control the sole basis of identity and worth."
+      }
+    },
+    {
+      "id": "planet_sign.sun.aquarius", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Aquarius" },
+      "topics": ["identity", "individuality", "community", "innovation"],
+      "interpretation": {
+        "core_meaning": "The Sun in Aquarius develops identity through independent thought, participation in a larger collective, and the freedom to question inherited forms. Purpose can emerge through ideas that widen what a group considers possible.",
+        "possible_expressions": ["Seeing systems from an unconventional angle", "Gathering people around a shared idea or cause", "Protecting intellectual and personal autonomy"],
+        "developmental_direction": "Join originality with personal warmth and embodied involvement so that distance from convention does not become distance from intimate human experience."
+      }
+    },
+    {
+      "id": "planet_sign.sun.pisces", "kind": "planet_sign", "factors": { "planet": "Sun", "sign": "Pisces" },
+      "topics": ["identity", "imagination", "compassion", "spirituality"],
+      "interpretation": {
+        "core_meaning": "The Sun in Pisces develops identity through imagination, sensitivity, and contact with meanings that exceed the individual ego. Creative or compassionate participation can feel more purposeful than rigid self-definition.",
+        "possible_expressions": ["Perceiving emotional or symbolic undercurrents", "Creating through image, feeling, music, or story", "Finding meaning in service, contemplation, or spiritual inquiry"],
+        "developmental_direction": "Give sensitivity a clear container, practical expression, and healthy boundaries so that openness does not dissolve direction or personal agency."
+      }
+    },
+
+    {
+      "id": "planet_sign.moon.aries", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Aries" },
+      "topics": ["emotions", "security", "independence", "reaction"],
+      "interpretation": {
+        "core_meaning": "The Moon in Aries seeks emotional security through movement, independence, and the freedom to respond directly. Feelings may arrive quickly and carry an immediate impulse toward action.",
+        "possible_expressions": ["Recovering emotional energy through activity", "Showing care through protection or decisive action", "Reacting openly before feelings have fully settled"],
+        "developmental_direction": "Honor emotional honesty while creating enough pause to distinguish a passing reaction from the action that is actually needed."
+      }
+    },
+    {
+      "id": "planet_sign.moon.taurus", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Taurus" },
+      "topics": ["emotions", "security", "stability", "embodiment"],
+      "interpretation": {
+        "core_meaning": "The Moon in Taurus seeks emotional security through continuity, physical ease, and dependable rhythms. Feelings often settle when there is time, sensory grounding, and something reliable to return to.",
+        "possible_expressions": ["Creating comfort through food, touch, nature, or familiar routines", "Offering steady and practical care", "Holding emotional commitments for a long time"],
+        "developmental_direction": "Preserve steadiness without confusing safety with immobility or holding on after a situation has genuinely changed."
+      }
+    },
+    {
+      "id": "planet_sign.moon.gemini", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Gemini" },
+      "topics": ["emotions", "communication", "variety", "curiosity"],
+      "interpretation": {
+        "core_meaning": "The Moon in Gemini seeks emotional security through language, exchange, and mental movement. Naming a feeling or seeing it from another angle can make it easier to hold.",
+        "possible_expressions": ["Processing emotion through conversation or writing", "Needing variety and fresh stimulation", "Moving quickly among different emotional perspectives"],
+        "developmental_direction": "Use curiosity to understand feelings without explaining them away or leaving before a deeper emotional process has had time to unfold."
+      }
+    },
+    {
+      "id": "planet_sign.moon.cancer", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Cancer" },
+      "topics": ["emotions", "belonging", "family", "care"],
+      "interpretation": {
+        "core_meaning": "The Moon in Cancer seeks emotional security through belonging, memory, and reciprocal care. Emotional impressions may be retained deeply, making the quality of home and close bonds especially meaningful.",
+        "possible_expressions": ["Sensing and responding to unspoken needs", "Creating a protective home or chosen family", "Returning to familiar people, places, or rituals for restoration"],
+        "developmental_direction": "Care generously while developing boundaries and direct ways of expressing needs, especially when hurt or afraid of disconnection."
+      }
+    },
+    {
+      "id": "planet_sign.moon.leo", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Leo" },
+      "topics": ["emotions", "recognition", "warmth", "creativity"],
+      "interpretation": {
+        "core_meaning": "The Moon in Leo seeks emotional security through warmth, wholehearted expression, and the experience of being personally appreciated. Affection may need to feel vivid rather than merely implied.",
+        "possible_expressions": ["Showing feelings generously and dramatically", "Creating emotional connection through play or celebration", "Protecting loved ones with loyalty and pride"],
+        "developmental_direction": "Build an inner source of appreciation so that the need to be seen can support mutual warmth rather than dependence on a particular response."
+      }
+    },
+    {
+      "id": "planet_sign.moon.virgo", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Virgo" },
+      "topics": ["emotions", "care", "order", "discernment"],
+      "interpretation": {
+        "core_meaning": "The Moon in Virgo seeks emotional security through usefulness, order, and careful attention to what can be improved. Care may be expressed more naturally through practical help than through display.",
+        "possible_expressions": ["Noticing small needs before others mention them", "Regaining calm by organizing or solving a concrete problem", "Analyzing emotional reactions in search of clarity"],
+        "developmental_direction": "Let care include imperfection, rest, and feelings that cannot be solved immediately rather than turning sensitivity into constant self-correction."
+      }
+    },
+    {
+      "id": "planet_sign.moon.libra", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Libra" },
+      "topics": ["emotions", "relationships", "harmony", "approval"],
+      "interpretation": {
+        "core_meaning": "The Moon in Libra seeks emotional security through companionship, reciprocity, and a balanced interpersonal atmosphere. Feelings may become clearer when reflected through another person's perspective.",
+        "possible_expressions": ["Creating calm through tact and consideration", "Feeling nourished by shared decisions or experiences", "Monitoring other people's responses before expressing a need"],
+        "developmental_direction": "Develop a personal emotional position that can tolerate disagreement without equating temporary disharmony with loss of connection."
+      }
+    },
+    {
+      "id": "planet_sign.moon.scorpio", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Scorpio" },
+      "topics": ["emotions", "trust", "intensity", "privacy"],
+      "interpretation": {
+        "core_meaning": "The Moon in Scorpio seeks emotional security through depth, honesty, and bonds capable of holding intense experience. Trust may matter more than surface harmony, and feelings can remain private until safety has been tested.",
+        "possible_expressions": ["Perceiving emotional shifts that others miss", "Forming deeply loyal attachments", "Holding feelings internally until they become concentrated"],
+        "developmental_direction": "Express vulnerability before intensity turns into withdrawal, suspicion, or attempts to control the emotional field."
+      }
+    },
+    {
+      "id": "planet_sign.moon.sagittarius", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Sagittarius" },
+      "topics": ["emotions", "freedom", "meaning", "optimism"],
+      "interpretation": {
+        "core_meaning": "The Moon in Sagittarius seeks emotional security through freedom, perspective, and confidence that experience has meaning. Space to move, learn, or imagine a wider future can restore emotional energy.",
+        "possible_expressions": ["Using humor or philosophy to regain perspective", "Feeling at home while learning, traveling, or exploring", "Responding to emotional pressure by seeking more space"],
+        "developmental_direction": "Let hope expand emotional experience without using movement or a larger explanation to bypass grief, dependence, or difficult detail."
+      }
+    },
+    {
+      "id": "planet_sign.moon.capricorn", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Capricorn" },
+      "topics": ["emotions", "responsibility", "control", "security"],
+      "interpretation": {
+        "core_meaning": "The Moon in Capricorn seeks emotional security through competence, self-command, and dependable structure. Feelings may be managed privately until there is a practical way to respond to them.",
+        "possible_expressions": ["Taking responsibility during emotionally demanding situations", "Showing care through consistency and provision", "Containing vulnerability in public or unfamiliar settings"],
+        "developmental_direction": "Allow support, softness, and emotional dependence to have a legitimate place alongside strength and responsibility."
+      }
+    },
+    {
+      "id": "planet_sign.moon.aquarius", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Aquarius" },
+      "topics": ["emotions", "friendship", "independence", "community"],
+      "interpretation": {
+        "core_meaning": "The Moon in Aquarius seeks emotional security through autonomy, friendship, and connection to ideas or communities larger than the personal moment. Distance can provide perspective when feelings become intense.",
+        "possible_expressions": ["Finding belonging through friendship or shared causes", "Observing feelings before participating in them", "Needing relationships that leave room for individuality"],
+        "developmental_direction": "Bring insight back into personal and embodied contact so that independence does not become emotional absence or avoidance of intimacy."
+      }
+    },
+    {
+      "id": "planet_sign.moon.pisces", "kind": "planet_sign", "factors": { "planet": "Moon", "sign": "Pisces" },
+      "topics": ["emotions", "sensitivity", "imagination", "compassion"],
+      "interpretation": {
+        "core_meaning": "The Moon in Pisces seeks emotional security through compassion, imagination, and connection with subtle or transcendent experience. Feelings may be porous, layered, and responsive to the surrounding atmosphere.",
+        "possible_expressions": ["Absorbing emotional tone without explicit explanation", "Restoring through solitude, creativity, music, or spiritual practice", "Responding tenderly to suffering or vulnerability"],
+        "developmental_direction": "Develop boundaries and discernment that protect sensitivity without closing the heart or confusing another person's feelings with one's own."
+      }
+    },
+
+    {
+      "id": "planet_sign.mercury.aries", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Aries" },
+      "topics": ["communication", "thinking", "directness", "decisions"],
+      "interpretation": {
+        "core_meaning": "Mercury in Aries thinks through direct engagement and communicates with speed, candor, and initiative. Ideas can become clearest in the act of testing or expressing them.",
+        "possible_expressions": ["Reaching decisions quickly", "Speaking plainly and energetically", "Introducing ideas before every detail is settled"],
+        "developmental_direction": "Preserve intellectual courage while making room to listen, check assumptions, and develop promising ideas beyond their first spark."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.taurus", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Taurus" },
+      "topics": ["communication", "thinking", "practicality", "persistence"],
+      "interpretation": {
+        "core_meaning": "Mercury in Taurus thinks deliberately and looks for ideas that can be applied, trusted, or made tangible. Understanding may develop slowly but become stable once personally verified.",
+        "possible_expressions": ["Communicating in a measured and concrete way", "Remembering information through practical or sensory association", "Holding to a conclusion after careful consideration"],
+        "developmental_direction": "Let consistency support clear judgment without turning familiarity into intellectual rigidity or resistance to new evidence."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.gemini", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Gemini" },
+      "topics": ["communication", "thinking", "curiosity", "learning"],
+      "interpretation": {
+        "core_meaning": "Mercury in Gemini gathers, compares, and exchanges information with agility. The mind is stimulated by variety, questions, and the discovery of connections among apparently separate subjects.",
+        "possible_expressions": ["Learning quickly through conversation", "Adapting communication to different contexts", "Following several lines of inquiry at once"],
+        "developmental_direction": "Choose which questions deserve sustained attention so that versatility can mature into depth and integrated understanding."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.cancer", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Cancer" },
+      "topics": ["communication", "thinking", "memory", "emotional_context"],
+      "interpretation": {
+        "core_meaning": "Mercury in Cancer thinks through memory, emotional context, and an instinct for what feels personally significant. Communication may carry more meaning through tone and implication than through detached facts alone.",
+        "possible_expressions": ["Remembering the emotional atmosphere of an exchange", "Communicating protectively or with personal care", "Using intuition when information is incomplete"],
+        "developmental_direction": "Honor emotional intelligence while distinguishing present information from inherited assumptions, memories, or defensive reactions."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.leo", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Leo" },
+      "topics": ["communication", "thinking", "creativity", "confidence"],
+      "interpretation": {
+        "core_meaning": "Mercury in Leo communicates with personal conviction, creativity, and a desire to make ideas vivid. Thought becomes energized when there is room to shape a message in an individual voice.",
+        "possible_expressions": ["Teaching or speaking through memorable stories", "Defending ideas with confidence", "Organizing information around a clear central vision"],
+        "developmental_direction": "Use expressive authority to invite engagement rather than making recognition or agreement a condition for genuine dialogue."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.virgo", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Virgo" },
+      "topics": ["communication", "thinking", "analysis", "precision"],
+      "interpretation": {
+        "core_meaning": "Mercury in Virgo analyzes, differentiates, and organizes information with close attention to function and detail. The mind naturally looks for what can be clarified, corrected, or made more efficient.",
+        "possible_expressions": ["Breaking complex problems into workable parts", "Choosing language with precision", "Learning through practice, classification, and refinement"],
+        "developmental_direction": "Use precision in service of understanding without allowing small imperfections or uncertainty to dominate the whole picture."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.libra", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Libra" },
+      "topics": ["communication", "thinking", "fairness", "decision_making"],
+      "interpretation": {
+        "core_meaning": "Mercury in Libra thinks comparatively and seeks language that can hold different viewpoints. Judgment may improve through dialogue, proportion, and attention to fairness.",
+        "possible_expressions": ["Seeing strengths and weaknesses on more than one side", "Communicating diplomatically", "Refining ideas through collaborative discussion"],
+        "developmental_direction": "Let consideration lead to a real conclusion rather than using endless comparison or polished language to postpone a necessary position."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.scorpio", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Scorpio" },
+      "topics": ["communication", "thinking", "investigation", "privacy"],
+      "interpretation": {
+        "core_meaning": "Mercury in Scorpio thinks by penetrating beneath appearances and following the emotional or strategic implications of information. Communication may be selective because words are understood to carry power.",
+        "possible_expressions": ["Investigating motives, patterns, or hidden structures", "Concentrating deeply on difficult subjects", "Waiting to speak until trust or certainty is sufficient"],
+        "developmental_direction": "Use perceptiveness to clarify rather than presume, and communicate enough of the inner process that privacy does not become suspicion or strategic silence."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.sagittarius", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Sagittarius" },
+      "topics": ["communication", "thinking", "meaning", "beliefs"],
+      "interpretation": {
+        "core_meaning": "Mercury in Sagittarius thinks in broad patterns and communicates through principles, stories, and possibilities. The mind seeks a horizon large enough to connect facts with meaning.",
+        "possible_expressions": ["Explaining the larger significance of an idea", "Learning through travel, philosophy, or cultural contrast", "Speaking with enthusiasm and conviction"],
+        "developmental_direction": "Join vision with precision, context, and tact so that a compelling conclusion remains open to facts and viewpoints that complicate it."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.capricorn", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Capricorn" },
+      "topics": ["communication", "thinking", "planning", "practicality"],
+      "interpretation": {
+        "core_meaning": "Mercury in Capricorn organizes thought around structure, consequence, and practical goals. Communication may favor economy and authority, especially when a plan must become workable.",
+        "possible_expressions": ["Thinking in sequences, priorities, and long-term outcomes", "Communicating with restraint and purpose", "Turning abstract ideas into plans or standards"],
+        "developmental_direction": "Let realism provide form without dismissing imagination, emotional information, or new possibilities before they have been fully considered."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.aquarius", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Aquarius" },
+      "topics": ["communication", "thinking", "innovation", "systems"],
+      "interpretation": {
+        "core_meaning": "Mercury in Aquarius thinks independently and looks for patterns across systems, groups, and future possibilities. Ideas may arrive through a sudden reframing of assumptions others take for granted.",
+        "possible_expressions": ["Questioning conventional explanations", "Connecting technical or social systems", "Communicating unusual ideas with intellectual detachment"],
+        "developmental_direction": "Ground originality in dialogue and lived human context so that being different remains a source of connection rather than intellectual isolation."
+      }
+    },
+    {
+      "id": "planet_sign.mercury.pisces", "kind": "planet_sign", "factors": { "planet": "Mercury", "sign": "Pisces" },
+      "topics": ["communication", "thinking", "intuition", "imagination"],
+      "interpretation": {
+        "core_meaning": "Mercury in Pisces thinks through image, association, intuition, and emotional resonance. Meaning may be perceived as a whole before it can be separated into orderly language.",
+        "possible_expressions": ["Communicating through metaphor, art, or story", "Sensing connections that are difficult to explain linearly", "Listening for tone and what remains unspoken"],
+        "developmental_direction": "Give intuitive understanding clear language, verification, and practical structure without stripping it of nuance or imagination."
+      }
+    },
+
+    {
+      "id": "planet_sign.venus.aries", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Aries" },
+      "topics": ["relationships", "affection", "desire", "independence"],
+      "interpretation": {
+        "core_meaning": "Venus in Aries is drawn toward vitality, candor, and the spark of direct engagement. Affection may be expressed spontaneously, with a preference for relationships that remain alive and self-directed.",
+        "possible_expressions": ["Taking initiative in attraction or connection", "Enjoying playful challenge and immediacy", "Showing appreciation openly and energetically"],
+        "developmental_direction": "Keep desire honest and alive while allowing mutual timing, receptivity, and the other person's independent wishes to shape connection."
+      }
+    },
+    {
+      "id": "planet_sign.venus.taurus", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Taurus" },
+      "topics": ["relationships", "affection", "pleasure", "stability"],
+      "interpretation": {
+        "core_meaning": "Venus in Taurus values continuity, sensual presence, and affection that can be felt in tangible ways. Attraction may grow through patience, reliability, beauty, and shared enjoyment of the physical world.",
+        "possible_expressions": ["Showing love through touch, time, or practical care", "Cultivating beauty and comfort", "Remaining loyal once trust and value are established"],
+        "developmental_direction": "Enjoy attachment and pleasure without turning them into possession, inflexibility, or resistance to a relationship's necessary changes."
+      }
+    },
+    {
+      "id": "planet_sign.venus.gemini", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Gemini" },
+      "topics": ["relationships", "affection", "communication", "variety"],
+      "interpretation": {
+        "core_meaning": "Venus in Gemini is drawn toward wit, curiosity, and relationships kept alive by exchange. Affection may travel through words, shared interests, and the freedom to encounter more than one perspective.",
+        "possible_expressions": ["Bonding through conversation and humor", "Enjoying varied social or creative experiences", "Needing mental interest as part of attraction"],
+        "developmental_direction": "Let variety enrich connection while developing the attention and emotional presence required for intimacy to deepen."
+      }
+    },
+    {
+      "id": "planet_sign.venus.cancer", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Cancer" },
+      "topics": ["relationships", "affection", "care", "security"],
+      "interpretation": {
+        "core_meaning": "Venus in Cancer values emotional safety, tenderness, and bonds that create a sense of home. Affection may be expressed through protection, remembrance, and attentive care.",
+        "possible_expressions": ["Creating intimacy through domestic or familiar rituals", "Remembering what makes another person feel cared for", "Approaching attraction cautiously until safety is felt"],
+        "developmental_direction": "Offer care without making closeness dependent on unspoken expectations, overprotection, or fear of separation."
+      }
+    },
+    {
+      "id": "planet_sign.venus.leo", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Leo" },
+      "topics": ["relationships", "affection", "creativity", "recognition"],
+      "interpretation": {
+        "core_meaning": "Venus in Leo values wholehearted affection, creative pleasure, and relationships in which appreciation is visibly expressed. Love may be offered with warmth, loyalty, and a desire to make the bond feel special.",
+        "possible_expressions": ["Giving generously to people who matter", "Enjoying romance, celebration, and dramatic creativity", "Wanting affection to be clear rather than understated"],
+        "developmental_direction": "Let love remain generous and playful without making admiration, exclusivity, or performance the price of connection."
+      }
+    },
+    {
+      "id": "planet_sign.venus.virgo", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Virgo" },
+      "topics": ["relationships", "affection", "service", "discernment"],
+      "interpretation": {
+        "core_meaning": "Venus in Virgo values care that is attentive, useful, and responsive to real needs. Affection may appear in thoughtful details, reliability, and a wish to improve what is shared.",
+        "possible_expressions": ["Showing love through practical help", "Choosing relationships with discernment", "Noticing subtle preferences and needs"],
+        "developmental_direction": "Allow affection to be imperfect and freely received rather than measuring worth through usefulness, correction, or exacting standards."
+      }
+    },
+    {
+      "id": "planet_sign.venus.libra", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Libra" },
+      "topics": ["relationships", "affection", "harmony", "fairness"],
+      "interpretation": {
+        "core_meaning": "Venus in Libra values reciprocity, beauty, and relationships shaped by mutual consideration. Attraction may grow through social grace, intellectual companionship, and a shared sense of proportion.",
+        "possible_expressions": ["Creating ease through tact and diplomacy", "Seeking balanced agreements", "Expressing affection through beauty, conversation, or shared culture"],
+        "developmental_direction": "Choose authentic reciprocity over surface harmony, especially when clarity or disagreement is necessary to keep a relationship honest."
+      }
+    },
+    {
+      "id": "planet_sign.venus.scorpio", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Scorpio" },
+      "topics": ["relationships", "affection", "intimacy", "trust"],
+      "interpretation": {
+        "core_meaning": "Venus in Scorpio values emotional depth, loyalty, and intimacy that can survive exposure to difficult truths. Attraction may carry intensity because connection is experienced as potentially transformative.",
+        "possible_expressions": ["Seeking bonds with emotional honesty and depth", "Taking trust and betrayal seriously", "Experiencing affection as a catalyst for change"],
+        "developmental_direction": "Build intimacy through disclosed vulnerability and consent rather than testing, possession, secrecy, or attempts to control uncertainty."
+      }
+    },
+    {
+      "id": "planet_sign.venus.sagittarius", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Sagittarius" },
+      "topics": ["relationships", "affection", "freedom", "exploration"],
+      "interpretation": {
+        "core_meaning": "Venus in Sagittarius values freedom, honesty, and relationships that enlarge experience. Attraction may be sparked by shared humor, learning, adventure, or a meaningful outlook on life.",
+        "possible_expressions": ["Bonding through travel or discovery", "Preferring candor and room to grow", "Finding beauty in unfamiliar people, ideas, or cultures"],
+        "developmental_direction": "Let freedom support truthful commitment rather than using possibility, bluntness, or the next horizon to avoid relational depth and consequence."
+      }
+    },
+    {
+      "id": "planet_sign.venus.capricorn", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Capricorn" },
+      "topics": ["relationships", "affection", "values", "commitment", "self_protection"],
+      "interpretation": {
+        "core_meaning": "Venus in Capricorn seeks value and connection through consistency, responsibility, and what can endure. Affection may be expressed through commitment and practical care more readily than through immediate emotional display.",
+        "possible_expressions": ["Allowing trust to develop gradually", "Taking commitments and agreements seriously", "Showing care through reliability or practical support"],
+        "developmental_direction": "Let tenderness become visible without treating vulnerability as a loss of control, and distinguish meaningful standards from distance created to avoid rejection."
+      }
+    },
+    {
+      "id": "planet_sign.venus.aquarius", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Aquarius" },
+      "topics": ["relationships", "affection", "friendship", "independence"],
+      "interpretation": {
+        "core_meaning": "Venus in Aquarius values friendship, individuality, and bonds spacious enough for each person to remain distinct. Attraction may begin through ideas, originality, or participation in a shared community.",
+        "possible_expressions": ["Wanting partnership to include genuine friendship", "Being drawn to unconventional people or arrangements", "Offering acceptance without strong possessiveness"],
+        "developmental_direction": "Keep freedom and equality while allowing personal need, emotional specificity, and sustained intimacy to become visible."
+      }
+    },
+    {
+      "id": "planet_sign.venus.pisces", "kind": "planet_sign", "factors": { "planet": "Venus", "sign": "Pisces" },
+      "topics": ["relationships", "affection", "compassion", "idealization"],
+      "interpretation": {
+        "core_meaning": "Venus in Pisces values tenderness, imagination, and forms of connection that soften ordinary boundaries. Love may be experienced through compassion, creativity, spiritual affinity, or devotion.",
+        "possible_expressions": ["Responding sensitively to another person's vulnerability", "Expressing affection through art, atmosphere, or quiet presence", "Seeing beauty and potential others overlook"],
+        "developmental_direction": "Join compassion with discernment and reciprocal boundaries so that devotion does not require rescue, idealization, or self-erasure."
+      }
+    },
+
+    {
+      "id": "planet_sign.mars.aries", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Aries" },
+      "topics": ["action", "assertion", "desire", "courage"],
+      "interpretation": {
+        "core_meaning": "Mars in Aries acts through direct initiative, speed, and a strong instinct to meet obstacles firsthand. Desire becomes energizing when there is freedom to begin and test personal strength.",
+        "possible_expressions": ["Acting quickly when a challenge appears", "Competing to discover personal capacity", "Defending a position with visible force"],
+        "developmental_direction": "Give courage enough patience and awareness that decisive action does not outrun strategy, consent, or the needs of the situation."
+      }
+    },
+    {
+      "id": "planet_sign.mars.taurus", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Taurus" },
+      "topics": ["action", "assertion", "persistence", "resources"],
+      "interpretation": {
+        "core_meaning": "Mars in Taurus acts through endurance, sustained effort, and the defense of what has tangible value. Energy may gather gradually but become difficult to redirect once committed.",
+        "possible_expressions": ["Working steadily toward a concrete result", "Protecting resources, values, or physical security", "Holding ground under prolonged pressure"],
+        "developmental_direction": "Use endurance deliberately while addressing frustration before accumulated resistance hardens into immobility or erupts all at once."
+      }
+    },
+    {
+      "id": "planet_sign.mars.gemini", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Gemini" },
+      "topics": ["action", "assertion", "communication", "variety"],
+      "interpretation": {
+        "core_meaning": "Mars in Gemini acts through words, ideas, dexterity, and rapid shifts of attention. Curiosity and debate can mobilize energy as strongly as a physical challenge.",
+        "possible_expressions": ["Arguing energetically for an idea", "Acting on several fronts at once", "Using wit, information, or technical skill competitively"],
+        "developmental_direction": "Direct mental speed toward a chosen purpose and distinguish productive challenge from conflict generated mainly by restlessness."
+      }
+    },
+    {
+      "id": "planet_sign.mars.cancer", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Cancer" },
+      "topics": ["action", "assertion", "protection", "emotions"],
+      "interpretation": {
+        "core_meaning": "Mars in Cancer acts in response to emotional stakes, belonging, and the instinct to protect. Motivation may be strongest when defending a person, home, memory, or vulnerable part of life.",
+        "possible_expressions": ["Mobilizing quickly when loved ones need protection", "Acting from intuition before motives are fully verbalized", "Expressing anger indirectly when direct assertion feels unsafe"],
+        "developmental_direction": "Name wants and anger directly enough that protective action remains responsive rather than becoming defensive, displaced, or bound to old hurt."
+      }
+    },
+    {
+      "id": "planet_sign.mars.leo", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Leo" },
+      "topics": ["action", "assertion", "creativity", "recognition"],
+      "interpretation": {
+        "core_meaning": "Mars in Leo acts with creative force, personal pride, and a desire to make an unmistakable impact. Energy grows when action can express the heart and carry an individual signature.",
+        "possible_expressions": ["Leading with visible confidence", "Competing through performance or creativity", "Defending loved ones and personal dignity"],
+        "developmental_direction": "Act from wholehearted purpose while letting feedback, collaboration, and another person's dignity matter as much as personal recognition."
+      }
+    },
+    {
+      "id": "planet_sign.mars.virgo", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Virgo" },
+      "topics": ["action", "assertion", "work", "precision"],
+      "interpretation": {
+        "core_meaning": "Mars in Virgo directs energy toward useful work, improvement, and precise execution. Action becomes effective by identifying the next concrete adjustment rather than relying on force alone.",
+        "possible_expressions": ["Working intensely on technical or detailed tasks", "Responding to problems with practical intervention", "Channeling competitiveness into mastery"],
+        "developmental_direction": "Let precision improve action without allowing irritation, self-criticism, or preparation to consume the energy needed to proceed."
+      }
+    },
+    {
+      "id": "planet_sign.mars.libra", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Libra" },
+      "topics": ["action", "assertion", "relationships", "conflict"],
+      "interpretation": {
+        "core_meaning": "Mars in Libra acts through negotiation, strategic comparison, and engagement with another person's position. Motivation may sharpen when fairness, cooperation, or a contested relationship is involved.",
+        "possible_expressions": ["Advocating through persuasion rather than force", "Taking action to restore balance", "Delaying action while weighing competing interests"],
+        "developmental_direction": "Develop direct and timely assertion within relationship so that diplomacy does not conceal anger or leave important choices to someone else."
+      }
+    },
+    {
+      "id": "planet_sign.mars.scorpio", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Scorpio" },
+      "topics": ["action", "assertion", "power", "transformation"],
+      "interpretation": {
+        "core_meaning": "Mars in Scorpio acts with concentration, emotional intensity, and sensitivity to hidden power. Energy can remain contained until there is a decisive purpose or a situation requiring deep change.",
+        "possible_expressions": ["Persisting through crisis or complex resistance", "Acting strategically rather than visibly", "Committing substantial energy to transformation or investigation"],
+        "developmental_direction": "Use power transparently and constructively, releasing resentment and control strategies before they begin directing action from underneath."
+      }
+    },
+    {
+      "id": "planet_sign.mars.sagittarius", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Sagittarius" },
+      "topics": ["action", "assertion", "freedom", "conviction"],
+      "interpretation": {
+        "core_meaning": "Mars in Sagittarius acts through enthusiasm, conviction, and movement toward a wider horizon. Energy is renewed by exploration and by goals that feel connected to meaning or freedom.",
+        "possible_expressions": ["Taking bold action for a belief", "Seeking physical or intellectual adventure", "Motivating others through optimism and candor"],
+        "developmental_direction": "Give conviction direction and accountability so that speed, certainty, or appetite for freedom does not disregard detail and consequence."
+      }
+    },
+    {
+      "id": "planet_sign.mars.capricorn", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Capricorn" },
+      "topics": ["action", "assertion", "ambition", "discipline"],
+      "interpretation": {
+        "core_meaning": "Mars in Capricorn directs energy through discipline, strategy, and sustained effort toward defined results. Desire may become more effective when there is a structure to climb or responsibility to master.",
+        "possible_expressions": ["Working patiently toward an ambitious objective", "Exercising authority under pressure", "Conserving effort until it can have practical impact"],
+        "developmental_direction": "Let achievement remain connected to personal desire and ethical limits rather than treating control, endurance, or productivity as ends in themselves."
+      }
+    },
+    {
+      "id": "planet_sign.mars.aquarius", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Aquarius" },
+      "topics": ["action", "assertion", "innovation", "collective_change"],
+      "interpretation": {
+        "core_meaning": "Mars in Aquarius acts through independence, experimentation, and efforts to change a larger system. Energy may rise when convention restricts autonomy or a collective possibility needs a catalyst.",
+        "possible_expressions": ["Challenging established methods", "Organizing action around a cause or network", "Defending freedom of thought and association"],
+        "developmental_direction": "Combine principled independence with emotional awareness and practical cooperation so that rebellion remains connected to people and outcomes."
+      }
+    },
+    {
+      "id": "planet_sign.mars.pisces", "kind": "planet_sign", "factors": { "planet": "Mars", "sign": "Pisces" },
+      "topics": ["action", "assertion", "compassion", "intuition"],
+      "interpretation": {
+        "core_meaning": "Mars in Pisces acts through intuition, imagination, and responsiveness to forces larger than personal will. Motivation may be strongest when action serves compassion, creativity, or a spiritual ideal.",
+        "possible_expressions": ["Acting sensitively behind the scenes", "Channeling energy into art, service, or contemplation", "Changing direction according to atmosphere and intuition"],
+        "developmental_direction": "Give desire clear boundaries and concrete aims so that empathy and flexibility do not turn into diffusion, avoidance, or indirect assertion."
+      }
+    },
+
+    {
+      "id": "planet_sign.jupiter.aries", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Aries" },
+      "topics": ["growth", "beliefs", "initiative", "leadership"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Aries expands through initiative, risk, and confidence in direct experience. Opportunity may become visible after the first independent step rather than before it.",
+        "possible_expressions": ["Growing by starting unfamiliar ventures", "Encouraging courage and self-reliance", "Learning from bold experiments"],
+        "developmental_direction": "Let confidence inspire action while developing patience, proportion, and respect for contributions that do not follow the same path."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.taurus", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Taurus" },
+      "topics": ["growth", "beliefs", "resources", "abundance"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Taurus expands through cultivation, material understanding, and confidence in steady growth. Abundance may be understood as something built, embodied, and sustained over time.",
+        "possible_expressions": ["Growing resources through patient investment", "Finding meaning in nature, craft, or sensory life", "Sharing practical generosity"],
+        "developmental_direction": "Allow prosperity to circulate and evolve rather than equating expansion with accumulation, comfort, or resistance to change."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.gemini", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Gemini" },
+      "topics": ["growth", "beliefs", "learning", "communication"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Gemini expands through questions, exchange, and exposure to many kinds of information. Growth comes from connecting perspectives rather than relying on a single authoritative explanation.",
+        "possible_expressions": ["Teaching or learning across several subjects", "Building opportunity through communication and networks", "Finding optimism in intellectual possibility"],
+        "developmental_direction": "Integrate information into a coherent understanding without turning breadth, cleverness, or constant movement into substitutes for depth."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.cancer", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Cancer" },
+      "topics": ["growth", "beliefs", "care", "belonging"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Cancer expands through nourishment, protection, and the creation of belonging. Confidence may grow when emotional roots are honored and care is allowed to support development.",
+        "possible_expressions": ["Creating generous family or community spaces", "Supporting another person's growth", "Learning through memory, ancestry, or emotional experience"],
+        "developmental_direction": "Let care enlarge life without becoming overprotection, emotional excess, or loyalty to familiar patterns that limit further growth."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.leo", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Leo" },
+      "topics": ["growth", "beliefs", "creativity", "generosity"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Leo expands through creative confidence, generosity, and wholehearted participation. Growth may come from trusting that personal gifts deserve expression and can encourage others.",
+        "possible_expressions": ["Teaching or leading with enthusiasm", "Creating on an ambitious scale", "Offering warmth, celebration, and encouragement"],
+        "developmental_direction": "Let confidence and generosity include humility and shared recognition so that expansion does not depend on being central or exceptional."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.virgo", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Virgo" },
+      "topics": ["growth", "beliefs", "service", "skill"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Virgo expands through useful knowledge, disciplined practice, and improvements that make an ideal workable. Meaning is often found in skillful service and attention to real conditions.",
+        "possible_expressions": ["Growing through apprenticeship or applied study", "Teaching practical methods", "Finding opportunity by solving overlooked problems"],
+        "developmental_direction": "Keep refinement connected to a larger purpose without letting criticism, excessive standards, or fixation on details narrow the field of possibility."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.libra", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Libra" },
+      "topics": ["growth", "beliefs", "relationships", "justice"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Libra expands through partnership, cultural exchange, and a widening understanding of fairness. Opportunity may arise when different perspectives are brought into constructive relationship.",
+        "possible_expressions": ["Growing through collaboration or mentorship", "Advocating for fairer agreements", "Developing judgment through art, law, or dialogue"],
+        "developmental_direction": "Let generosity and diplomacy support principled choices rather than overpromising, avoiding conflict, or trying to satisfy every side."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.scorpio", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Scorpio" },
+      "topics": ["growth", "beliefs", "depth", "shared_resources"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Scorpio expands through emotional depth, investigation, and the willingness to enter transformative territory. Growth may follow an honest encounter with power, trust, loss, or shared resources.",
+        "possible_expressions": ["Finding meaning during periods of profound change", "Studying hidden psychological or spiritual processes", "Supporting renewal through shared commitment"],
+        "developmental_direction": "Use insight and influence with transparency, avoiding certainty, excess, or moral justification around control and intensity."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.sagittarius", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Sagittarius" },
+      "topics": ["growth", "beliefs", "wisdom", "exploration"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Sagittarius expands through exploration, philosophy, and trust in a larger field of meaning. Learning becomes most alive when it changes how life is understood and lived.",
+        "possible_expressions": ["Teaching from broad experience", "Seeking unfamiliar cultures or systems of thought", "Inspiring possibility through humor and perspective"],
+        "developmental_direction": "Let faith remain spacious enough for nuance, accountability, and ideas that challenge a favored worldview."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.capricorn", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Capricorn" },
+      "topics": ["growth", "beliefs", "achievement", "structure"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Capricorn expands through discipline, responsibility, and the patient translation of vision into durable form. Confidence may strengthen through earned competence rather than optimism alone.",
+        "possible_expressions": ["Building institutions, plans, or expertise over time", "Growing into positions of responsibility", "Applying broad principles to practical constraints"],
+        "developmental_direction": "Make room for generosity, imagination, and calculated risk without treating authority or measurable achievement as the full meaning of success."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.aquarius", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Aquarius" },
+      "topics": ["growth", "beliefs", "community", "innovation"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Aquarius expands through collective intelligence, unconventional ideas, and participation in social change. Growth may come from networks that widen freedom and possibility beyond the individual.",
+        "possible_expressions": ["Learning through diverse communities", "Supporting experimental or humanitarian projects", "Seeing future potential in systems and technology"],
+        "developmental_direction": "Connect ideals with specific people and practical consequences so that broad vision does not become detached certainty or rebellion for its own sake."
+      }
+    },
+    {
+      "id": "planet_sign.jupiter.pisces", "kind": "planet_sign", "factors": { "planet": "Jupiter", "sign": "Pisces" },
+      "topics": ["growth", "beliefs", "compassion", "spirituality"],
+      "interpretation": {
+        "core_meaning": "Jupiter in Pisces expands through compassion, imagination, and trust in forms of meaning that cannot be reduced to logic. Generosity may extend toward suffering, creativity, and spiritual life.",
+        "possible_expressions": ["Finding meaning through service or contemplation", "Offering hope through empathy and imagination", "Exploring mystical, artistic, or symbolic traditions"],
+        "developmental_direction": "Join faith with discernment and practical boundaries so that openness does not become overextension, idealization, or escape."
+      }
+    },
+
+    {
+      "id": "planet_sign.saturn.aries", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Aries" },
+      "topics": ["responsibility", "limits", "identity", "assertion"],
+      "interpretation": {
+        "core_meaning": "Saturn in Aries concentrates learning around initiative, self-assertion, and the responsible use of personal force. Acting independently may initially feel constrained or unusually consequential.",
+        "possible_expressions": ["Taking action only after substantial self-testing", "Developing disciplined courage", "Alternating between restraint and forceful assertion"],
+        "developmental_direction": "Build trust in deliberate action so that patience strengthens initiative rather than suppressing it or releasing it only under pressure."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.taurus", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Taurus" },
+      "topics": ["responsibility", "limits", "resources", "self_worth"],
+      "interpretation": {
+        "core_meaning": "Saturn in Taurus concentrates learning around material security, self-worth, and the patient stewardship of resources. Stability may need to be built slowly and on personally tested values.",
+        "possible_expressions": ["Managing resources cautiously", "Working persistently for durable security", "Feeling responsible for preserving what has value"],
+        "developmental_direction": "Create grounded sufficiency without allowing fear of scarcity, loss, or change to harden into withholding and overcontrol."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.gemini", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Gemini" },
+      "topics": ["responsibility", "limits", "communication", "learning"],
+      "interpretation": {
+        "core_meaning": "Saturn in Gemini concentrates learning around communication, mental structure, and confidence in one's own ideas. Words may be treated seriously because error or misunderstanding feels consequential.",
+        "possible_expressions": ["Developing expertise through disciplined study", "Speaking carefully or withholding until prepared", "Creating orderly systems for information"],
+        "developmental_direction": "Build clear and accountable communication without letting fear of error, judgment, or uncertainty silence curiosity and spontaneous exchange."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.cancer", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Cancer" },
+      "topics": ["responsibility", "limits", "belonging", "emotional_security"],
+      "interpretation": {
+        "core_meaning": "Saturn in Cancer concentrates learning around emotional safety, care, and the responsibilities carried within family or belonging. Vulnerability may be protected through self-containment or practical caretaking.",
+        "possible_expressions": ["Taking family or caregiving duties seriously", "Creating firm boundaries around private life", "Managing feelings before revealing them"],
+        "developmental_direction": "Develop emotional authority that can receive care and express need without equating vulnerability with instability or failure."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.leo", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Leo" },
+      "topics": ["responsibility", "limits", "creativity", "recognition"],
+      "interpretation": {
+        "core_meaning": "Saturn in Leo concentrates learning around creative authority, visibility, and confidence in personal expression. Recognition may feel earned only after talent has been tested and disciplined.",
+        "possible_expressions": ["Taking creative work very seriously", "Holding back self-expression until it meets a high standard", "Developing steady leadership through experience"],
+        "developmental_direction": "Let disciplined creativity include play, warmth, and imperfect visibility rather than waiting for total control or unquestionable approval."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.virgo", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Virgo" },
+      "topics": ["responsibility", "limits", "work", "perfectionism"],
+      "interpretation": {
+        "core_meaning": "Saturn in Virgo concentrates learning around competence, service, and the limits of control through detail. Work may become a demanding arena for proving reliability and correctness.",
+        "possible_expressions": ["Developing rigorous technical skill", "Feeling responsible for preventing mistakes", "Creating systems of order and accountability"],
+        "developmental_direction": "Use discipline to support useful work while accepting uncertainty, delegation, and the difference between responsible care and impossible perfection."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.libra", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Libra" },
+      "topics": ["responsibility", "limits", "relationships", "fairness"],
+      "interpretation": {
+        "core_meaning": "Saturn in Libra concentrates learning around commitment, reciprocity, and the structures that make relationship fair. Partnership may be approached with seriousness and close attention to obligation.",
+        "possible_expressions": ["Creating durable agreements", "Taking time before committing", "Assuming responsibility for balance within a relationship"],
+        "developmental_direction": "Build mature reciprocity without replacing living connection with duty, rigid standards, or fear of making the wrong relational choice."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.scorpio", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Scorpio" },
+      "topics": ["responsibility", "limits", "trust", "power"],
+      "interpretation": {
+        "core_meaning": "Saturn in Scorpio concentrates learning around trust, shared power, and the disciplined handling of emotional intensity. Exposure and dependence may feel consequential enough to require strong defenses.",
+        "possible_expressions": ["Approaching intimacy or shared resources cautiously", "Enduring difficult processes with control", "Taking responsibility for confidential or high-stakes matters"],
+        "developmental_direction": "Develop boundaries that support honest exchange rather than using secrecy, withholding, or control to eliminate the vulnerability of mutual dependence."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.sagittarius", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Sagittarius" },
+      "topics": ["responsibility", "limits", "beliefs", "meaning"],
+      "interpretation": {
+        "core_meaning": "Saturn in Sagittarius concentrates learning around belief, truth, and the responsibility carried by a worldview. Convictions may be tested until they can withstand experience rather than depend on authority alone.",
+        "possible_expressions": ["Studying a philosophy or discipline over many years", "Taking teaching and ethical claims seriously", "Restricting exploration until a direction feels justified"],
+        "developmental_direction": "Build grounded conviction while remaining open to complexity, lived evidence, and meanings that extend beyond an established doctrine."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.capricorn", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Capricorn" },
+      "topics": ["responsibility", "limits", "authority", "achievement"],
+      "interpretation": {
+        "core_meaning": "Saturn in Capricorn concentrates discipline, ambition, and awareness of consequence. There may be a strong instinct for how authority, time, and structure shape what can actually be accomplished.",
+        "possible_expressions": ["Assuming demanding long-term responsibilities", "Building authority through experience", "Creating durable systems and standards"],
+        "developmental_direction": "Use discipline in service of meaningful construction without allowing status, severity, or endless obligation to eclipse emotional and personal life."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.aquarius", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Aquarius" },
+      "topics": ["responsibility", "limits", "community", "social_systems"],
+      "interpretation": {
+        "core_meaning": "Saturn in Aquarius concentrates learning around collective responsibility, social structures, and the disciplined use of independent thought. Belonging may require negotiating the tension between individuality and group expectations.",
+        "possible_expressions": ["Building systems for a community or cause", "Testing unconventional ideas against practical reality", "Taking responsibility for long-range social outcomes"],
+        "developmental_direction": "Create forms that protect both freedom and participation without hardening into ideological distance, exclusion, or reflexive opposition."
+      }
+    },
+    {
+      "id": "planet_sign.saturn.pisces", "kind": "planet_sign", "factors": { "planet": "Saturn", "sign": "Pisces" },
+      "topics": ["responsibility", "limits", "sensitivity", "spirituality"],
+      "interpretation": {
+        "core_meaning": "Saturn in Pisces concentrates learning around boundaries, faith, and giving form to subtle or compassionate impulses. Uncertainty may feel difficult until imagination and sensitivity have a reliable container.",
+        "possible_expressions": ["Disciplining an artistic or spiritual practice", "Taking responsibility for vulnerable people or diffuse situations", "Alternating between strict control and surrender"],
+        "developmental_direction": "Build flexible boundaries and practical forms that protect sensitivity without trying to eliminate mystery, dependence, or ambiguity."
+      }
+    },
+
+    {
+      "id": "planet_sign.uranus.aries", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Aries" },
+      "topics": ["change", "freedom", "initiative", "innovation"],
+      "interpretation": {
+        "core_meaning": "Uranus in Aries links change with radical initiative and the urge to act outside inherited permission. When personally emphasized, freedom may be pursued through decisive breaks and experiments in self-definition.",
+        "possible_expressions": ["Introducing new methods abruptly", "Resisting imposed identities", "Acting as an early catalyst for change"],
+        "developmental_direction": "Give innovation enough continuity and awareness of consequence that disruption can open a path rather than merely break the existing one."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.taurus", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Taurus" },
+      "topics": ["change", "freedom", "values", "resources"],
+      "interpretation": {
+        "core_meaning": "Uranus in Taurus links change with material systems, values, and the forms used to create security. Innovation may build slowly until accumulated pressure makes a substantial revision unavoidable.",
+        "possible_expressions": ["Experimenting with resources or ownership", "Questioning conventional definitions of stability", "Combining persistence with unconventional methods"],
+        "developmental_direction": "Allow values and material forms to evolve deliberately so that necessary change does not require prolonged resistance followed by rupture."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.gemini", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Gemini" },
+      "topics": ["change", "freedom", "communication", "technology"],
+      "interpretation": {
+        "core_meaning": "Uranus in Gemini links change with language, information, mobility, and the structures of thought. When personally emphasized, the mind may challenge familiar categories through rapid and unusual connections.",
+        "possible_expressions": ["Experimenting with communication or technology", "Learning through nonlinear leaps", "Circulating ideas that destabilize conventional thinking"],
+        "developmental_direction": "Translate flashes of insight into language and applications others can engage, while giving attention enough stability to develop what arrives."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.cancer", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Cancer" },
+      "topics": ["change", "freedom", "family", "belonging"],
+      "interpretation": {
+        "core_meaning": "Uranus in Cancer links change with family, home, emotional belonging, and inherited forms of care. When personally emphasized, freedom may require creating a less conventional basis for security.",
+        "possible_expressions": ["Revising family or domestic roles", "Creating chosen forms of belonging", "Experiencing sudden insight through memory or feeling"],
+        "developmental_direction": "Make room for emotional roots while changing their form, rather than treating freedom and attachment as mutually exclusive."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.leo", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Leo" },
+      "topics": ["change", "freedom", "creativity", "individuality"],
+      "interpretation": {
+        "core_meaning": "Uranus in Leo links change with creative self-expression, leadership, and the right to be visibly individual. When personally emphasized, originality may need an unmistakably personal form.",
+        "possible_expressions": ["Creating outside established styles", "Challenging conventional authority through personal example", "Seeking freedom in romance, play, or performance"],
+        "developmental_direction": "Let originality become a contribution others can share rather than making difference, attention, or defiance the sole proof of authenticity."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.virgo", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Virgo" },
+      "topics": ["change", "freedom", "work", "systems"],
+      "interpretation": {
+        "core_meaning": "Uranus in Virgo links change with work, technique, health systems, and the organization of daily life. When personally emphasized, innovation may emerge through precise attention to where a process fails.",
+        "possible_expressions": ["Redesigning routines or technical methods", "Applying unconventional analysis to practical problems", "Resisting inefficient forms of service or labor"],
+        "developmental_direction": "Use disruption to create more workable systems without allowing restless correction or impossible standards to fragment daily life."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.libra", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Libra" },
+      "topics": ["change", "freedom", "relationships", "justice"],
+      "interpretation": {
+        "core_meaning": "Uranus in Libra links change with partnership, justice, and social agreements. When personally emphasized, relationships may become a laboratory for more equal or unconventional forms of connection.",
+        "possible_expressions": ["Questioning inherited relationship roles", "Seeking fairness through structural change", "Needing partnership to preserve strong individuality"],
+        "developmental_direction": "Create freedom through honest agreements and sustained reciprocity rather than relying on distance or sudden rupture to restore balance."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.scorpio", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Scorpio" },
+      "topics": ["change", "freedom", "power", "intimacy"],
+      "interpretation": {
+        "core_meaning": "Uranus in Scorpio links change with intimacy, shared power, and the exposure of what has been kept hidden. When personally emphasized, liberation may arrive through intense confrontation with taboo or control.",
+        "possible_expressions": ["Challenging secrecy around power or sexuality", "Experiencing sudden shifts in trust or shared resources", "Investigating transformative subjects unconventionally"],
+        "developmental_direction": "Let revelation support conscious change without using shock, secrecy, or emotional extremity as substitutes for vulnerable exchange."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.sagittarius", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Sagittarius" },
+      "topics": ["change", "freedom", "beliefs", "exploration"],
+      "interpretation": {
+        "core_meaning": "Uranus in Sagittarius links change with belief, education, travel, and freedom of meaning. When personally emphasized, liberation may come from crossing intellectual or cultural boundaries.",
+        "possible_expressions": ["Rejecting inherited doctrine", "Experimenting with education or philosophy", "Pursuing truth through unfamiliar experience"],
+        "developmental_direction": "Keep the search for freedom open to evidence and consequence so that unconventional conviction does not become another rigid certainty."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.capricorn", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Capricorn" },
+      "topics": ["change", "freedom", "authority", "institutions"],
+      "interpretation": {
+        "core_meaning": "Uranus in Capricorn links change with authority, institutions, and the structures that organize public life. When personally emphasized, innovation may focus on rebuilding systems rather than abandoning structure itself.",
+        "possible_expressions": ["Modernizing established organizations", "Questioning who holds authority and why", "Combining ambition with unconventional strategy"],
+        "developmental_direction": "Create durable reform by understanding the function of existing structures while refusing forms that no longer serve their purpose."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.aquarius", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Aquarius" },
+      "topics": ["change", "freedom", "community", "innovation"],
+      "interpretation": {
+        "core_meaning": "Uranus in Aquarius intensifies the drive toward innovation, collective change, and freedom from obsolete social forms. When personally emphasized, insight may arrive through networks and systems rather than private reflection alone.",
+        "possible_expressions": ["Building communities around emerging ideas", "Recognizing patterns before they become widely visible", "Challenging exclusionary or rigid conventions"],
+        "developmental_direction": "Ground future-oriented thinking in human relationship and practical participation so that vision does not become impersonal or self-sealing."
+      }
+    },
+    {
+      "id": "planet_sign.uranus.pisces", "kind": "planet_sign", "factors": { "planet": "Uranus", "sign": "Pisces" },
+      "topics": ["change", "freedom", "spirituality", "imagination"],
+      "interpretation": {
+        "core_meaning": "Uranus in Pisces links change with imagination, spirituality, compassion, and the boundaries of ordinary perception. When personally emphasized, liberation may emerge through intuitive or creative breakthroughs.",
+        "possible_expressions": ["Experimenting with spiritual or artistic forms", "Receiving sudden insights through dreams or symbols", "Questioning fixed boundaries around identity and belonging"],
+        "developmental_direction": "Give subtle innovation enough clarity and form to become usable without reducing mystery or drifting away from shared reality."
+      }
+    },
+
+    {
+      "id": "planet_sign.neptune.aries", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Aries" },
+      "topics": ["imagination", "spirituality", "identity", "action"],
+      "interpretation": {
+        "core_meaning": "Neptune in Aries blends imagination and transcendence with initiative, identity, and action. When personally emphasized, inspiration may seek immediate embodiment through a quest, cause, or idealized form of courage.",
+        "possible_expressions": ["Acting from intuitive inspiration", "Idealizing independence or heroic action", "Channeling imagination into pioneering work"],
+        "developmental_direction": "Clarify whose desire is being served and connect inspiration with practical consequence so that action is neither inflated nor diffused."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.taurus", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Taurus" },
+      "topics": ["imagination", "spirituality", "values", "embodiment"],
+      "interpretation": {
+        "core_meaning": "Neptune in Taurus blends imagination and transcendence with value, matter, and sensory life. When personally emphasized, beauty or nature may become a doorway into experiences of unity and devotion.",
+        "possible_expressions": ["Giving spiritual or artistic meaning to material forms", "Experiencing beauty through touch, sound, or nature", "Idealizing security or abundance"],
+        "developmental_direction": "Honor the sacred dimension of matter while keeping values, resources, and promises clear enough to withstand idealization."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.gemini", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Gemini" },
+      "topics": ["imagination", "spirituality", "communication", "ideas"],
+      "interpretation": {
+        "core_meaning": "Neptune in Gemini blends imagination and transcendence with language, information, and mental connection. When personally emphasized, words may carry suggestive, poetic, or elusive layers beyond their literal meaning.",
+        "possible_expressions": ["Communicating through metaphor or atmosphere", "Receiving ideas through association and intuition", "Becoming absorbed in multiple narratives or possibilities"],
+        "developmental_direction": "Pair imaginative communication with verification and definition so that ambiguity enriches meaning without obscuring what is actually being said."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.cancer", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Cancer" },
+      "topics": ["imagination", "spirituality", "family", "emotions"],
+      "interpretation": {
+        "core_meaning": "Neptune in Cancer blends imagination and transcendence with home, memory, and emotional belonging. When personally emphasized, care and ancestry may be experienced through an especially permeable symbolic field.",
+        "possible_expressions": ["Idealizing home or family bonds", "Creating sanctuary through compassion and imagination", "Feeling collective emotion through personal memory"],
+        "developmental_direction": "Let sensitivity deepen belonging while maintaining boundaries between present relationships, inherited longing, and an imagined ideal of home."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.leo", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Leo" },
+      "topics": ["imagination", "spirituality", "creativity", "recognition"],
+      "interpretation": {
+        "core_meaning": "Neptune in Leo blends imagination and transcendence with creativity, performance, and personal radiance. When personally emphasized, artistic expression or idealized love may become a vehicle for reaching beyond the ordinary self.",
+        "possible_expressions": ["Creating vivid imaginative work", "Idealizing romance, talent, or recognition", "Inspiring others through symbolic performance"],
+        "developmental_direction": "Create from genuine inspiration while distinguishing shared love from projection and creative calling from the fantasy of specialness."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.virgo", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Virgo" },
+      "topics": ["imagination", "spirituality", "service", "discernment"],
+      "interpretation": {
+        "core_meaning": "Neptune in Virgo blends imagination and transcendence with work, service, and discernment. When personally emphasized, there may be a wish to make compassion useful or to find the sacred within ordinary detail.",
+        "possible_expressions": ["Serving through subtle attentiveness", "Bringing imagination into practical craft", "Idealizing purity, usefulness, or perfect method"],
+        "developmental_direction": "Give compassion workable form without demanding purity or certainty from experiences whose meaning remains fluid."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.libra", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Libra" },
+      "topics": ["imagination", "spirituality", "relationships", "idealization"],
+      "interpretation": {
+        "core_meaning": "Neptune in Libra blends imagination and transcendence with partnership, beauty, and ideals of harmony. When personally emphasized, relationship may carry longing for an unusually complete or redemptive union.",
+        "possible_expressions": ["Creating beauty through collaboration", "Perceiving the highest potential in a partner", "Avoiding distinctions that disturb an ideal of harmony"],
+        "developmental_direction": "Let ideals inspire relationship while keeping perception, boundaries, and agreements clear enough for two actual people to remain visible."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.scorpio", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Scorpio" },
+      "topics": ["imagination", "spirituality", "intimacy", "power"],
+      "interpretation": {
+        "core_meaning": "Neptune in Scorpio blends imagination and transcendence with intimacy, power, and transformation. When personally emphasized, merging may be sought through emotional, sexual, psychological, or spiritual depth.",
+        "possible_expressions": ["Sensing subtle dynamics in intense relationships", "Finding spiritual meaning in transformation", "Idealizing secrecy, sacrifice, or total union"],
+        "developmental_direction": "Approach depth with consent, clarity, and grounded discernment so that longing for union does not obscure power differences or personal boundaries."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.sagittarius", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Sagittarius" },
+      "topics": ["imagination", "spirituality", "beliefs", "meaning"],
+      "interpretation": {
+        "core_meaning": "Neptune in Sagittarius blends imagination and transcendence with belief, exploration, and the search for universal meaning. When personally emphasized, a spiritual or philosophical vision may organize the horizon of possibility.",
+        "possible_expressions": ["Seeking unity across religions or cultures", "Being inspired by pilgrimage, travel, or teaching", "Idealizing a worldview or distant horizon"],
+        "developmental_direction": "Let faith remain expansive while testing interpretation against context, evidence, and the limits of any single universal claim."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.capricorn", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Capricorn" },
+      "topics": ["imagination", "spirituality", "authority", "institutions"],
+      "interpretation": {
+        "core_meaning": "Neptune in Capricorn blends imagination and transcendence with authority, ambition, and institutional form. When personally emphasized, there may be a drive to embody an ideal through work or to see through the myths supporting established structures.",
+        "possible_expressions": ["Giving practical form to a spiritual or creative vision", "Idealizing achievement or authority", "Sensing where institutions have lost meaningful purpose"],
+        "developmental_direction": "Build ideals into accountable structures without confusing prestige with purpose or dissolving practical responsibility in vision."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.aquarius", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Aquarius" },
+      "topics": ["imagination", "spirituality", "community", "future"],
+      "interpretation": {
+        "core_meaning": "Neptune in Aquarius blends imagination and transcendence with community, technology, and collective visions of the future. When personally emphasized, ideals may gather around human interconnectedness and social possibility.",
+        "possible_expressions": ["Imagining new forms of community", "Experiencing networks as fields of collective feeling", "Idealizing movements, technology, or social progress"],
+        "developmental_direction": "Keep collective vision connected to individual dignity, practical limits, and relationships that can test whether an ideal is actually humane."
+      }
+    },
+    {
+      "id": "planet_sign.neptune.pisces", "kind": "planet_sign", "factors": { "planet": "Neptune", "sign": "Pisces" },
+      "topics": ["imagination", "spirituality", "compassion", "boundaries"],
+      "interpretation": {
+        "core_meaning": "Neptune in Pisces intensifies sensitivity to imagination, compassion, symbolism, and experiences of unity. When personally emphasized, ordinary boundaries may feel permeable and the unseen dimensions of experience unusually present.",
+        "possible_expressions": ["Creating from dreams, music, image, or spiritual experience", "Feeling profound compassion for suffering", "Seeking retreat from harsh or disenchanted environments"],
+        "developmental_direction": "Give openness discernment, embodiment, and sustainable boundaries so that compassion can act without becoming confusion, rescue, or disappearance."
+      }
+    },
+
+    {
+      "id": "planet_sign.pluto.aries", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Aries" },
+      "topics": ["transformation", "power", "identity", "survival"],
+      "interpretation": {
+        "core_meaning": "Pluto in Aries links deep transformation with identity, survival, and the raw force of initiative. When personally emphasized, encounters with power may demand a more conscious relationship to will and self-assertion.",
+        "possible_expressions": ["Reinventing identity after decisive conflict", "Confronting the consequences of unrestrained will", "Discovering regenerative strength through courageous action"],
+        "developmental_direction": "Transform force into conscious agency that protects life without needing domination, permanent combat, or destruction as proof of power."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.taurus", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Taurus" },
+      "topics": ["transformation", "power", "resources", "values"],
+      "interpretation": {
+        "core_meaning": "Pluto in Taurus links deep transformation with resources, embodiment, and the values used to create security. When personally emphasized, attachment and loss may expose what carries enduring value beneath possession.",
+        "possible_expressions": ["Rebuilding material life after major change", "Concentrating power through resources or endurance", "Questioning what is truly necessary for stability"],
+        "developmental_direction": "Develop inner value and regenerative stewardship so that security does not depend on accumulation, immobility, or control of what must change."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.gemini", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Gemini" },
+      "topics": ["transformation", "power", "communication", "knowledge"],
+      "interpretation": {
+        "core_meaning": "Pluto in Gemini links deep transformation with language, knowledge, and the circulation of information. When personally emphasized, words and ideas may be experienced as forces capable of changing perception at its roots.",
+        "possible_expressions": ["Investigating how narratives shape power", "Using research or communication to expose hidden structures", "Becoming intensely focused on a question or idea"],
+        "developmental_direction": "Use intellectual depth to open understanding rather than controlling conversation, fixating on one explanation, or treating information as leverage."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.cancer", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Cancer" },
+      "topics": ["transformation", "power", "family", "belonging"],
+      "interpretation": {
+        "core_meaning": "Pluto in Cancer links deep transformation with family, emotional inheritance, and collective forms of belonging. When personally emphasized, private roots may become the ground of profound endings and renewal.",
+        "possible_expressions": ["Transforming inherited family patterns", "Protecting home or belonging with unusual intensity", "Discovering power in emotional memory"],
+        "developmental_direction": "Honor emotional roots while releasing loyalties, defenses, or control patterns that keep the past governing present belonging."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.leo", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Leo" },
+      "topics": ["transformation", "power", "creativity", "recognition"],
+      "interpretation": {
+        "core_meaning": "Pluto in Leo links deep transformation with creativity, authority, and the need for personal significance. When personally emphasized, visibility may become an arena for confronting the uses and costs of individual power.",
+        "possible_expressions": ["Creating with concentrated force", "Experiencing major changes in leadership or self-expression", "Seeking influence through personal presence"],
+        "developmental_direction": "Let creative power regenerate and empower others rather than requiring admiration, centrality, or control of the stage."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.virgo", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Virgo" },
+      "topics": ["transformation", "power", "work", "purification"],
+      "interpretation": {
+        "core_meaning": "Pluto in Virgo links deep transformation with work, analysis, service, and the drive to purify systems. When personally emphasized, small flaws may reveal larger structures that require fundamental repair.",
+        "possible_expressions": ["Reforming methods, labor, or daily systems", "Investigating problems others overlook", "Pursuing mastery through intense refinement"],
+        "developmental_direction": "Transform through discerning service without turning improvement into compulsion, moral purity, or relentless control of detail."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.libra", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Libra" },
+      "topics": ["transformation", "power", "relationships", "justice"],
+      "interpretation": {
+        "core_meaning": "Pluto in Libra links deep transformation with partnership, justice, and the distribution of power between people. When personally emphasized, close relationships may expose hidden imbalances beneath apparent harmony.",
+        "possible_expressions": ["Transforming through consequential partnerships", "Examining power inside agreements", "Pursuing deeper forms of fairness"],
+        "developmental_direction": "Create reciprocity that can survive honest conflict without using charm, withdrawal, or relational pressure to control the balance."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.scorpio", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Scorpio" },
+      "topics": ["transformation", "power", "intimacy", "regeneration"],
+      "interpretation": {
+        "core_meaning": "Pluto in Scorpio intensifies themes of power, intimacy, loss, and regeneration. When personally emphasized, there may be little tolerance for superficial engagement with experiences that demand total honesty and change.",
+        "possible_expressions": ["Entering difficult transformative processes directly", "Investigating taboo or hidden material", "Developing resilience through profound endings and renewals"],
+        "developmental_direction": "Use depth for conscious regeneration while releasing fascination with crisis, secrecy, vengeance, or control as sources of identity."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.sagittarius", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Sagittarius" },
+      "topics": ["transformation", "power", "beliefs", "truth"],
+      "interpretation": {
+        "core_meaning": "Pluto in Sagittarius links deep transformation with belief, truth, education, and cultural horizons. When personally emphasized, a worldview may undergo repeated destruction and reconstruction in search of a more vital meaning.",
+        "possible_expressions": ["Challenging powerful doctrines or institutions of belief", "Pursuing truth with intense conviction", "Transforming through encounters with unfamiliar cultures or ideas"],
+        "developmental_direction": "Let conviction be transformed by humility, context, and lived evidence rather than using certainty or moral force to dominate meaning."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.capricorn", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Capricorn" },
+      "topics": ["transformation", "power", "authority", "institutions"],
+      "interpretation": {
+        "core_meaning": "Pluto in Capricorn links deep transformation with authority, ambition, and institutional structures. When personally emphasized, encounters with control may reveal which forms of power have substance and which have become hollow.",
+        "possible_expressions": ["Rebuilding systems after structural failure", "Developing formidable strategic endurance", "Confronting inherited models of success and authority"],
+        "developmental_direction": "Use power to create accountable and durable structures rather than reproducing domination, fear, or achievement emptied of purpose."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.aquarius", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Aquarius" },
+      "topics": ["transformation", "power", "community", "technology"],
+      "interpretation": {
+        "core_meaning": "Pluto in Aquarius links deep transformation with collective systems, technology, and the power carried by groups and ideas. When personally emphasized, social belonging may become an arena for confronting control and radical change.",
+        "possible_expressions": ["Exposing power within networks or movements", "Participating in consequential social transformation", "Questioning who benefits from systems presented as progress"],
+        "developmental_direction": "Join collective transformation with individual dignity so that ideology, technology, or group power does not erase the person."
+      }
+    },
+    {
+      "id": "planet_sign.pluto.pisces", "kind": "planet_sign", "factors": { "planet": "Pluto", "sign": "Pisces" },
+      "topics": ["transformation", "power", "spirituality", "collective_emotion"],
+      "interpretation": {
+        "core_meaning": "Pluto in Pisces links deep transformation with spirituality, imagination, collective emotion, and the dissolution of familiar boundaries. When personally emphasized, surrender may expose both hidden power and regenerative compassion.",
+        "possible_expressions": ["Transforming through spiritual or creative immersion", "Confronting collective grief, fantasy, or denial", "Discovering strength through compassionate surrender"],
+        "developmental_direction": "Let dissolution clear what has ended while maintaining discernment, embodiment, and responsibility within powerful collective or spiritual currents."
+      }
+    }
+  ]
+}

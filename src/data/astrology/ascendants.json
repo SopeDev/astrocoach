@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "Libro Cosmobiología - 2014.docx",
+  "kind": "ascendant",
+  "entries": [
+    {
+      "id": "ascendant.aries",
+      "kind": "ascendant",
+      "factors": { "sign": "Aries" },
+      "topics": ["identity", "beginnings", "initiative", "courage", "competition"],
+      "interpretation": {
+        "core_meaning": "Aries rising meets life through immediacy, initiative, and the need to discover identity through direct action. Others may first encounter an energetic, candid, or self-starting presence.",
+        "possible_expressions": ["Entering unfamiliar situations quickly and learning by doing", "Projecting courage, urgency, or competitive energy", "Losing interest when movement slows or another person sets the pace"],
+        "developmental_direction": "Let decisiveness open the way while developing patience, proportion, and the capacity to act with others rather than treating every beginning as a contest."
+      }
+    },
+    {
+      "id": "ascendant.taurus",
+      "kind": "ascendant",
+      "factors": { "sign": "Taurus" },
+      "topics": ["identity", "stability", "values", "resources", "continuity"],
+      "interpretation": {
+        "core_meaning": "Taurus rising approaches life through steadiness, sensory awareness, and the gradual creation of security. Others may first encounter a grounded, deliberate, or reassuring presence.",
+        "possible_expressions": ["Taking time to assess whether a new situation feels stable and worthwhile", "Projecting reliability, calm, and continuity", "Holding tightly to possessions, people, or familiar patterns when change feels threatening"],
+        "developmental_direction": "Build durable values and commitments without confusing security with immobility or allowing what is possessed to determine the range of possible growth."
+      }
+    },
+    {
+      "id": "ascendant.gemini",
+      "kind": "ascendant",
+      "factors": { "sign": "Gemini" },
+      "topics": ["identity", "communication", "curiosity", "learning", "adaptability"],
+      "interpretation": {
+        "core_meaning": "Gemini rising meets life by observing, comparing, questioning, and making connections. Others may first encounter a lively, articulate, adaptable, or mentally alert presence.",
+        "possible_expressions": ["Opening contact through conversation, humor, or questions", "Adapting presentation to different people and environments", "Collecting more information or possibilities than can be meaningfully integrated"],
+        "developmental_direction": "Turn curiosity into understanding by giving selected ideas enough continuity and depth to become lived knowledge rather than remaining endless comparison."
+      }
+    },
+    {
+      "id": "ascendant.cancer",
+      "kind": "ascendant",
+      "factors": { "sign": "Cancer" },
+      "topics": ["identity", "sensitivity", "care", "belonging", "protection"],
+      "interpretation": {
+        "core_meaning": "Cancer rising approaches life through emotional sensitivity, protection, and an instinctive reading of what feels safe or familiar. Others may first encounter a caring, receptive, reserved, or changeable presence.",
+        "possible_expressions": ["Sensing the emotional climate before revealing oneself", "Creating warmth by caring for people, places, or developing possibilities", "Retreating into familiarity or attachment after perceived rejection"],
+        "developmental_direction": "Let sensitivity become responsive care while distinguishing present feeling from inherited defenses and allowing closeness without making dependency the price of safety."
+      }
+    },
+    {
+      "id": "ascendant.leo",
+      "kind": "ascendant",
+      "factors": { "sign": "Leo" },
+      "topics": ["identity", "creativity", "visibility", "leadership", "recognition"],
+      "interpretation": {
+        "core_meaning": "Leo rising meets life through creative self-expression, warmth, and the wish to make a recognizable impact. Others may first encounter a vivid, confident, generous, or commanding presence.",
+        "possible_expressions": ["Bringing enthusiasm and personal style into new situations", "Responding readily to challenge, performance, or leadership", "Using pride, display, or control to protect a vulnerable sense of significance"],
+        "developmental_direction": "Let visibility express genuine creative participation and generosity rather than making praise, status, or control over the room the proof of personal value."
+      }
+    },
+    {
+      "id": "ascendant.virgo",
+      "kind": "ascendant",
+      "factors": { "sign": "Virgo" },
+      "topics": ["identity", "discernment", "service", "order", "improvement"],
+      "interpretation": {
+        "core_meaning": "Virgo rising approaches life through observation, discernment, and the impulse to make experience more coherent or useful. Others may first encounter a thoughtful, precise, modest, or capable presence.",
+        "possible_expressions": ["Noticing details and practical needs that others overlook", "Establishing trust through usefulness, preparation, or skill", "Managing uncertainty through excessive analysis, criticism, or self-correction"],
+        "developmental_direction": "Use discernment in the service of life while allowing imperfection, intuition, and unfinished experience to exist without immediately becoming problems to control."
+      }
+    },
+    {
+      "id": "ascendant.libra",
+      "kind": "ascendant",
+      "factors": { "sign": "Libra" },
+      "topics": ["identity", "relationships", "harmony", "diplomacy", "beauty"],
+      "interpretation": {
+        "core_meaning": "Libra rising meets life through relationship, proportion, and awareness of how separate perspectives can share space. Others may first encounter a gracious, diplomatic, aesthetic, or accommodating presence.",
+        "possible_expressions": ["Creating rapport by finding common ground and reading another viewpoint", "Presenting with warmth, tact, or an instinct for balance", "Postponing decisions or personal needs to preserve approval and apparent harmony"],
+        "developmental_direction": "Create mutuality from a clear center of personal value, letting honest difference strengthen relationship instead of disappearing into another person's preferences."
+      }
+    },
+    {
+      "id": "ascendant.scorpio",
+      "kind": "ascendant",
+      "factors": { "sign": "Scorpio" },
+      "topics": ["identity", "intensity", "privacy", "power", "transformation"],
+      "interpretation": {
+        "core_meaning": "Scorpio rising approaches life with concentration, privacy, and sensitivity to hidden motives or shifts in power. Others may first encounter a contained, magnetic, serious, or penetrating presence.",
+        "possible_expressions": ["Reading beneath appearances before deciding whether to trust", "Meeting difficult transitions with unusual regenerative force", "Using secrecy, vigilance, or control to avoid exposure and uncertainty"],
+        "developmental_direction": "Turn perceptiveness into honest self-mastery, releasing what has become corrosive and allowing trust to grow through transparency rather than tests of loyalty or control."
+      }
+    },
+    {
+      "id": "ascendant.sagittarius",
+      "kind": "ascendant",
+      "factors": { "sign": "Sagittarius" },
+      "topics": ["identity", "exploration", "meaning", "freedom", "perspective"],
+      "interpretation": {
+        "core_meaning": "Sagittarius rising meets life through exploration, candor, and the search for a larger field of possibility or meaning. Others may first encounter an open, enthusiastic, humorous, or restless presence.",
+        "possible_expressions": ["Entering new situations by looking for opportunity and a broader horizon", "Sharing convictions, stories, or perspective with contagious enthusiasm", "Moving toward the next possibility before the present one has acquired depth"],
+        "developmental_direction": "Let breadth become wisdom by choosing commitments that can carry freedom, testing conviction against experience, and valuing quality as much as possibility."
+      }
+    },
+    {
+      "id": "ascendant.capricorn",
+      "kind": "ascendant",
+      "factors": { "sign": "Capricorn" },
+      "topics": ["identity", "responsibility", "achievement", "discipline", "authority"],
+      "interpretation": {
+        "core_meaning": "Capricorn rising approaches life through realism, self-command, and awareness of lasting consequence. Others may first encounter a composed, responsible, reserved, or quietly ambitious presence.",
+        "possible_expressions": ["Assessing expectations and building credibility before relaxing into a situation", "Taking a long view of effort, reputation, and achievement", "Protecting pride or insecurity through distance, severity, or excessive control"],
+        "developmental_direction": "Develop authority through patient, accountable action while allowing warmth, experimentation, and human limitation to matter alongside standards and accomplishment."
+      }
+    },
+    {
+      "id": "ascendant.aquarius",
+      "kind": "ascendant",
+      "factors": { "sign": "Aquarius" },
+      "topics": ["identity", "freedom", "innovation", "community", "perspective"],
+      "interpretation": {
+        "core_meaning": "Aquarius rising meets life through independent observation, experimentation, and sensitivity to collective patterns. Others may first encounter an unconventional, impartial, inventive, or socially alert presence.",
+        "possible_expressions": ["Questioning assumptions and noticing alternatives that a group has overlooked", "Connecting people or ideas around a future possibility", "Using detachment or reflexive nonconformity to avoid ordinary emotional participation"],
+        "developmental_direction": "Make originality relational and usable, allowing freedom to include emotional presence, continuity, and responsibility to the people affected by change."
+      }
+    },
+    {
+      "id": "ascendant.pisces",
+      "kind": "ascendant",
+      "factors": { "sign": "Pisces" },
+      "topics": ["identity", "imagination", "sensitivity", "compassion", "boundaries"],
+      "interpretation": {
+        "core_meaning": "Pisces rising approaches life through imagination, permeability, and sensitivity to subtle emotional or symbolic currents. Others may first encounter a gentle, elusive, compassionate, or creatively receptive presence.",
+        "possible_expressions": ["Adapting intuitively to the atmosphere and people nearby", "Expressing identity through image, feeling, spirituality, or imagination", "Losing definition by merging with expectations or escaping difficult concrete demands"],
+        "developmental_direction": "Give imagination and compassion an embodied center through clear boundaries, practical choices, and forms that allow sensitivity to participate without disappearing."
+      }
+    }
+  ]
+}

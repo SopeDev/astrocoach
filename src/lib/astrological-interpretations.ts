@@ -1,4 +1,50 @@
-import interpretations from "../../astrological-interpretations.en.json";
+import interpretations from "@/data/astrology/lunar-nodes.json";
+
+export {
+  ascendantInterpretationCatalog,
+  getAscendantInterpretation,
+} from "@/lib/ascendant-interpretations";
+export type {
+  AscendantInterpretation,
+  AscendantSign,
+} from "@/lib/ascendant-interpretations";
+
+export {
+  getHouseArchetype,
+  getPlanetArchetype,
+  getSignArchetype,
+  houseArchetypeCatalog,
+  planetArchetypeCatalog,
+  signArchetypeCatalog,
+} from "@/lib/archetype-interpretations";
+export type {
+  ArchetypeHouse,
+  ArchetypePlanet,
+  ArchetypeSign,
+  HouseArchetypeInterpretation,
+  PlanetArchetypeInterpretation,
+  SignArchetypeInterpretation,
+} from "@/lib/archetype-interpretations";
+
+export {
+  getPlanetSignInterpretation,
+  planetSignInterpretationCatalog,
+} from "@/lib/planet-sign-interpretations";
+export type {
+  PlanetSignInterpretation,
+  PlanetSignPlanet,
+  PlanetSignSign,
+} from "@/lib/planet-sign-interpretations";
+
+export {
+  getPlanetHouseInterpretation,
+  planetHouseInterpretationCatalog,
+} from "@/lib/planet-house-interpretations";
+export type {
+  PlanetHouseHouse,
+  PlanetHouseInterpretation,
+  PlanetHousePlanet,
+} from "@/lib/planet-house-interpretations";
 
 type FamiliarPattern = {
   summary: string;

@@ -8,12 +8,15 @@ import {
   ASTROCOACH_VOICE_INSTRUCTIONS,
   ASTROLOGY_COMMUNICATION_INSTRUCTIONS,
   ASTROLOGY_CONVERSATION_EXAMPLES,
-  privateChartContext,
 } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
-import { lunarNodeInterpretationContext } from "@/lib/astrological-interpretations";
 import { CORE_INSTRUCTIONS } from "@/lib/explore";
 import { getServerEnv } from "@/lib/env";
+import type { LifeAreaKey } from "@/lib/life-areas";
+import {
+  retrieveNatalInterpretation,
+  type NatalInterpretationDocument,
+} from "@/lib/natal-interpretation";
 import { type CandidateEvaluationPromptContext, recognizeResponseSchema } from "@/lib/recognize-contract";
 
 type ThreadMessage = { role: "user" | "assistant"; content: string };
@@ -42,13 +45,14 @@ If new lived evidence contradicts a proposition or astrological framing, respond
 
 export async function generateRecognizeResponse({
   locale,
+  lifeAreaKeys,
   lifeAreas,
   currentContext,
   initialQuestions,
   initialAnswers,
   finalQuestions,
   finalAnswers,
-  natalChart,
+  natalInterpretation,
   astrologyFamiliarity,
   astrologyStyle,
   thread,
@@ -57,13 +61,14 @@ export async function generateRecognizeResponse({
   candidateEvaluationContext,
 }: {
   locale: Locale;
+  lifeAreaKeys: LifeAreaKey[];
   lifeAreas: string[];
   currentContext: string | null;
   initialQuestions: unknown;
   initialAnswers: unknown;
   finalQuestions: unknown;
   finalAnswers: unknown;
-  natalChart: unknown;
+  natalInterpretation: NatalInterpretationDocument;
   astrologyFamiliarity: AstrologyFamiliarity;
   astrologyStyle: AstrologyStyle;
   thread: ThreadMessage[];
@@ -77,6 +82,14 @@ export async function generateRecognizeResponse({
   const openingConstraint = opening
     ? "This is the first RECOGNIZE response. Do not automatically formulate a candidate. First decide whether a material competing explanation remains unresolved. If so, begin with HYPOTHESIS_TESTING and one discriminating question. If the existing lived evidence already resolves the important alternatives, present the smallest defensible candidate in CANDIDATE_EVALUATION."
     : "Continue from the actual recognition stage shown by the conversation. Do not mistake an answer to hypothesis testing for acceptance. Preserve the user's wording where it improves accuracy, and only broaden scope after independent lived evidence supports it.";
+  const privateInterpretationContext = retrieveNatalInterpretation(natalInterpretation, {
+    reason: "conversation",
+    lifeAreas: lifeAreaKeys,
+    text: [
+      ...thread.filter((message) => message.role === "user").slice(-6).map((message) => message.content),
+      ...(latestMessage ? [latestMessage] : []),
+    ].join("\n"),
+  });
 
   const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
     model: env.OPENAI_MODEL,
@@ -90,8 +103,7 @@ export async function generateRecognizeResponse({
           ...exchanges(initialQuestions, initialAnswers),
           ...exchanges(finalQuestions, finalAnswers),
         ],
-        privateNatalContext: privateChartContext(natalChart),
-        privateInterpretationContext: lunarNodeInterpretationContext(natalChart),
+        privateInterpretationContext,
         astrologyFamiliarity,
         astrologyStyle,
       },

@@ -8,12 +8,15 @@ import {
   ASTROCOACH_VOICE_INSTRUCTIONS,
   ASTROLOGY_COMMUNICATION_INSTRUCTIONS,
   ASTROLOGY_CONVERSATION_EXAMPLES,
-  privateChartContext,
 } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
-import { lunarNodeInterpretationContext } from "@/lib/astrological-interpretations";
 import { getServerEnv } from "@/lib/env";
 import { exploreResponseSchema, type ExploreSignals } from "@/lib/explore-contract";
+import type { LifeAreaKey } from "@/lib/life-areas";
+import {
+  retrieveNatalInterpretation,
+  type NatalInterpretationDocument,
+} from "@/lib/natal-interpretation";
 import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
 
 type ThreadMessage = { role: "user" | "assistant"; content: string };
@@ -44,13 +47,14 @@ Do not treat something as a problem to fix unless the user has indicated it is o
 
 export async function generateExploreResponse({
   locale,
+  lifeAreaKeys,
   lifeAreas,
   currentContext,
   initialQuestions,
   initialAnswers,
   finalQuestions,
   finalAnswers,
-  natalChart,
+  natalInterpretation,
   astrologyFamiliarity,
   astrologyStyle,
   thread,
@@ -59,13 +63,14 @@ export async function generateExploreResponse({
   recentResponseApproaches = [],
 }: {
   locale: Locale;
+  lifeAreaKeys: LifeAreaKey[];
   lifeAreas: string[];
   currentContext: string | null;
   initialQuestions: unknown;
   initialAnswers: unknown;
   finalQuestions: unknown;
   finalAnswers: unknown;
-  natalChart: unknown;
+  natalInterpretation: NatalInterpretationDocument;
   astrologyFamiliarity: AstrologyFamiliarity;
   astrologyStyle: AstrologyStyle;
   thread: ThreadMessage[];
@@ -86,6 +91,14 @@ export async function generateExploreResponse({
   ];
   const recentAssistantTurns = thread.filter((message) => message.role === "assistant").slice(-4);
   const responsesEndingInQuestion = recentAssistantTurns.filter((message) => message.content.trim().endsWith("?")).length;
+  const privateInterpretationContext = retrieveNatalInterpretation(natalInterpretation, {
+    reason: "conversation",
+    lifeAreas: lifeAreaKeys,
+    text: [
+      ...thread.filter((message) => message.role === "user").slice(-6).map((message) => message.content),
+      latestMessage,
+    ].join("\n"),
+  });
 
   const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
     model: env.OPENAI_MODEL,
@@ -96,8 +109,7 @@ export async function generateExploreResponse({
         selectedLifeAreas: lifeAreas,
         initialDescription: currentContext,
         onboardingExchanges,
-        privateNatalContext: privateChartContext(natalChart),
-        privateInterpretationContext: lunarNodeInterpretationContext(natalChart),
+        privateInterpretationContext,
         astrologyFamiliarity,
         astrologyStyle,
       },

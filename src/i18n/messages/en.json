@@ -163,9 +163,18 @@
     "newConversation": "New conversation",
     "untitled": "Untitled conversation",
     "messageCount": "{count} messages",
-    "emptyTitle": "No conversations yet",
+    "emptyTitle": "No active conversations",
     "emptyDescription": "When something is on your mind, start from Home and it will appear here.",
-    "goHome": "Go to Home"
+    "goHome": "Go to Home",
+    "archive": "Archive conversation",
+    "actions": "Conversation actions",
+    "restore": "Restore",
+    "archivedTitle": "Archived conversations",
+    "delete": "Delete",
+    "deleteConfirm": "Delete forever",
+    "deleteDescription": "This permanently deletes the conversation, all its messages, and any Patterns saved from it. This cannot be undone.",
+    "cancel": "Cancel",
+    "actionError": "We couldn’t update this conversation. Please try again."
   },
   "map": {
     "title": "My Map",

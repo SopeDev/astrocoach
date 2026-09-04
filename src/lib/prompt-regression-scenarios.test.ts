@@ -27,6 +27,7 @@ test("prompt regression set covers the observed conversational failures", () => 
       "recognize-test-broadened-scope",
       "recognize-no-forced-pattern",
       "recognize-candidate-evaluation-is-ui-owned",
+      "recognize-natal-envelope-is-not-evidence",
       "deep-no-forced-astrology",
       "astrology-holistic-synthesis",
       "astrology-evolutionary-language",

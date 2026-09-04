@@ -7,6 +7,6 @@ export default async function ExploreIndexPage({ params }: { params: Promise<{ l
   const { locale } = await params;
   if (!isLocale(locale)) redirect("/");
   const user = await requireCurrentUser(locale);
-  const latest = await db.conversation.findFirst({ where: { userId: user.id }, orderBy: { lastMessageAt: "desc" } });
+  const latest = await db.conversation.findFirst({ where: { userId: user.id, archivedAt: null }, orderBy: { lastMessageAt: "desc" } });
   redirect(latest ? `/${locale}/explore/${latest.id}` : `/${locale}/home`);
 }

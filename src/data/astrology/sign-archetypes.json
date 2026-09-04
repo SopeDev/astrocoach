@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "Libro Cosmobiología - 2014.docx",
+  "kind": "sign_archetype",
+  "entries": [
+    {
+      "id": "sign.aries", "kind": "sign_archetype", "factors": { "sign": "Aries" },
+      "topics": ["initiative", "courage", "identity", "beginnings", "independence"],
+      "interpretation": {
+        "core_meaning": "Aries gives energy an initiating, direct, and self-defining form. It moves toward experience by acting, testing strength, and opening a path where none yet exists.",
+        "possible_expressions": ["Beginning before certainty is available", "Meeting resistance through direct effort", "Discovering identity through independent action"],
+        "developmental_direction": "Develop courage that includes patience and relational awareness, allowing initiative to mature beyond urgency or reflexive opposition."
+      }
+    },
+    {
+      "id": "sign.taurus", "kind": "sign_archetype", "factors": { "sign": "Taurus" },
+      "topics": ["stability", "values", "embodiment", "resources", "persistence"],
+      "interpretation": {
+        "core_meaning": "Taurus gives energy a steady, embodied, and value-building form. It develops through patience, continuity, and contact with what can be sustained in material life.",
+        "possible_expressions": ["Building gradually toward a tangible result", "Protecting what has proven valuable", "Finding orientation through sensory and practical experience"],
+        "developmental_direction": "Let steadiness support growth without confusing value with possession or allowing security to become resistance to necessary change."
+      }
+    },
+    {
+      "id": "sign.gemini", "kind": "sign_archetype", "factors": { "sign": "Gemini" },
+      "topics": ["communication", "curiosity", "learning", "adaptability", "connection"],
+      "interpretation": {
+        "core_meaning": "Gemini gives energy a curious, mobile, and connective form. It learns by comparing perspectives, exchanging information, and discovering relationships among different parts of experience.",
+        "possible_expressions": ["Asking questions that open another angle", "Adapting communication to changing contexts", "Moving information among people or fields"],
+        "developmental_direction": "Let versatility become integrated understanding by staying long enough to develop the most meaningful questions beyond initial interest."
+      }
+    },
+    {
+      "id": "sign.cancer", "kind": "sign_archetype", "factors": { "sign": "Cancer" },
+      "topics": ["belonging", "care", "emotions", "security", "memory"],
+      "interpretation": {
+        "core_meaning": "Cancer gives energy a protective, receptive, and emotionally rooted form. It attends to belonging, memory, and the conditions under which vulnerable life can be nourished.",
+        "possible_expressions": ["Creating a secure base for growth", "Responding instinctively to emotional atmosphere", "Preserving meaningful bonds, memories, or traditions"],
+        "developmental_direction": "Develop care with clear boundaries and direct expression so that protection does not become withdrawal, attachment, or indirect control."
+      }
+    },
+    {
+      "id": "sign.leo", "kind": "sign_archetype", "factors": { "sign": "Leo" },
+      "topics": ["creativity", "visibility", "warmth", "leadership", "recognition"],
+      "interpretation": {
+        "core_meaning": "Leo gives energy a creative, radiant, and personally expressive form. It seeks to bring something from the inner center into visible life with warmth and conviction.",
+        "possible_expressions": ["Creating with an individual signature", "Leading through encouragement and presence", "Seeking wholehearted participation and appreciation"],
+        "developmental_direction": "Let visibility become generous creative contribution rather than making attention, pride, or control the proof of personal value."
+      }
+    },
+    {
+      "id": "sign.virgo", "kind": "sign_archetype", "factors": { "sign": "Virgo" },
+      "topics": ["discernment", "service", "craft", "order", "improvement"],
+      "interpretation": {
+        "core_meaning": "Virgo gives energy a discerning, practical, and refining form. It identifies distinctions and adjustments that allow a skill, system, or act of service to function more faithfully.",
+        "possible_expressions": ["Improving a process through careful observation", "Developing competence through repeated practice", "Responding to need with precise and useful action"],
+        "developmental_direction": "Use discernment to support participation and repair without turning imperfection into a reason for chronic criticism, anxiety, or delay."
+      }
+    },
+    {
+      "id": "sign.libra", "kind": "sign_archetype", "factors": { "sign": "Libra" },
+      "topics": ["relationships", "fairness", "balance", "harmony", "reciprocity"],
+      "interpretation": {
+        "core_meaning": "Libra gives energy a relational, comparative, and balancing form. It seeks proportion by considering more than one perspective and shaping conditions for reciprocal participation.",
+        "possible_expressions": ["Mediating among competing interests", "Creating social or aesthetic harmony", "Refining judgment through dialogue"],
+        "developmental_direction": "Develop a clear position within relationship so that fairness and harmony do not require indecision, accommodation, or avoidance of conflict."
+      }
+    },
+    {
+      "id": "sign.scorpio", "kind": "sign_archetype", "factors": { "sign": "Scorpio" },
+      "topics": ["depth", "transformation", "trust", "power", "intimacy"],
+      "interpretation": {
+        "core_meaning": "Scorpio gives energy an intense, penetrating, and transformative form. It seeks what remains true beneath appearances and engages experiences in which trust, power, or attachment cannot remain superficial.",
+        "possible_expressions": ["Investigating hidden motives or structures", "Committing deeply where trust has been established", "Regenerating after loss, exposure, or profound change"],
+        "developmental_direction": "Use depth for honest transformation while releasing secrecy, resentment, testing, or control strategies that protect against vulnerability."
+      }
+    },
+    {
+      "id": "sign.sagittarius", "kind": "sign_archetype", "factors": { "sign": "Sagittarius" },
+      "topics": ["meaning", "freedom", "exploration", "beliefs", "wisdom"],
+      "interpretation": {
+        "core_meaning": "Sagittarius gives energy an exploratory, meaning-seeking, and horizon-widening form. It connects experience with principles, possibilities, and a larger view of life.",
+        "possible_expressions": ["Learning through unfamiliar experience", "Sharing perspective through teaching, humor, or story", "Following a conviction toward a wider horizon"],
+        "developmental_direction": "Let freedom and conviction mature through nuance, consequence, and sustained practice rather than outrunning detail or contradiction."
+      }
+    },
+    {
+      "id": "sign.capricorn", "kind": "sign_archetype", "factors": { "sign": "Capricorn" },
+      "topics": ["responsibility", "structure", "authority", "achievement", "time"],
+      "interpretation": {
+        "core_meaning": "Capricorn gives energy a structured, responsible, and long-range form. It asks what can be built through discipline, realistic limits, and accountability over time.",
+        "possible_expressions": ["Working patiently toward durable results", "Accepting responsibility when structure is needed", "Developing authority through experience and competence"],
+        "developmental_direction": "Let structure serve an authentic purpose without allowing achievement, control, or social recognition to become the only measures of worth."
+      }
+    },
+    {
+      "id": "sign.aquarius", "kind": "sign_archetype", "factors": { "sign": "Aquarius" },
+      "topics": ["individuality", "community", "innovation", "freedom", "systems"],
+      "interpretation": {
+        "core_meaning": "Aquarius gives energy an independent, systemic, and future-oriented form. It steps outside convention to see how a group or structure might operate with greater freedom.",
+        "possible_expressions": ["Questioning inherited social assumptions", "Connecting people through a shared idea", "Approaching problems from an unconventional angle"],
+        "developmental_direction": "Join independence and collective vision with personal warmth, embodiment, and attention to the individual lives inside a system."
+      }
+    },
+    {
+      "id": "sign.pisces", "kind": "sign_archetype", "factors": { "sign": "Pisces" },
+      "topics": ["compassion", "imagination", "spirituality", "sensitivity", "surrender"],
+      "interpretation": {
+        "core_meaning": "Pisces gives energy a receptive, imaginative, and boundary-softening form. It senses participation in a larger emotional, creative, or spiritual field beyond the separate self.",
+        "possible_expressions": ["Responding compassionately to vulnerability", "Perceiving meaning through symbol, feeling, or intuition", "Finding renewal through creativity, contemplation, or surrender"],
+        "developmental_direction": "Give sensitivity clear boundaries and practical expression so that openness can serve life without becoming confusion, idealization, or escape."
+      }
+    }
+  ]
+}

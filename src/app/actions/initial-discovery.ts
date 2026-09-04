@@ -11,9 +11,9 @@ import {
   finalDiscoveryAnswersSchema,
   finalDiscoveryQuestionsSchema,
   generateFinalDiscoveryQuestions,
-  type DiscoveryChartData,
 } from "@/lib/initial-discovery";
 import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
+import { ensureNatalInterpretation } from "@/lib/natal-interpretation-persistence";
 
 export type FinalQuestionResult = { questions?: string[]; error?: "answers" | "service" };
 export type CompleteDiscoveryResult = { completed?: boolean; error?: "answers" | "service" };
@@ -46,11 +46,13 @@ export async function prepareFinalDiscoveryQuestions(locale: Locale, answers: st
     const messages = getDictionary(locale);
     const lifeAreaKeys = parseLifeAreaKeys(intent.lifeAreas);
     const areaLabels = lifeAreaKeys.map((key: LifeAreaKey) => messages.initialIntent.areas[key]);
+    const natalInterpretation = await ensureNatalInterpretation(user.id, natalChart);
     const questions = await generateFinalDiscoveryQuestions({
       locale,
+      lifeAreaKeys,
       areaLabels,
       currentContext: intent.currentContext,
-      chart: natalChart.data as unknown as DiscoveryChartData,
+      natalInterpretation,
       astrologyFamiliarity: user.astrologyFamiliarity,
       astrologyStyle: user.astrologyStyle,
       initialQuestions: initialQuestions.data,

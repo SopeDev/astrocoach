@@ -7,6 +7,11 @@ import type { Locale } from "@/i18n/config";
 import { ASTROCOACH_VOICE_INSTRUCTIONS, ASTROLOGY_COMMUNICATION_INSTRUCTIONS } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
 import { getServerEnv } from "@/lib/env";
+import type { LifeAreaKey } from "@/lib/life-areas";
+import {
+  retrieveNatalInterpretation,
+  type NatalInterpretationDocument,
+} from "@/lib/natal-interpretation";
 
 const initialQuestionSetSchema = z.object({
   questions: z.array(z.string().min(10).max(240)).length(3),
@@ -21,32 +26,15 @@ export const finalDiscoveryQuestionsSchema = z.array(z.string().min(10).max(240)
 export const discoveryAnswersSchema = z.array(z.string().trim().min(1).max(2000)).length(3);
 export const finalDiscoveryAnswersSchema = z.array(z.string().trim().min(1).max(2000)).length(2);
 
-export type DiscoveryChartData = {
-  planets?: Array<{ name?: string; sign?: string; degree?: number; minute?: number; house?: number }>;
-  nodes?: Array<{ name?: string; sign?: string; degree?: number; minute?: number; house?: number }>;
-  aspects?: Array<{ body1?: string; body2?: string; type?: string; orb?: number; strength?: number }>;
-  angles?: Record<string, { sign?: string; degree?: number; minute?: number }> | null;
-  uncertainty?: unknown;
-};
-
 type DiscoveryContext = {
   locale: Locale;
+  lifeAreaKeys: LifeAreaKey[];
   areaLabels: string[];
   currentContext: string | null;
-  chart: DiscoveryChartData;
+  natalInterpretation: NatalInterpretationDocument;
   astrologyFamiliarity: AstrologyFamiliarity;
   astrologyStyle: AstrologyStyle;
 };
-
-function chartSummary(chart: DiscoveryChartData) {
-  return JSON.stringify({
-    planets: chart.planets,
-    nodes: chart.nodes,
-    angles: chart.angles,
-    aspects: chart.aspects?.slice(0, 20),
-    uncertainty: chart.uncertainty,
-  });
-}
 
 function sharedInstructions(locale: Locale) {
   return `Write in ${locale === "es" ? "Spanish" : "English"}. Questions must be concise, natural, nonjudgmental, meaningfully distinct, and presented according to the supplied astrologyStyle and astrologyFamiliarity. The preferences affect presentation only; the holistic astrological framework should inform question selection at every style. Never assume a selected area is a problem, imply diagnosis, or state a chart-derived interpretation as lived fact. Prefer concrete inquiry about recent experiences, wants, needs, expectations, tensions, and uncertainty. Do not create a Pattern, Insight, recommendation, Practice, or intervention.\n\n${ASTROLOGY_COMMUNICATION_INSTRUCTIONS}\n\n${ASTROCOACH_VOICE_INSTRUCTIONS}`;
@@ -84,10 +72,15 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
   if (!env.OPENAI_API_KEY) return fallbackInitialQuestions(context.locale, context.areaLabels, context.currentContext);
 
   try {
+    const privateInterpretationContext = retrieveNatalInterpretation(context.natalInterpretation, {
+      reason: "initial_discovery",
+      lifeAreas: context.lifeAreaKeys,
+      text: context.currentContext,
+    });
     const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
       model: env.OPENAI_MODEL,
       instructions: `${sharedInstructions(context.locale)} Generate exactly three initial discovery questions. Together they should establish a broad but personalized first picture and cover different dimensions rather than variations of one theme. Move from accessible lived experience toward slightly deeper inquiry. Do not ask for information already present in the user's context. Chart symbolism may select hypotheses worth testing; present that influence according to astrologyStyle without turning a question into a conclusion.`,
-      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
+      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
       text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
     });
 
@@ -108,10 +101,15 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
 
   try {
     const exchanges = context.initialQuestions.map((question, index) => ({ question, answer: context.initialAnswers[index] }));
+    const privateInterpretationContext = retrieveNatalInterpretation(context.natalInterpretation, {
+      reason: "initial_discovery",
+      lifeAreas: context.lifeAreaKeys,
+      text: [context.currentContext, ...context.initialAnswers].filter(Boolean).join("\n"),
+    });
     const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
       model: env.OPENAI_MODEL,
       instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing questions after examining the three initial exchanges. These are not generic extra questions. Identify the highest-value remaining uncertainties, contradictions, assumptions, competing explanations, or missing context. Treat the answers as more authoritative than chart symbolism. Do not repeat anything already answered. Prefer questions that distinguish between plausible understandings and materially improve the initial picture.`,
-      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateChartContext: JSON.parse(chartSummary(context.chart)) }),
+      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
       text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
     });
 

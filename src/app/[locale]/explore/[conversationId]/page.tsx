@@ -23,9 +23,10 @@ export default async function ConversationPage({ params }: { params: Promise<{ l
 
   const messages = getDictionary(locale);
   const lastMessage = conversation.messages.at(-1);
-  const evaluationOffer = lastMessage?.role === "assistant" ? candidateEvaluationOffer(lastMessage.id, lastMessage.internalSignals) : null;
-  const patternStatement = lastMessage?.role === "assistant" ? recognizedPatternOffer(lastMessage.internalSignals) : null;
+  const interactive = !conversation.archivedAt;
+  const evaluationOffer = interactive && lastMessage?.role === "assistant" ? candidateEvaluationOffer(lastMessage.id, lastMessage.internalSignals) : null;
+  const patternStatement = interactive && lastMessage?.role === "assistant" ? recognizedPatternOffer(lastMessage.internalSignals) : null;
   const patternSaveOffer = patternStatement && lastMessage ? { messageId: lastMessage.id, statement: patternStatement } : null;
   const profileInitial = (user.name?.trim()[0] ?? user.email?.trim()[0] ?? "A").toUpperCase();
-  return <><ThemePreferenceSync preference={user.theme} userId={user.id} /><ExploreChat initialCandidateEvaluationOffer={evaluationOffer} initialClosed={conversation.status !== "active"} initialConversationId={conversation.id} initialFailedMessageId={conversation.status === "active" && lastMessage?.role === "user" ? lastMessage.id : null} initialMessages={conversation.messages.map((message) => ({ id: message.id, role: message.role, mode: message.mode, content: message.content, createdAt: message.createdAt.toISOString() }))} initialMode={conversation.mode} initialPatternSaveOffer={patternSaveOffer} initialTransitionOffered={conversation.transitionState === "OFFERED"} locale={locale} messages={messages.explore} profileInitial={profileInitial} /></>;
+  return <><ThemePreferenceSync preference={user.theme} userId={user.id} /><ExploreChat initialCandidateEvaluationOffer={evaluationOffer} initialClosed={!interactive || conversation.status !== "active"} initialConversationId={conversation.id} initialFailedMessageId={interactive && conversation.status === "active" && lastMessage?.role === "user" ? lastMessage.id : null} initialMessages={conversation.messages.map((message) => ({ id: message.id, role: message.role, mode: message.mode, content: message.content, createdAt: message.createdAt.toISOString() }))} initialMode={conversation.mode} initialPatternSaveOffer={patternSaveOffer} initialTransitionOffered={interactive && conversation.transitionState === "OFFERED"} locale={locale} messages={messages.explore} profileInitial={profileInitial} /></>;
 }

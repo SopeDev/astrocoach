@@ -181,6 +181,14 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
     forbidden: ["Does this fit?", "Does this feel right?", "Would you like to save this?", "VALIDATED or accepted based on conversational inference"],
   },
   {
+    id: "recognize-natal-envelope-is-not-evidence",
+    mode: "RECOGNIZE",
+    setup: ["The retrieved natal_interpretation envelope contains a highly relevant recurring-theme hypothesis.", "The conversation contains only one concrete lived episode and no independent confirmation."],
+    chartSignal: "A stored Chart-at-a-glance theme and several authored snippets all point toward the same symbolic possibility.",
+    expected: ["Use the symbolism only to guide a tentative distinction or question.", "Keep evidence strength based solely on the one lived episode.", "Remain in hypothesis testing or return to EXPLORE."],
+    forbidden: ["Adding chart factors or generated themes to supportingObservations", "Raising candidate confidence because several astrological sources agree", "Presenting a recurring Pattern"],
+  },
+  {
     id: "deep-no-forced-astrology",
     mode: "EXPLORE",
     setup: ["astrologyStyle is deep and familiarity is advanced.", "The latest exchange is fully understood and natal context adds no useful distinction."],

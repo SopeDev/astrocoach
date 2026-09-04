@@ -11,7 +11,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   if (!isLocale(locale)) return null;
   const user = await requireCurrentUser(locale);
   const messages = getDictionary(locale);
-  const latest = await db.conversation.findFirst({ where: { userId: user.id }, orderBy: { lastMessageAt: "desc" } });
+  const latest = await db.conversation.findFirst({ where: { userId: user.id, archivedAt: null }, orderBy: { lastMessageAt: "desc" } });
   const firstName = user.name?.trim().split(/\s+/)[0];
 
   return (

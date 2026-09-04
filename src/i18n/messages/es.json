@@ -163,9 +163,18 @@
     "newConversation": "Nueva conversación",
     "untitled": "Conversación sin título",
     "messageCount": "{count} mensajes",
-    "emptyTitle": "Aún no hay conversaciones",
+    "emptyTitle": "No hay conversaciones activas",
     "emptyDescription": "Cuando tengas algo en mente, comienza desde Inicio y aparecerá aquí.",
-    "goHome": "Ir a Inicio"
+    "goHome": "Ir a Inicio",
+    "archive": "Archivar conversación",
+    "actions": "Acciones de la conversación",
+    "restore": "Restaurar",
+    "archivedTitle": "Conversaciones archivadas",
+    "delete": "Eliminar",
+    "deleteConfirm": "Eliminar para siempre",
+    "deleteDescription": "Esto elimina permanentemente la conversación, todos sus mensajes y cualquier Patrón guardado desde ella. No se puede deshacer.",
+    "cancel": "Cancelar",
+    "actionError": "No pudimos actualizar esta conversación. Inténtalo de nuevo."
   },
   "map": {
     "title": "Mi Mapa",
