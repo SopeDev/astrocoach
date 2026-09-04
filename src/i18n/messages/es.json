@@ -159,7 +159,8 @@
   },
   "conversations": {
     "title": "Conversaciones",
-    "description": "Retoma algo que estabas explorando o comienza de nuevo desde Inicio.",
+    "description": "Retoma algo que estabas explorando o comienza algo nuevo.",
+    "newConversation": "Nueva conversación",
     "untitled": "Conversación sin título",
     "messageCount": "{count} mensajes",
     "emptyTitle": "Aún no hay conversaciones",
@@ -172,7 +173,17 @@
     "emptyTitle": "Tu mapa crecerá contigo",
     "emptyDescription": "Nada se agrega automáticamente. Cuando algo útil se aclare en una conversación, tú decidirás si pertenece aquí.",
     "patternsTitle": "Patrones que has reconocido",
-    "patternLabel": "Patrón"
+    "patternLabel": "Patrón",
+    "edit": "Editar",
+    "editTitle": "Edita este Patrón",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "archive": "Archivar",
+    "archiveConfirm": "Archivar Patrón",
+    "archiveDescription": "Esto elimina el Patrón de tu Mapa activo. Puedes restaurarlo después.",
+    "restore": "Restaurar",
+    "archivedTitle": "Patrones archivados",
+    "actionError": "No pudimos actualizar este Patrón. Inténtalo de nuevo."
   },
   "account": {
     "title": "Cuenta",

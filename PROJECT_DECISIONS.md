@@ -43,6 +43,7 @@ Last updated: 2026-09-03
 - AstroCoach is a mobile-first progressive web application. Every interface starts with phone ergonomics, touch targets, safe-area behavior, and standalone display constraints before adding tablet or desktop enhancements.
 - Completed discovery leads through a one-time, concise product orientation and then into a Home-first application shell rather than directly into chat. The primary mobile navigation is Home, Conversations, and My Map, with Account available from the header avatar.
 - Home is the starting point for a new EXPLORE conversation; Conversations reopens saved threads. My Map contains only user-validated Patterns the user deliberately chooses to keep; saving a recognized Pattern completes the originating conversation for now.
+- Saved Pattern wording is user-owned and may be edited directly without another model call or revalidation. Removing a Pattern from the active Map archives it recoverably rather than deleting its statement or conversation provenance; archived Patterns can be restored.
 - Maintain an installable web app manifest and platform app icons. Add offline caching or push behavior only through deliberate, separately verified slices so stale application code or private user data is not cached accidentally.
 - Use Prisma 7 as the ORM and migration system for PostgreSQL. During solo early development, local, preview, and production environments share the Prisma Postgres database connected through the Vercel Marketplace; split environments before broader testing or routine schema-changing previews.
 - Use Prisma's PostgreSQL driver adapter. Prefer standard `DATABASE_URL` and `DIRECT_URL` names; accept the Vercel integration's generated `POSTGRES_URL` and resource-prefixed `astro_*` aliases so deployment is not coupled to manually copied secrets.
@@ -56,6 +57,7 @@ Last updated: 2026-09-03
 - Use the OpenAI Responses API when conversational AI is implemented and request application-facing metadata through Structured Outputs.
 - Keep the initial chat implementation stateless with respect to OpenAI: AstroCoach owns conversation history in PostgreSQL, sends the relevant recent thread on each request, and disables OpenAI response storage. Add token streaming only as a separately verified UX improvement.
 - Voice input is transcript-first: authenticated users may record up to two minutes, the temporary audio is sent directly for server-side transcription, and only the resulting editable text enters the existing message flow. Do not persist recordings or send a transcript automatically without user review.
+- Use the same voice-recording and transcription behavior in the Home new-conversation composer and existing conversation composer so starting context has input parity.
 - The OpenAI model is configured with `OPENAI_MODEL`. The development default is `gpt-5.6-luna`, selected as the current cost-sensitive model; it can be changed without code changes.
 - Audio transcription uses the same server-only OpenAI credential and a separately configurable `OPENAI_TRANSCRIBE_MODEL`, defaulting to `gpt-transcribe`.
 

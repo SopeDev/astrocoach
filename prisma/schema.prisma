@@ -138,6 +138,7 @@ model Pattern {
   conversationId  String?       @map("conversation_id") @db.Uuid
   sourceMessageId String?       @unique @map("source_message_id") @db.Uuid
   statement       String        @db.Text
+  archivedAt      DateTime?     @map("archived_at") @db.Timestamptz(6)
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -145,6 +146,7 @@ model Pattern {
   sourceMessage   Message?      @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, archivedAt, createdAt(sort: Desc)])
   @@map("patterns")
 }
 

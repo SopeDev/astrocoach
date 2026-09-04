@@ -64,12 +64,13 @@ Last updated: 2026-09-03
 - Refined the shared and EXPLORE prompts from a real relationship conversation: AstroCoach now validates experience without endorsing every conclusion, calibrates challenge without debate, handles absent people without mind-reading or automatic redirection, requires new value from repeated astrology, retires framings the user already knows, and reserves DEEP_EXPLORE for a recognized user-selected object. Recent structured response approaches are now supplied to generation to help prevent corrective streaks.
 - Added a versioned, product-safe English adaptation of the Spanish lunar-node interpretation source and deterministic chart-based retrieval of the matching sign and house axes. EXPLORE and RECOGNIZE now receive only those matches as private reference context, with prompt safeguards against treating possible expressions as biography or developmental directions as destiny. Unknown-time charts retain noon-reference node signs while omitting node houses, and older stored charts are refreshed on their next chat generation.
 - Refined AstroCoach's interpretation voice from observed conversation and a supplied style reference: responses now begin directly with concise, holistic substance; use natural direct address, concrete contrasts, and occasional grounded metaphor; avoid routine framework preambles; and embody chart-versus-lived-evidence standards without narrating them. Updated the shared examples and added regression coverage for methodological leakage, natural correction, and background/new re-explanation while retaining confident evolutionary/Kabbalistic astrology.
+- Added direct user editing and recoverable archiving/restoration for saved Patterns in My Map, protected by authenticated ownership checks and server validation. Added a clear new-conversation entry point to Conversations and extracted the existing voice flow into shared behavior so the Home composer supports the same recording, transcription, limits, and error states as open chats.
 
 ## Remaining
 
 - Add conversation-management details such as conversation titles and archival or deletion behavior after the core navigation is evaluated.
 - Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness and RECOGNIZE accuracy, especially cadence, premature invitations, partial agreement, rejection, and revised wording.
-- Add Pattern detail, editing, archival, and provenance views after validating that saved formulations are useful.
+- Add richer Pattern detail and conversation-provenance views after validating that saved formulations are useful.
 - Implement DEEP_EXPLORE only after recognized Patterns and their handoff behavior are stable.
 - Manually verify microphone permission, recording, cancellation, and transcription on an installed iPhone and Android PWA.
 
@@ -86,4 +87,4 @@ Last updated: 2026-09-03
 
 ## Next planned slice
 
-Run the expanded prompt regression set against the configured model, including methodological leakage, background/new re-explanation, lunar-node reference context, attunement-versus-agreement, absent-person, astrology-repetition, debate-streak, and mode-boundary cases. Then manually exercise all four RECOGNIZE candidate-evaluation paths and voice transcription on iPhone and Android before adding Pattern editing or DEEP_EXPLORE.
+Apply the Pattern-archiving migration, then manually exercise Pattern editing/archive/restore, the Conversations new-conversation entry point, Home and open-chat voice transcription on iPhone and Android, and all four RECOGNIZE candidate-evaluation paths. Run the expanded prompt regression set against the configured model before considering richer Pattern detail or DEEP_EXPLORE.

@@ -19,7 +19,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <p className="text-sm text-slate-500 dark:text-slate-400">{firstName ? messages.home.greeting.replace("{name}", firstName) : messages.home.greetingFallback}</p>
       <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">{messages.home.title}</h1>
       <p className="mt-3 max-w-lg leading-7 text-slate-600 dark:text-slate-300">{messages.home.description}</p>
-      <div className="mt-7"><HomeComposer locale={locale} messages={messages.home.composer} /></div>
+      <div className="mt-7"><HomeComposer locale={locale} messages={messages.home.composer} voiceMessages={messages.explore} /></div>
 
       {latest ? (
         <section className="mt-10">

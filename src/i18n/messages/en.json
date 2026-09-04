@@ -159,7 +159,8 @@
   },
   "conversations": {
     "title": "Conversations",
-    "description": "Return to something you were exploring or begin again from Home.",
+    "description": "Return to something you were exploring or start something new.",
+    "newConversation": "New conversation",
     "untitled": "Untitled conversation",
     "messageCount": "{count} messages",
     "emptyTitle": "No conversations yet",
@@ -172,7 +173,17 @@
     "emptyTitle": "Your map will grow with you",
     "emptyDescription": "Nothing is added automatically. When something useful becomes clear in a conversation, you’ll decide whether it belongs here.",
     "patternsTitle": "Patterns you’ve recognized",
-    "patternLabel": "Pattern"
+    "patternLabel": "Pattern",
+    "edit": "Edit",
+    "editTitle": "Edit this Pattern",
+    "save": "Save",
+    "cancel": "Cancel",
+    "archive": "Archive",
+    "archiveConfirm": "Archive Pattern",
+    "archiveDescription": "This removes the Pattern from your active Map. You can restore it later.",
+    "restore": "Restore",
+    "archivedTitle": "Archived Patterns",
+    "actionError": "We couldn’t update this Pattern. Please try again."
   },
   "account": {
     "title": "Account",
