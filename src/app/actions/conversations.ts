@@ -10,6 +10,7 @@ function revalidateConversationLists(locale: Locale) {
   revalidatePath(`/${locale}/conversations`);
   revalidatePath(`/${locale}/home`);
   revalidatePath(`/${locale}/map`);
+  revalidatePath(`/${locale}/map/patterns`);
 }
 
 export async function archiveConversation(locale: Locale, conversationId: string) {

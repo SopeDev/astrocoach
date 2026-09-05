@@ -40,7 +40,13 @@ export function AppShell({ children, locale, profileInitial, messages }: {
       <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200/80 bg-[color:var(--background)]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-slate-800/90">
         <div className="mx-auto grid max-w-2xl grid-cols-3">
           {navigation.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href;
+            const mapSectionActive = href === `/${locale}/map`
+              && (
+                pathname === href
+                || pathname.startsWith(`/${locale}/map/`)
+                || pathname === `/${locale}/chart`
+              );
+            const active = pathname === href || mapSectionActive;
             return <Link aria-current={active ? "page" : undefined} className={`${active ? "text-violet-700 dark:text-violet-300" : "text-slate-500 dark:text-slate-400"} flex min-h-16 cursor-pointer flex-col items-center justify-center gap-1 text-xs font-medium transition hover:text-violet-700 dark:hover:text-violet-300`} href={href} key={href}><Icon aria-hidden="true" className="size-5" /><span>{label}</span></Link>;
           })}
         </div>

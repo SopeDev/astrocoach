@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { ChartAtAGlance } from "@/components/chart-at-a-glance";
 import { db } from "@/db/client";
 import { isLocale } from "@/i18n/config";
@@ -25,7 +27,8 @@ export default async function ChartPage({
 
   return (
     <main>
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-700 dark:text-violet-300">{messages.chart.eyebrow}</p>
+      <Link className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-600 hover:text-violet-700 dark:text-slate-300 dark:hover:text-violet-300" href={`/${locale}/map`}><ArrowLeft aria-hidden="true" className="size-4" />{messages.map.backToMap}</Link>
+      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-violet-700 dark:text-violet-300">{messages.chart.eyebrow}</p>
       <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">{messages.chart.title}</h1>
       <p className="mt-3 max-w-xl leading-7 text-slate-600 dark:text-slate-300">{messages.chart.description}</p>
       <div className="mt-8">
