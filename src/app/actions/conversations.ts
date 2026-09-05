@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db/client";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
-import { conversationIdSchema } from "@/lib/conversations";
+import { conversationIdSchema, serializeConversationExport } from "@/lib/conversations";
 
 function revalidateConversationLists(locale: Locale) {
   revalidatePath(`/${locale}/conversations`);
@@ -67,4 +67,23 @@ export async function deleteArchivedConversation(locale: Locale, conversationId:
 
   revalidateConversationLists(locale);
   return { ok: true as const, deletedPatterns: result.deletedPatterns };
+}
+
+export async function exportConversation(locale: Locale, conversationId: string) {
+  if (!isLocale(locale)) return { ok: false as const };
+  const parsedId = conversationIdSchema.safeParse(conversationId);
+  if (!parsedId.success) return { ok: false as const };
+
+  const user = await requireCurrentUser(locale);
+  const conversation = await db.conversation.findFirst({
+    where: { id: parsedId.data, userId: user.id },
+    include: { messages: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] } },
+  });
+  if (!conversation) return { ok: false as const };
+
+  return {
+    ok: true as const,
+    title: conversation.title,
+    data: serializeConversationExport(conversation),
+  };
 }

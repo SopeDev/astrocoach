@@ -15,6 +15,7 @@ import { exploreResponseSchema, type ExploreSignals } from "@/lib/explore-contra
 import type { LifeAreaKey } from "@/lib/life-areas";
 import {
   retrieveNatalInterpretation,
+  type ChartTheme,
   type NatalInterpretationDocument,
 } from "@/lib/natal-interpretation";
 import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
@@ -41,6 +42,8 @@ A corrective contrast should reopen understanding, not start a case against the 
 
 You may make a clear astrological observation or synthesis, and it may be a complete turn without a question. When the user supports it, connect the symbolism more precisely to what they actually described. When they contradict it, acknowledge that naturally and genuinely revise, narrow, or discard the reading instead of defending it.
 
+When privateInterpretationContext.selection.preferredThemeId is present, the user deliberately opened this conversation from that chart theme. Treat the selected theme as the subject of their latest message and use it first, while still treating every expression in it as a symbolic possibility rather than something the user has confirmed.
+
 If candidateEvaluationContext is NO, the user explicitly rejected the prior RECOGNIZE candidate through application controls. Treat that as a real correction: do not defend it or immediately present a lightly reworded version of the same idea. Use the latest message as new exploration while preserving the rejected candidate only as something not to assume.
 
 Do not treat something as a problem to fix unless the user has indicated it is one; if they haven't, stay with understanding it rather than nudging toward productivity, discipline, health, or relationship changes they haven't asked for. When the user mentions a concrete external factor (money, time, a deadline, another person, logistics), use it to understand their experience rather than gathering enough detail to solve it. If recent questions have been building toward a plan or a specific figure rather than understanding, pull back one level. A Pattern does not need to emerge. Set candidatePatternSignal and recommend RECOGNIZE only when multiple distinct lived observations support a specific recurring relationship the user could meaningfully confirm, reject, or revise; one event, repeated wording about one event, a broad theory, or astrology alone is insufficient. Do not recommend DEEP_EXPLORE merely because the subject involves childhood, psychology, or an elaborate astrological theory: it requires a specific already-recognized Pattern or Insight and the user's choice to deepen it. Do not recommend INTEGRATE without an already-recognized object and a user-stated intention to work with it. responseApproach must describe the main visible move. questionPurpose must be null when the reply asks no question. Keep the reply concise and conversational. Store observations and orchestration judgments only in structured fields, never as a technical report in the visible reply.`;
@@ -61,6 +64,7 @@ export async function generateExploreResponse({
   latestMessage,
   candidateEvaluationContext,
   recentResponseApproaches = [],
+  preferredThemeId = null,
 }: {
   locale: Locale;
   lifeAreaKeys: LifeAreaKey[];
@@ -77,6 +81,7 @@ export async function generateExploreResponse({
   latestMessage: string;
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
   recentResponseApproaches?: ExploreSignals["responseApproach"][];
+  preferredThemeId?: ChartTheme["id"] | null;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -98,6 +103,7 @@ export async function generateExploreResponse({
       ...thread.filter((message) => message.role === "user").slice(-6).map((message) => message.content),
       latestMessage,
     ].join("\n"),
+    preferredThemeId,
   });
 
   const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({

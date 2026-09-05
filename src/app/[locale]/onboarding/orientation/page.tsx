@@ -15,6 +15,7 @@ export default async function OrientationPage({ params }: { params: Promise<{ lo
   const intent = await db.initialIntent.findUnique({ where: { userId: user.id } });
   if (!intent?.discoveryCompletedAt) redirect(`/${locale}/onboarding/discovery`);
   if (intent.orientationCompletedAt) redirect(`/${locale}/home`);
+  if (!intent.chartAtAGlanceViewedAt) redirect(`/${locale}/onboarding/chart-at-a-glance`);
 
   const steps = [
     { icon: MessageCircle, ...messages.orientation.share },

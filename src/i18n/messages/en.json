@@ -114,7 +114,14 @@
     "serviceError": "We couldn’t prepare the next step right now. Please try again.",
     "completedTitle": "Your starting point is ready",
     "completedDescription": "Thank you. You’ve given us a clear place to begin, and we can take it from here.",
-    "continueToExplore": "Continue"
+    "continueToExplore": "See my starting point"
+  },
+  "chartIntroduction": {
+    "eyebrow": "Your starting point",
+    "title": "A first look at your chart",
+    "description": "These five themes bring together the strongest threads we can see right now. They are starting hypotheses—something to recognize, question, or revise through your own experience.",
+    "continue": "Continue",
+    "returnNote": "You’ll be able to return to these themes from My Map."
   },
   "orientation": {
     "title": "Here’s how AstroCoach works",
@@ -157,6 +164,37 @@
     "continue": "Return to this conversation",
     "review": "Review this conversation"
   },
+  "chart": {
+    "eyebrow": "Natal chart",
+    "title": "Your chart at a glance",
+    "description": "Five starting themes drawn from your chart. Treat them as possibilities to explore, not conclusions about who you are.",
+    "foundationsTitle": "Your foundations",
+    "emergentTitle": "Other strong patterns",
+    "slotLabels": {
+      "identity": "Identity",
+      "karmic": "Karmic pattern",
+      "mission": "Mission and direction",
+      "emergent_1": "Chart pattern",
+      "emergent_2": "Chart pattern"
+    },
+    "unknownTimeTitle": "Your birth time is unknown",
+    "unknownTimeDescription": "These themes use your planet and lunar-node signs. Ascendant, Midheaven, houses, and aspects are omitted rather than guessed.",
+    "details": "Possible expressions and chart factors",
+    "possibleExpressions": "Possible expressions",
+    "supportingFactors": "Supporting chart factors",
+    "explore": "Explore this theme",
+    "closeComposer": "Close",
+    "prompt": "What would you like to understand about this theme?",
+    "promptPlaceholder": "Write what feels relevant or choose a starting question…",
+    "suggestions": [
+      "How might this show up in my life?",
+      "Where could this create tension?",
+      "How could I work with this?"
+    ],
+    "startConversation": "Start conversation",
+    "openingConversation": "Opening your conversation…",
+    "conversationError": "We couldn’t open that conversation. Please try again."
+  },
   "conversations": {
     "title": "Conversations",
     "description": "Return to something you were exploring or start something new.",
@@ -167,6 +205,8 @@
     "emptyDescription": "When something is on your mind, start from Home and it will appear here.",
     "goHome": "Go to Home",
     "archive": "Archive conversation",
+    "export": "Export conversation",
+    "exporting": "Exporting…",
     "actions": "Conversation actions",
     "restore": "Restore",
     "archivedTitle": "Archived conversations",
@@ -174,7 +214,8 @@
     "deleteConfirm": "Delete forever",
     "deleteDescription": "This permanently deletes the conversation, all its messages, and any Patterns saved from it. This cannot be undone.",
     "cancel": "Cancel",
-    "actionError": "We couldn’t update this conversation. Please try again."
+    "actionError": "We couldn’t update this conversation. Please try again.",
+    "exportError": "We couldn’t export this conversation. Please try again."
   },
   "map": {
     "title": "My Map",

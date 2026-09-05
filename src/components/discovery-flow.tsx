@@ -62,7 +62,7 @@ export function DiscoveryFlow({
         <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"><Check aria-hidden="true" className="size-6" /></div>
         <h2 className="mt-5 text-2xl font-semibold text-slate-950 dark:text-white">{messages.completedTitle}</h2>
         <p className="mx-auto mt-3 max-w-md leading-7 text-slate-600 dark:text-slate-300">{messages.completedDescription}</p>
-        <Link className="mt-6 flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-violet-800 dark:bg-violet-600 dark:hover:bg-violet-500" href={`/${locale}/onboarding/orientation`}>{messages.continueToExplore}<ArrowRight aria-hidden="true" className="size-4" /></Link>
+        <Link className="mt-6 flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-violet-800 dark:bg-violet-600 dark:hover:bg-violet-500" href={`/${locale}/onboarding/chart-at-a-glance`}>{messages.continueToExplore}<ArrowRight aria-hidden="true" className="size-4" /></Link>
       </div>
     );
   }

@@ -11,6 +11,13 @@ import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
 import { shouldOfferRecognition } from "@/lib/mode-orchestration";
 import { calculateNatalChart, NATAL_ENGINE, NATAL_ENGINE_VERSION, NATAL_SCHEMA_VERSION } from "@/lib/natal-chart";
 import { ensureNatalInterpretation } from "@/lib/natal-interpretation-persistence";
+import {
+  chartThemeIdSchema,
+  chartThemePresentation,
+  NATAL_INTERPRETATION_EVIDENCE_STATUS,
+  NATAL_INTERPRETATION_SOURCE,
+  themeConversationStarterSchema,
+} from "@/lib/natal-interpretation";
 import { generateRecognizeResponse } from "@/lib/recognize";
 import {
   applyCandidateEvaluation,
@@ -120,9 +127,10 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
 
 async function generateReply(userId: string, locale: Locale, conversationId: string, userMessage: StoredMessage) {
   const context = await loadGenerationContext(userId, locale, conversationId, userMessage.id);
+  const themeStarter = themeConversationStarterSchema.safeParse(userMessage.internalSignals);
   const generated = context.conversation.mode === "RECOGNIZE"
     ? await generateRecognizeResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, opening: false, candidateEvaluationContext: context.evaluationContext })
-    : await generateExploreResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, candidateEvaluationContext: context.evaluationContext, recentResponseApproaches: context.recentResponseApproaches });
+    : await generateExploreResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, candidateEvaluationContext: context.evaluationContext, recentResponseApproaches: context.recentResponseApproaches, preferredThemeId: themeStarter.success ? themeStarter.data.themeId : null });
 
   const assistantMessage = await db.message.create({
     data: { conversationId, role: "assistant", mode: context.conversation.mode, content: generated.reply, internalSignals: generated.signals, model: generated.model, responseId: generated.responseId, inReplyToId: userMessage.id },
@@ -161,13 +169,39 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
   };
 }
 
-export async function sendExploreMessage(locale: Locale, conversationId: string | null, content: string): Promise<ConversationActionResult> {
+export async function sendExploreMessage(
+  locale: Locale,
+  conversationId: string | null,
+  content: string,
+  startingThemeId?: string | null,
+): Promise<ConversationActionResult> {
   if (!isLocale(locale)) return { ok: false, error: "message" };
   const parsed = exploreMessageSchema.safeParse(content);
   if (!parsed.success) return { ok: false, error: "message" };
   const user = await requireCurrentUser(locale);
   const intent = await db.initialIntent.findUnique({ where: { userId: user.id } });
   if (!intent?.discoveryCompletedAt) return { ok: false, error: "message" };
+
+  let themeStarter: z.infer<typeof themeConversationStarterSchema> | null = null;
+  let themeTitle: string | null = null;
+  if (startingThemeId) {
+    if (conversationId) return { ok: false, error: "message" };
+    const parsedThemeId = chartThemeIdSchema.safeParse(startingThemeId);
+    if (!parsedThemeId.success) return { ok: false, error: "message" };
+    const natalChart = await db.natalChart.findUnique({ where: { userId: user.id } });
+    if (!natalChart) return { ok: false, error: "message" };
+    const natalInterpretation = await ensureNatalInterpretation(user.id, natalChart);
+    const theme = natalInterpretation.chartAtAGlance.themes.find(
+      (candidate) => candidate.id === parsedThemeId.data,
+    );
+    if (!theme) return { ok: false, error: "message" };
+    themeStarter = {
+      source: NATAL_INTERPRETATION_SOURCE,
+      evidenceStatus: NATAL_INTERPRETATION_EVIDENCE_STATUS,
+      themeId: theme.id,
+    };
+    themeTitle = chartThemePresentation(theme, locale).title;
+  }
 
   let activeConversationId = conversationId;
   let userMessage: StoredMessage;
@@ -179,7 +213,22 @@ export async function sendExploreMessage(locale: Locale, conversationId: string 
     userMessage = await db.message.create({ data: { conversationId: activeConversationId, role: "user", mode: conversation.mode, content: parsed.data } });
     await db.conversation.update({ where: { id: activeConversationId }, data: { lastMessageAt: userMessage.createdAt } });
   } else {
-    const conversation = await db.conversation.create({ data: { userId: user.id, mode: "EXPLORE", title: titleFromExploreMessage(parsed.data), messages: { create: { role: "user", mode: "EXPLORE", content: parsed.data } } }, include: { messages: true } });
+    const conversation = await db.conversation.create({
+      data: {
+        userId: user.id,
+        mode: "EXPLORE",
+        title: themeTitle ?? titleFromExploreMessage(parsed.data),
+        messages: {
+          create: {
+            role: "user",
+            mode: "EXPLORE",
+            content: parsed.data,
+            internalSignals: themeStarter ?? undefined,
+          },
+        },
+      },
+      include: { messages: true },
+    });
     activeConversationId = conversation.id;
     userMessage = conversation.messages[0];
   }

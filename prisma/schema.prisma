@@ -164,6 +164,7 @@ model InitialIntent {
   finalAnswers           Json?     @map("final_answers")
   questionsGenerated     DateTime? @map("questions_generated_at") @db.Timestamptz(6)
   discoveryCompletedAt   DateTime? @map("discovery_completed_at") @db.Timestamptz(6)
+  chartAtAGlanceViewedAt DateTime? @map("chart_at_a_glance_viewed_at") @db.Timestamptz(6)
   orientationCompletedAt DateTime? @map("orientation_completed_at") @db.Timestamptz(6)
   createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)

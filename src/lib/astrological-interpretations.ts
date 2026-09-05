@@ -1,6 +1,25 @@
 import interpretations from "@/data/astrology/lunar-nodes.json";
 
 export {
+  getKarmicPlanetSignInterpretation,
+  karmicPlanetSignInterpretationCatalog,
+} from "@/lib/karmic-planet-sign-interpretations";
+export type {
+  KarmicPlanetSignInterpretation,
+  KarmicPlanetSignPlanet,
+  KarmicPlanetSignSign,
+} from "@/lib/karmic-planet-sign-interpretations";
+
+export {
+  getMidheavenInterpretation,
+  midheavenInterpretationCatalog,
+} from "@/lib/midheaven-interpretations";
+export type {
+  MidheavenInterpretation,
+  MidheavenSign,
+} from "@/lib/midheaven-interpretations";
+
+export {
   ascendantInterpretationCatalog,
   getAscendantInterpretation,
 } from "@/lib/ascendant-interpretations";

@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { Archive, ArchiveRestore, ArrowRight, LoaderCircle, MessageCircle, MoreVertical, Trash2 } from "lucide-react";
-import { archiveConversation, deleteArchivedConversation, restoreConversation } from "@/app/actions/conversations";
+import { Archive, ArchiveRestore, ArrowRight, Download, LoaderCircle, MessageCircle, MoreVertical, Trash2 } from "lucide-react";
+import { archiveConversation, deleteArchivedConversation, exportConversation, restoreConversation } from "@/app/actions/conversations";
 import type { Locale } from "@/i18n/config";
 
 type ConversationItem = {
@@ -17,6 +17,8 @@ type Messages = {
   untitled: string;
   messageCount: string;
   archive: string;
+  export: string;
+  exporting: string;
   actions: string;
   restore: string;
   archivedTitle: string;
@@ -25,6 +27,7 @@ type Messages = {
   deleteDescription: string;
   cancel: string;
   actionError: string;
+  exportError: string;
 };
 
 export function ConversationList({ locale, initialConversations, messages }: {
@@ -36,6 +39,7 @@ export function ConversationList({ locale, initialConversations, messages }: {
   const [menuId, setMenuId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<string | null>(null);
+  const [errorKind, setErrorKind] = useState<"action" | "export">("action");
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const activeConversations = conversations.filter((conversation) => !conversation.archivedAt);
@@ -60,6 +64,7 @@ export function ConversationList({ locale, initialConversations, messages }: {
     if (isPending) return;
     setPendingId(id);
     setErrorId(null);
+    setErrorKind("action");
     startTransition(async () => {
       const result = await archiveConversation(locale, id);
       if (result.ok) {
@@ -76,6 +81,7 @@ export function ConversationList({ locale, initialConversations, messages }: {
     if (isPending) return;
     setPendingId(id);
     setErrorId(null);
+    setErrorKind("action");
     startTransition(async () => {
       const result = await restoreConversation(locale, id);
       if (result.ok) {
@@ -93,6 +99,7 @@ export function ConversationList({ locale, initialConversations, messages }: {
     if (isPending) return;
     setPendingId(id);
     setErrorId(null);
+    setErrorKind("action");
     startTransition(async () => {
       const result = await deleteArchivedConversation(locale, id);
       if (result.ok) {
@@ -101,6 +108,33 @@ export function ConversationList({ locale, initialConversations, messages }: {
         setMenuId(null);
       } else {
         setErrorId(id);
+      }
+      setPendingId(null);
+    });
+  }
+
+  function exportAsJson(conversation: ConversationItem) {
+    if (isPending) return;
+    setPendingId(conversation.id);
+    setErrorId(null);
+    setErrorKind("export");
+    startTransition(async () => {
+      const result = await exportConversation(locale, conversation.id);
+      if (result.ok) {
+        const safeTitle = (result.title ?? "astrocoach-conversation")
+          .normalize("NFKD")
+          .replace(/[^a-zA-Z0-9_-]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 80) || "astrocoach-conversation";
+        const url = URL.createObjectURL(new Blob([JSON.stringify(result.data, null, 2)], { type: "application/json" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${safeTitle}.json`;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 0);
+        setMenuId(null);
+      } else {
+        setErrorId(conversation.id);
       }
       setPendingId(null);
     });
@@ -119,6 +153,7 @@ export function ConversationList({ locale, initialConversations, messages }: {
           <div className="relative shrink-0" data-conversation-menu>
             <button aria-expanded={menuId === conversation.id} aria-haspopup="menu" aria-label={messages.actions} className="flex size-11 cursor-pointer items-center justify-center rounded-xl border border-slate-300 text-slate-600 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900" disabled={isPending} onClick={() => setMenuId((current) => current === conversation.id ? null : conversation.id)} title={messages.actions} type="button">{pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <MoreVertical aria-hidden="true" className="size-5" />}</button>
             {menuId === conversation.id ? <div className="absolute right-0 top-12 z-10 min-w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-900" role="menu">
+              <button className="flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" onClick={() => exportAsJson(conversation)} role="menuitem" type="button"><Download aria-hidden="true" className="size-4" />{pending ? messages.exporting : messages.export}</button>
               {conversation.archivedAt ? <>
                 <button className="flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" onClick={() => restore(conversation.id)} role="menuitem" type="button"><ArchiveRestore aria-hidden="true" className="size-4" />{messages.restore}</button>
                 <button className="flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/50" onClick={() => { setDeleteConfirmId(conversation.id); setErrorId(null); setMenuId(null); }} role="menuitem" type="button"><Trash2 aria-hidden="true" className="size-4" />{messages.delete}</button>
@@ -136,7 +171,7 @@ export function ConversationList({ locale, initialConversations, messages }: {
             </div>
           </div>
         ) : null}
-        {errorId === conversation.id ? <p className="mt-3 text-sm text-red-700 dark:text-red-300" role="alert">{messages.actionError}</p> : null}
+        {errorId === conversation.id ? <p className="mt-3 text-sm text-red-700 dark:text-red-300" role="alert">{errorKind === "export" ? messages.exportError : messages.actionError}</p> : null}
       </article>
     );
   }

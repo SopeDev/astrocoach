@@ -5,17 +5,17 @@ import { db } from "@/db/client";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
 
-export async function completeOrientation(locale: Locale) {
+export async function completeChartAtAGlanceIntroduction(locale: Locale) {
   if (!isLocale(locale)) redirect("/");
 
   const user = await requireCurrentUser(locale);
   const intent = await db.initialIntent.findUnique({ where: { userId: user.id } });
   if (!intent?.discoveryCompletedAt) redirect(`/${locale}/onboarding/discovery`);
-  if (!intent.chartAtAGlanceViewedAt) redirect(`/${locale}/onboarding/chart-at-a-glance`);
+  if (intent.orientationCompletedAt) redirect(`/${locale}/chart`);
 
   await db.initialIntent.update({
     where: { id: intent.id },
-    data: { orientationCompletedAt: intent.orientationCompletedAt ?? new Date() },
+    data: { chartAtAGlanceViewedAt: intent.chartAtAGlanceViewedAt ?? new Date() },
   });
-  redirect(`/${locale}/home`);
+  redirect(`/${locale}/onboarding/orientation`);
 }

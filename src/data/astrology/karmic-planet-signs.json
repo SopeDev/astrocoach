@@ -1,0 +1,609 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "Libro Cosmobiología - 2014.docx",
+  "kind": "karmic_planet_sign",
+  "entries": [
+    {
+      "id": "karmic_planet_sign.moon.aries",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Aries"
+      },
+      "topics": [
+        "emotional_patterns",
+        "self_protection",
+        "assertion",
+        "patience",
+        "collaboration"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Aries, viewed through a karmic lens, suggests an emotional memory organized around self-protection, immediacy, and the need to act before vulnerability can be felt.",
+        "possible_expressions": [
+          "Reading disagreement as a threat and reacting before the situation is fully understood",
+          "Feeling safest when independent, decisive, or in motion",
+          "Meeting emotional uncertainty with urgency, competitiveness, or anger"
+        ],
+        "developmental_direction": "Retain courage and directness while cultivating tact, patience, and the capacity to cooperate without experiencing compromise as defeat."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.taurus",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Taurus"
+      },
+      "topics": [
+        "emotional_patterns",
+        "security",
+        "attachment",
+        "resources",
+        "self_trust"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Taurus, viewed through a karmic lens, suggests a deep emotional association between safety and what can be held, preserved, or relied upon.",
+        "possible_expressions": [
+          "Seeking reassurance through possessions, routines, or dependable relationships",
+          "Holding on after a situation has stopped being nourishing because loss feels unsafe",
+          "Responding to uncertainty by accumulating, conserving, or resisting change"
+        ],
+        "developmental_direction": "Build security from embodied self-trust and inner resources, learning to value and enjoy what is present without making possession the condition for peace."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.gemini",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Gemini"
+      },
+      "topics": [
+        "emotional_patterns",
+        "communication",
+        "restlessness",
+        "continuity",
+        "integration"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Gemini, viewed through a karmic lens, suggests emotional familiarity with movement, exchange, and rapidly changing points of reference.",
+        "possible_expressions": [
+          "Processing feeling through talking, comparing, traveling, or gathering information",
+          "Becoming restless when home, relationship, or routine asks for sustained emotional presence",
+          "Moving between perspectives so quickly that no single experience has time to settle"
+        ],
+        "developmental_direction": "Let curiosity remain alive while developing continuity, emotional integration, and the ability to stay with one place, person, or feeling long enough for it to deepen."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.cancer",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Cancer"
+      },
+      "topics": [
+        "emotional_patterns",
+        "belonging",
+        "family",
+        "care",
+        "boundaries"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Cancer, viewed through a karmic lens, suggests a powerful inherited sensitivity around belonging, dependence, protection, and the possibility of abandonment.",
+        "possible_expressions": [
+          "Clinging to family roles or familiar bonds when independence feels emotionally risky",
+          "Trying to secure love by becoming indispensable, protective, or quietly controlling",
+          "Feeling responsible for preserving a shared emotional world even when it limits growth"
+        ],
+        "developmental_direction": "Trust personal emotional resources, care without possessing, and allow both self and others enough autonomy to choose closeness freely."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.leo",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Leo"
+      },
+      "topics": [
+        "emotional_patterns",
+        "recognition",
+        "creativity",
+        "leadership",
+        "humility"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Leo, viewed through a karmic lens, suggests emotional familiarity with visibility, status, and being recognized as a central or exceptional presence.",
+        "possible_expressions": [
+          "Needing appreciation or applause to feel emotionally secure",
+          "Protecting vulnerability through pride, performance, or command",
+          "Offering warmth and generosity while struggling when another person receives the attention"
+        ],
+        "developmental_direction": "Ground dignity in the heart rather than the audience, using creative power generously and allowing simplicity, accountability, and other people's significance to coexist with personal radiance."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.virgo",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Virgo"
+      },
+      "topics": [
+        "emotional_patterns",
+        "service",
+        "perfectionism",
+        "embodiment",
+        "self_acceptance"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Virgo, viewed through a karmic lens, suggests emotional habits built around usefulness, correction, precision, and the pressure to earn safety by getting things right.",
+        "possible_expressions": [
+          "Managing vulnerability by working, fixing, organizing, or caring for practical needs",
+          "Turning uncertainty into self-criticism or vigilance about what could go wrong",
+          "Offering skillful service while finding it difficult to receive imperfect care"
+        ],
+        "developmental_direction": "Let discernment support life rather than police it, opening the emotional world to tenderness and pursuing meaningful improvement without demanding perfection."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.libra",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Libra"
+      },
+      "topics": [
+        "emotional_patterns",
+        "relationships",
+        "dependence",
+        "needs",
+        "individuality"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Libra, viewed through a karmic lens, suggests emotional familiarity with securing safety through partnership, accommodation, and the preservation of relational harmony.",
+        "possible_expressions": [
+          "Feeling most real or secure when accompanied, chosen, or mirrored by another person",
+          "Concealing needs and objections to avoid disapproval or separation",
+          "Accumulating resentment beneath a gracious or cooperative surface"
+        ],
+        "developmental_direction": "Develop a distinct emotional center, express needs before silence hardens into resentment, and create partnership between two whole people rather than through self-erasure."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.scorpio",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Scorpio"
+      },
+      "topics": [
+        "emotional_patterns",
+        "trust",
+        "intensity",
+        "attachment",
+        "transformation"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Scorpio, viewed through a karmic lens, suggests emotional memory shaped by crisis, profound attachment, and vigilance around betrayal or loss of control.",
+        "possible_expressions": [
+          "Testing loyalty or reading beneath the surface before allowing trust",
+          "Holding tightly to people or feelings because separation evokes a survival response",
+          "Experiencing intimacy as intensely healing and intensely threatening at the same time"
+        ],
+        "developmental_direction": "Use emotional depth for honest transformation, expressing desire and anger constructively while allowing closeness to breathe without demands for identical intensity or response."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.sagittarius",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Sagittarius"
+      },
+      "topics": [
+        "emotional_patterns",
+        "freedom",
+        "meaning",
+        "rootedness",
+        "wisdom"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Sagittarius, viewed through a karmic lens, suggests emotional familiarity with travel, learning, conviction, and the freedom of a horizon larger than the immediate environment.",
+        "possible_expressions": [
+          "Seeking emotional renewal through movement, study, teaching, or a guiding philosophy",
+          "Protecting freedom by keeping relationships or places from becoming too binding",
+          "Taking the role of adviser, advocate, or moral protector while remaining personally unrooted"
+        ],
+        "developmental_direction": "Share perspective without living above ordinary attachment, allowing wisdom to acquire roots through sustained relationships, mutuality, and participation in a real place."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.capricorn",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Capricorn"
+      },
+      "topics": [
+        "emotional_patterns",
+        "authority",
+        "control",
+        "responsibility",
+        "vulnerability"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Capricorn, viewed through a karmic lens, suggests emotional familiarity with responsibility, hierarchy, self-control, and the need to remain composed under pressure.",
+        "possible_expressions": [
+          "Seeking safety through achievement, competence, or control of the environment",
+          "Treating vulnerable feeling as an interruption to duty or authority",
+          "Becoming the reliable one while privately doubting whether support will be available"
+        ],
+        "developmental_direction": "Integrate strength with emotional honesty, letting flexibility, receptivity, and mutual support become part of mature authority rather than signs of weakness."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.aquarius",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Aquarius"
+      },
+      "topics": [
+        "emotional_patterns",
+        "community",
+        "individuality",
+        "intimacy",
+        "reform"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Aquarius, viewed through a karmic lens, suggests emotional familiarity with collective identity, shared ideals, and observing personal feeling from the distance of the group.",
+        "possible_expressions": [
+          "Feeling safest among friends, networks, or communities organized around a common idea",
+          "Intellectualizing emotion when intimacy becomes too immediate or personally exposing",
+          "Alternating between conformity to a group and abrupt withdrawal in defense of individuality"
+        ],
+        "developmental_direction": "Belong without disappearing and differentiate without becoming remote, bringing originality, friendship, and reform into warmer contact with the personal heart."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.moon.pisces",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Moon",
+        "sign": "Pisces"
+      },
+      "topics": [
+        "emotional_patterns",
+        "sensitivity",
+        "dependence",
+        "faith",
+        "boundaries"
+      ],
+      "interpretation": {
+        "core_meaning": "Moon in Pisces, viewed through a karmic lens, suggests emotional familiarity with surrender, idealization, porous boundaries, and environments where individual agency is easily dissolved.",
+        "possible_expressions": [
+          "Absorbing the atmosphere or needs of others before recognizing personal feeling",
+          "Seeking refuge in fantasy, spirituality, caretaking, or withdrawal when ordinary life feels harsh",
+          "Confusing compassion with helplessness, rescue, or dependence"
+        ],
+        "developmental_direction": "Give sensitivity a practical container through boundaries and self-support, cultivating faith that enlarges agency rather than reinforcing guilt, passivity, or isolation."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.aries",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Aries"
+      },
+      "topics": [
+        "identity",
+        "assertion",
+        "courage",
+        "inhibition",
+        "self_authority"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Aries, viewed through a karmic lens, describes a developmental task of constructing a durable identity and learning responsible self-assertion without relying on an inherited role.",
+        "possible_expressions": [
+          "Alternating between inhibition and force when personal initiative is tested",
+          "Feeling unusually exposed when beginning something without permission or precedent",
+          "Treating independence as something that must be proven through effort or conflict"
+        ],
+        "developmental_direction": "Build self-authority one chosen action at a time, allowing courage to become steady, accountable, and strong enough to include uncertainty."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.taurus",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Taurus"
+      },
+      "topics": [
+        "values",
+        "security",
+        "resources",
+        "self_worth",
+        "stability"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Taurus, viewed through a karmic lens, describes the slow construction of inner value, material competence, and a foundation that does not depend on inherited security.",
+        "possible_expressions": [
+          "Feeling scarcity or inadequacy even when practical resources are available",
+          "Approaching money, possessions, pleasure, or change with caution and control",
+          "Working patiently to make skills and values tangible over time"
+        ],
+        "developmental_direction": "Create stability through tested values, embodied self-worth, and responsible stewardship, without allowing fear of loss to turn endurance into rigidity."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.gemini",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Gemini"
+      },
+      "topics": [
+        "communication",
+        "learning",
+        "self_expression",
+        "inhibition",
+        "clarity"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Gemini, viewed through a karmic lens, describes a responsibility to make thought and communication clear, honest, and structurally sound.",
+        "possible_expressions": [
+          "Censoring spontaneous speech out of fear of being misunderstood or judged",
+          "Using precision, argument, or strategic wording to control an uncertain exchange",
+          "Developing unusual concentration and authority in a chosen field of knowledge"
+        ],
+        "developmental_direction": "Replace guarded or manipulative communication with patient inquiry and direct exchange, trusting that ideas become stronger when they can be examined openly."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.cancer",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Cancer"
+      },
+      "topics": [
+        "belonging",
+        "family",
+        "emotional_foundations",
+        "inheritance",
+        "care"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Cancer, viewed through a karmic lens, describes the work of building an inner home while carrying serious questions about family, belonging, protection, and inherited responsibility.",
+        "possible_expressions": [
+          "Feeling emotionally outside the family or responsible for holding it together",
+          "Keeping sensitivity private while expressing inherited talents through organized work",
+          "Seeking belonging through caretaking, achievement, or dependence on a protective structure"
+        ],
+        "developmental_direction": "Create a dependable inner foundation and reciprocal forms of care, using inherited gifts publicly without letting family history define the limits of belonging."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.leo",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Leo"
+      },
+      "topics": [
+        "creativity",
+        "recognition",
+        "leadership",
+        "play",
+        "self_expression"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Leo, viewed through a karmic lens, describes the task of giving disciplined form to genuine creative purpose while loosening dependence on an approved or impressive role.",
+        "possible_expressions": [
+          "Taking performance, leadership, or personal goals with exceptional seriousness",
+          "Restricting play and spontaneity until they can be controlled or perfected",
+          "Using achievement or command to protect uncertainty about being seen"
+        ],
+        "developmental_direction": "Accept responsibility for what the heart truly wants, allowing warmth, play, and creative risk to animate sustained expression rather than treating control as the source of dignity."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.virgo",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Virgo"
+      },
+      "topics": [
+        "service",
+        "work",
+        "perfectionism",
+        "embodiment",
+        "discernment"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Virgo, viewed through a karmic lens, describes a demanding apprenticeship in skill, service, discernment, and cooperation between mind and body.",
+        "possible_expressions": [
+          "Trying to prevent uncertainty through exhaustive preparation or exacting routines",
+          "Measuring worth by productivity, correctness, or usefulness",
+          "Developing patient mastery of details that other people overlook"
+        ],
+        "developmental_direction": "Let disciplined craft serve a living purpose, making room for bodily feedback, intuition, and timely response instead of requiring every step to be perfected in advance."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.libra",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Libra"
+      },
+      "topics": [
+        "relationships",
+        "commitment",
+        "equality",
+        "boundaries",
+        "independence"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Libra, viewed through a karmic lens, describes a serious education in partnership: how to commit, negotiate, and share life without surrendering an independent center.",
+        "possible_expressions": [
+          "Approaching relationship with caution, duty, high standards, or fear of choosing badly",
+          "Defining identity through a partner while privately resisting the resulting dependence",
+          "Becoming skilled at fairness, mediation, and durable agreements"
+        ],
+        "developmental_direction": "Build mature reciprocity between equal adults, bringing clear boundaries and personal responsibility into commitment rather than making either isolation or dependency the price of relationship."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.scorpio",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Scorpio"
+      },
+      "topics": [
+        "trust",
+        "power",
+        "intimacy",
+        "vulnerability",
+        "transformation"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Scorpio, viewed through a karmic lens, describes a concentrated encounter with trust, shared power, vulnerability, and the fear that deep merging could erase personal control.",
+        "possible_expressions": [
+          "Guarding private feeling or shared resources until another person's reliability is proven",
+          "Experiencing intimacy as a field of duty, risk, control, or profound consequence",
+          "Developing endurance and insight in situations that require psychological honesty"
+        ],
+        "developmental_direction": "Hold power consciously rather than defensively, allowing mutual dependence and emotional exposure to become chosen forms of strength instead of threats to survival."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.sagittarius",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Sagittarius"
+      },
+      "topics": [
+        "beliefs",
+        "meaning",
+        "authority",
+        "education",
+        "ethics"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Sagittarius, viewed through a karmic lens, describes responsibility for examining inherited beliefs and constructing an ethical worldview that can withstand lived experience.",
+        "possible_expressions": [
+          "Feeling constrained by rigid religious, academic, legal, or moral authority",
+          "Replacing uncertainty with dogma, judgment, or the need to possess the correct explanation",
+          "Developing disciplined scholarship or teaching around questions of meaning"
+        ],
+        "developmental_direction": "Release beliefs sustained mainly by fear or external authority, taking responsibility for a spacious philosophy whose truth is tested through experience, humility, and ethical consequence."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.capricorn",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Capricorn"
+      },
+      "topics": [
+        "authority",
+        "responsibility",
+        "achievement",
+        "public_role",
+        "integrity"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Capricorn, viewed through a karmic lens, intensifies the responsibility to develop legitimate authority, patient ambition, and structures capable of serving more than personal status.",
+        "possible_expressions": [
+          "Carrying heavy expectations around achievement, leadership, or public competence",
+          "Treating obstacles as tests of endurance and self-command",
+          "Seeking control or recognition when inner authority has not yet consolidated"
+        ],
+        "developmental_direction": "Earn authority through integrity, proportion, and accountable contribution, letting achievement become the consequence of mature stewardship rather than proof of personal worth."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.aquarius",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Aquarius"
+      },
+      "topics": [
+        "community",
+        "innovation",
+        "convention",
+        "freedom",
+        "social_change"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Aquarius, viewed through a karmic lens, describes the work of giving practical form to social insight, innovation, and freedom beyond the approval of established convention.",
+        "possible_expressions": [
+          "Feeling responsible for reform while remaining wary of groups and their expectations",
+          "Meeting resistance when unconventional ideas lack a workable structure",
+          "Developing authority in systems, communities, or fields oriented toward the future"
+        ],
+        "developmental_direction": "Build change that can endure, joining independence with responsibility to the collective and measuring originality by what it frees or improves rather than by difference alone."
+      }
+    },
+    {
+      "id": "karmic_planet_sign.saturn.pisces",
+      "kind": "karmic_planet_sign",
+      "lens": "karmic",
+      "factors": {
+        "planet": "Saturn",
+        "sign": "Pisces"
+      },
+      "topics": [
+        "faith",
+        "identity",
+        "surrender",
+        "boundaries",
+        "spirituality"
+      ],
+      "interpretation": {
+        "core_meaning": "Saturn in Pisces, viewed through a karmic lens, describes the difficult creation of form within sensitivity, uncertainty, and the gradual release of identities that no longer carry meaning.",
+        "possible_expressions": [
+          "Feeling ineffective or unmoored when familiar roles and achievements lose their force",
+          "Trying to contain boundless feeling through withdrawal, rigid control, or self-denial",
+          "Taking spiritual, imaginative, or compassionate work with grave seriousness"
+        ],
+        "developmental_direction": "Let obsolete self-definitions dissolve without abandoning agency, building flexible boundaries and disciplined forms through which faith, imagination, and service can become tangible."
+      }
+    }
+  ]
+}
+

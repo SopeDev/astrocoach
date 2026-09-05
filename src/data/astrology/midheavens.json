@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "Libro Cosmobiología - 2014.docx",
+  "kind": "midheaven",
+  "entries": [
+    {
+      "id": "midheaven.aries",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Aries"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "leadership",
+        "initiative"
+      ],
+      "interpretation": {
+        "core_meaning": "Aries on the Midheaven approaches vocation and public contribution through initiative, action, and the willingness to enter unclaimed territory.",
+        "possible_expressions": [
+          "Being recognized for decisiveness, courage, or the ability to start",
+          "Gravitating toward autonomous, competitive, physical, technical, or fast-moving work",
+          "Growing impatient with delay, diffuse authority, or roles that offer no room to act"
+        ],
+        "developmental_direction": "Lead through purposeful initiative while developing pacing, cooperation, and enough strategic patience for bold beginnings to become durable accomplishment."
+      }
+    },
+    {
+      "id": "midheaven.taurus",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Taurus"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "stability",
+        "resources",
+        "creativity"
+      ],
+      "interpretation": {
+        "core_meaning": "Taurus on the Midheaven approaches vocation through continuity, tangible value, patient cultivation, and the desire to build a stable public contribution.",
+        "possible_expressions": [
+          "Being recognized for reliability, calm authority, practical judgment, or aesthetic sense",
+          "Working with resources, finance, craft, land, food, beauty, voice, or material production",
+          "Preferring gradual progress and manageable risk over abrupt professional change"
+        ],
+        "developmental_direction": "Build lasting value without letting the need for security narrow ambition, and allow creativity and pleasure to participate alongside sound practical stewardship."
+      }
+    },
+    {
+      "id": "midheaven.gemini",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Gemini"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "communication",
+        "variety",
+        "learning"
+      ],
+      "interpretation": {
+        "core_meaning": "Gemini on the Midheaven approaches vocation through communication, exchange, versatility, and the movement of ideas between people and settings.",
+        "possible_expressions": [
+          "Being recognized for wit, memory, explanation, persuasion, or connecting disparate information",
+          "Maintaining parallel interests or roles that keep work mentally varied",
+          "Losing momentum when repetition replaces curiosity and contact"
+        ],
+        "developmental_direction": "Turn versatility into a coherent body of work by choosing which messages deserve continuity, and let adaptability support expertise rather than perpetual dispersal."
+      }
+    },
+    {
+      "id": "midheaven.cancer",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Cancer"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "care",
+        "teaching",
+        "community"
+      ],
+      "interpretation": {
+        "core_meaning": "Cancer on the Midheaven approaches public contribution through sensitivity to human needs, protection, cultivation, and an instinct for what helps people or living systems develop.",
+        "possible_expressions": [
+          "Being recognized for care, emotional intelligence, teaching, guidance, or stewardship",
+          "Working with families, food, health support, education, ecology, land, or community life",
+          "Depending heavily on encouragement or belonging when professional confidence is uncertain"
+        ],
+        "developmental_direction": "Let sensitivity inform capable public service while building enough inner support to continue through imperfect feedback and avoid making approval the measure of meaningful work."
+      }
+    },
+    {
+      "id": "midheaven.leo",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Leo"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "leadership",
+        "creativity",
+        "visibility"
+      ],
+      "interpretation": {
+        "core_meaning": "Leo on the Midheaven approaches vocation through creative authorship, visible leadership, and the wish to offer work that carries a distinctive personal signature.",
+        "possible_expressions": [
+          "Being recognized for confidence, originality, direction, performance, or generosity",
+          "Seeking roles with creative control, public visibility, research ownership, or organizational authority",
+          "Rejecting modest or supporting roles when recognition becomes confused with significance"
+        ],
+        "developmental_direction": "Use visibility to animate and encourage meaningful work, grounding ambition in craft and shared purpose so leadership expresses the heart rather than merely protecting pride."
+      }
+    },
+    {
+      "id": "midheaven.virgo",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Virgo"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "service",
+        "analysis",
+        "craft"
+      ],
+      "interpretation": {
+        "core_meaning": "Virgo on the Midheaven approaches vocation through analysis, practical intelligence, service, and the refinement of methods that make work more useful or precise.",
+        "possible_expressions": [
+          "Being recognized for competence, careful research, identifying problems, or dependable service",
+          "Working in analytical, administrative, scientific, health-support, editorial, or technical fields",
+          "Delaying commitment because no path feels sufficiently certain or perfected"
+        ],
+        "developmental_direction": "Develop mastery through consistent practice and useful contribution, treating uncertainty as part of learning rather than evidence that the vocation must be solved before it can begin."
+      }
+    },
+    {
+      "id": "midheaven.libra",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Libra"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "justice",
+        "diplomacy",
+        "aesthetics"
+      ],
+      "interpretation": {
+        "core_meaning": "Libra on the Midheaven approaches vocation through relationship, proportion, justice, aesthetics, and the ability to bring different interests into workable balance.",
+        "possible_expressions": [
+          "Being recognized for diplomacy, grace, mediation, fairness, or artistic judgment",
+          "Working with clients, partners, law, negotiation, design, beauty, or public relations",
+          "Preserving a polished consensus while private disagreement or ambition remains unspoken"
+        ],
+        "developmental_direction": "Let diplomacy carry clear principles and honest decisions, using social intelligence to create real balance rather than concealing conflict behind an agreeable public image."
+      }
+    },
+    {
+      "id": "midheaven.scorpio",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Scorpio"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "research",
+        "crisis",
+        "transformation"
+      ],
+      "interpretation": {
+        "core_meaning": "Scorpio on the Midheaven approaches vocation through depth, investigation, strategic focus, and the capacity to engage what is hidden, risky, or undergoing transformation.",
+        "possible_expressions": [
+          "Being recognized for courage under pressure, intuition, discretion, or penetrating analysis",
+          "Working with research, crisis, psychology, medicine, finance, investigation, or complex systems",
+          "Becoming combative with authority when autonomy or strongly held judgments feel threatened"
+        ],
+        "developmental_direction": "Use intensity to reveal and regenerate rather than control, joining intuition with evidence and developing forms of authority that can share power without losing depth."
+      }
+    },
+    {
+      "id": "midheaven.sagittarius",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Sagittarius"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "travel",
+        "teaching",
+        "meaning"
+      ],
+      "interpretation": {
+        "core_meaning": "Sagittarius on the Midheaven approaches vocation through expansion, travel, teaching, publishing, or the communication of a larger philosophical and cultural horizon.",
+        "possible_expressions": [
+          "Being recognized for perspective, candor, optimism, instruction, or cross-cultural reach",
+          "Combining a stable occupation with exploratory, creative, academic, or mission-driven work",
+          "Restlessly seeking a wider field when a role stops offering growth or freedom"
+        ],
+        "developmental_direction": "Give breadth a durable direction, testing conviction through lived responsibility and building enough continuity for exploration and insight to become a genuine contribution."
+      }
+    },
+    {
+      "id": "midheaven.capricorn",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Capricorn"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "authority",
+        "discipline",
+        "achievement"
+      ],
+      "interpretation": {
+        "core_meaning": "Capricorn on the Midheaven approaches vocation through discipline, earned authority, long-range effort, and respect for structures that can carry responsibility over time.",
+        "possible_expressions": [
+          "Being recognized for endurance, seriousness, accountability, or organizational command",
+          "Advancing gradually through demanding fields that reward mastery and sound judgment",
+          "Treating every obstacle as a personal test and every role as a measure of worth"
+        ],
+        "developmental_direction": "Build authority patiently without romanticizing struggle, allowing support, flexibility, and humane priorities to shape success alongside standards and ambition."
+      }
+    },
+    {
+      "id": "midheaven.aquarius",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Aquarius"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "innovation",
+        "technology",
+        "independence"
+      ],
+      "interpretation": {
+        "core_meaning": "Aquarius on the Midheaven approaches vocation through originality, systems thinking, future-oriented ideas, and the wish to contribute without being confined by inherited professional forms.",
+        "possible_expressions": [
+          "Being recognized for invention, independent thought, experimentation, or social vision",
+          "Working with technology, networks, media, science, reform, or unconventional creative fields",
+          "Resisting hierarchy and routine so reflexively that collaboration or continuity becomes difficult"
+        ],
+        "developmental_direction": "Give innovation a structure other people can use, preserving independence while learning how sustained collaboration turns an unusual idea into collective possibility."
+      }
+    },
+    {
+      "id": "midheaven.pisces",
+      "kind": "midheaven",
+      "factors": {
+        "sign": "Pisces"
+      },
+      "topics": [
+        "career",
+        "vocation",
+        "public_role",
+        "compassion",
+        "imagination",
+        "ecology"
+      ],
+      "interpretation": {
+        "core_meaning": "Pisces on the Midheaven approaches vocation through imagination, compassion, spiritual or ecological sensitivity, and responsiveness to living beings and subtle human needs.",
+        "possible_expressions": [
+          "Being recognized for empathy, inspiration, artistry, healing presence, or service",
+          "Working with care, psychology, ecology, animals, music, poetry, spirituality, or water",
+          "Changing direction when a role becomes spiritually empty or too rigid for an emerging vision"
+        ],
+        "developmental_direction": "Give sensitivity an inhabitable form through boundaries, practical commitments, and realistic stewardship so inspiration can serve without dissolving into drift or self-sacrifice."
+      }
+    }
+  ]
+}

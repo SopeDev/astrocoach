@@ -114,7 +114,14 @@
     "serviceError": "No pudimos preparar el siguiente paso en este momento. Inténtalo de nuevo.",
     "completedTitle": "Tu punto de partida está listo",
     "completedDescription": "Gracias. Ya tenemos un punto de partida claro y podemos continuar desde aquí.",
-    "continueToExplore": "Continuar"
+    "continueToExplore": "Ver mi punto de partida"
+  },
+  "chartIntroduction": {
+    "eyebrow": "Tu punto de partida",
+    "title": "Una primera mirada a tu carta",
+    "description": "Estos cinco temas reúnen los hilos más fuertes que podemos ver por ahora. Son hipótesis iniciales: algo que puedes reconocer, cuestionar o revisar a través de tu propia experiencia.",
+    "continue": "Continuar",
+    "returnNote": "Podrás volver a estos temas desde Mi Mapa."
   },
   "orientation": {
     "title": "Así funciona AstroCoach",
@@ -157,6 +164,37 @@
     "continue": "Volver a esta conversación",
     "review": "Revisar esta conversación"
   },
+  "chart": {
+    "eyebrow": "Carta natal",
+    "title": "Tu carta de un vistazo",
+    "description": "Cinco temas iniciales derivados de tu carta. Tómalos como posibilidades para explorar, no como conclusiones sobre quién eres.",
+    "foundationsTitle": "Tus fundamentos",
+    "emergentTitle": "Otros patrones fuertes",
+    "slotLabels": {
+      "identity": "Identidad",
+      "karmic": "Patrón kármico",
+      "mission": "Misión y dirección",
+      "emergent_1": "Patrón de la carta",
+      "emergent_2": "Patrón de la carta"
+    },
+    "unknownTimeTitle": "No conocemos tu hora de nacimiento",
+    "unknownTimeDescription": "Estos temas usan los signos de tus planetas y nodos lunares. El Ascendente, Medio Cielo, las casas y los aspectos se omiten en lugar de adivinarlos.",
+    "details": "Posibles expresiones y factores de la carta",
+    "possibleExpressions": "Posibles expresiones",
+    "supportingFactors": "Factores de la carta que lo sostienen",
+    "explore": "Explorar este tema",
+    "closeComposer": "Cerrar",
+    "prompt": "¿Qué te gustaría comprender sobre este tema?",
+    "promptPlaceholder": "Escribe lo que te resulte relevante o elige una pregunta inicial…",
+    "suggestions": [
+      "¿Cómo podría manifestarse esto en mi vida?",
+      "¿Dónde podría crear tensión?",
+      "¿Cómo podría trabajar con esto?"
+    ],
+    "startConversation": "Iniciar conversación",
+    "openingConversation": "Abriendo tu conversación…",
+    "conversationError": "No pudimos abrir esa conversación. Inténtalo de nuevo."
+  },
   "conversations": {
     "title": "Conversaciones",
     "description": "Retoma algo que estabas explorando o comienza algo nuevo.",
@@ -167,6 +205,8 @@
     "emptyDescription": "Cuando tengas algo en mente, comienza desde Inicio y aparecerá aquí.",
     "goHome": "Ir a Inicio",
     "archive": "Archivar conversación",
+    "export": "Exportar conversación",
+    "exporting": "Exportando…",
     "actions": "Acciones de la conversación",
     "restore": "Restaurar",
     "archivedTitle": "Conversaciones archivadas",
@@ -174,7 +214,8 @@
     "deleteConfirm": "Eliminar para siempre",
     "deleteDescription": "Esto elimina permanentemente la conversación, todos sus mensajes y cualquier Patrón guardado desde ella. No se puede deshacer.",
     "cancel": "Cancelar",
-    "actionError": "No pudimos actualizar esta conversación. Inténtalo de nuevo."
+    "actionError": "No pudimos actualizar esta conversación. Inténtalo de nuevo.",
+    "exportError": "No pudimos exportar esta conversación. Inténtalo de nuevo."
   },
   "map": {
     "title": "Mi Mapa",

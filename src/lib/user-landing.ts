@@ -10,6 +10,9 @@ export async function getUserLandingPath(locale: Locale, userId: string) {
   ]);
 
   if (intent?.orientationCompletedAt) return `/${locale}/home`;
+  if (intent?.discoveryCompletedAt && !intent.chartAtAGlanceViewedAt) {
+    return `/${locale}/onboarding/chart-at-a-glance`;
+  }
   if (intent?.discoveryCompletedAt) return `/${locale}/onboarding/orientation`;
   if (intent?.discoveryQuestions) return `/${locale}/onboarding/discovery`;
   if (profile?.geonameId && profile.timezoneId) return `/${locale}/onboarding/intent`;
