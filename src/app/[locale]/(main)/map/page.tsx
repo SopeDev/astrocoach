@@ -17,7 +17,7 @@ export default async function MapPage({ params }: { params: Promise<{ locale: st
     <main>
       <h1 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">{messages.map.title}</h1>
       <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">{messages.map.description}</p>
-      <MapHub locale={locale} messages={messages.map} patternCount={patternCount} />
+      <MapHub insightsCount={0} locale={locale} messages={messages.map} patternCount={patternCount} practicesCount={0} />
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { ChartNoAxesCombined, Lightbulb, Repeat2, Sprout } from "lucide-react";
 import type { Locale } from "@/i18n/config";
 
 type MapHubMessages = {
@@ -10,62 +11,47 @@ type MapHubMessages = {
   practicesTitle: string;
 };
 
-export function MapHub({ locale, messages, patternCount }: {
+export function MapHub({ insightsCount, locale, messages, patternCount, practicesCount }: {
+  insightsCount: number;
   locale: Locale;
   messages: MapHubMessages;
   patternCount: number;
+  practicesCount: number;
 }) {
-  const countLabel = messages.patternCount.replace("{count}", String(patternCount));
-  const patternsLabel = patternCount ? `${messages.hubPatternsTitle}, ${countLabel}` : messages.hubPatternsTitle;
+  const formatCount = (count: number) => messages.patternCount.replace("{count}", String(count));
+  const patternCountLabel = formatCount(patternCount);
+  const insightsCountLabel = formatCount(insightsCount);
+  const practicesCountLabel = formatCount(practicesCount);
 
   return (
-    <nav aria-label={messages.navigationLabel} className="mx-auto mt-8 w-full max-w-[30rem]">
-      <svg className="aspect-square w-full overflow-visible" viewBox="0 0 400 400">
-        <circle aria-hidden="true" cx="200" cy="200" fill="var(--surface-muted)" r="190" />
-        <circle aria-hidden="true" className="map-orbit" cx="200" cy="200" fill="none" r="183" strokeWidth="1" />
-        <circle aria-hidden="true" className="map-orbit" cx="200" cy="200" fill="none" r="88" strokeWidth="1" />
-
-        <g aria-hidden="true" className="stroke-[var(--line-strong)]" strokeWidth="1">
-          <path d="M200 10v10M295 35l-5 9M365 105l-9 5M390 200h-10M365 295l-9-5M295 365l-5-9M200 390v-10M105 365l5-9M35 295l9-5M10 200h10M35 105l9 5M105 35l5 9" />
-        </g>
-
-        <a aria-label={patternsLabel} className="group outline-none" href={`/${locale}/map/patterns`}>
-          <path className="fill-[var(--recognition-soft)] stroke-[var(--line)] transition-colors group-hover:fill-amber-200/45 group-focus-visible:fill-amber-200/55 dark:group-hover:fill-amber-700/20 dark:group-focus-visible:fill-amber-700/25" d="M45.8 111A178 178 0 0 1 354.2 111L271 159A82 82 0 0 0 129 159Z" />
-          <circle aria-hidden="true" className="fill-[var(--recognition)]" cx="200" cy="54" r="4" />
-          <foreignObject height="76" pointerEvents="none" width="170" x="115" y="68">
-            <div className="flex h-full flex-col items-center justify-center text-center text-slate-950 dark:text-white">
-              <span className="text-sm font-semibold sm:text-base">{messages.hubPatternsTitle}</span>
-              {patternCount ? <span className="mt-1 text-[11px] text-[var(--recognition)] sm:text-xs">{countLabel}</span> : null}
-            </div>
-          </foreignObject>
+    <nav aria-label={messages.navigationLabel} className="mx-auto mt-8 w-full max-w-md">
+      <svg className="aspect-square w-full" role="img" viewBox="0 0 400 400">
+        <a aria-label={`${messages.hubPatternsTitle}, ${patternCountLabel}`} className="group outline-none" href={`/${locale}/map/patterns`}>
+          <path className="fill-white/60 stroke-slate-300 transition-colors group-hover:fill-amber-50 group-focus-visible:fill-amber-50 dark:fill-slate-950/40 dark:stroke-slate-700 dark:group-hover:fill-amber-950/25 dark:group-focus-visible:fill-amber-950/25" d="M44.1 110A180 180 0 0 1 355.9 110L265.8 162A76 76 0 0 0 134.2 162Z" />
+          <Repeat2 aria-hidden="true" className="pointer-events-none text-amber-600 dark:text-amber-400" height="20" width="20" x="190" y="43" />
+          <text className="pointer-events-none fill-slate-950 text-[15px] font-semibold dark:fill-white" textAnchor="middle" x="200" y="82">{messages.hubPatternsTitle}</text>
+          <text className="pointer-events-none fill-slate-500 text-[11px] dark:fill-slate-400" textAnchor="middle" x="200" y="102">{patternCountLabel}</text>
         </a>
 
-        <a aria-label={messages.insightsTitle} className="group outline-none" href={`/${locale}/map/insights`}>
-          <path className="fill-[var(--natal-soft)] stroke-[var(--line)] transition-colors group-hover:fill-blue-200/45 group-focus-visible:fill-blue-200/55 dark:group-hover:fill-blue-700/20 dark:group-focus-visible:fill-blue-700/25" d="M361.3 124.8A178 178 0 0 1 184.5 377.3L192.9 281.7A82 82 0 0 0 274.3 165.3Z" />
-          <circle aria-hidden="true" className="fill-[var(--natal)]" cx="350" cy="200" r="3.5" />
-          <foreignObject height="72" pointerEvents="none" width="112" x="260" y="225">
-            <div className="flex h-full items-center justify-center text-center text-sm font-semibold text-slate-950 sm:text-base dark:text-white">{messages.insightsTitle}</div>
-          </foreignObject>
+        <a aria-label={`${messages.insightsTitle}, ${insightsCountLabel}`} className="group outline-none" href={`/${locale}/map/insights`}>
+          <path className="fill-white/60 stroke-slate-300 transition-colors group-hover:fill-blue-50 group-focus-visible:fill-blue-50 dark:fill-slate-950/40 dark:stroke-slate-700 dark:group-hover:fill-blue-950/25 dark:group-focus-visible:fill-blue-950/25" d="M355.9 110A180 180 0 0 1 200 380L200 276A76 76 0 0 0 265.8 162Z" />
+          <Lightbulb aria-hidden="true" className="pointer-events-none text-blue-600 dark:text-blue-300" height="20" width="20" x="305" y="224" />
+          <text className="pointer-events-none fill-slate-950 text-[15px] font-semibold dark:fill-white" textAnchor="middle" x="315" y="263">{messages.insightsTitle}</text>
+          <text className="pointer-events-none fill-slate-500 text-[11px] dark:fill-slate-400" textAnchor="middle" x="315" y="283">{insightsCountLabel}</text>
         </a>
 
-        <a aria-label={messages.practicesTitle} className="group outline-none" href={`/${locale}/map/practices`}>
-          <path className="fill-[var(--explore-soft)] stroke-[var(--line)] transition-colors group-hover:fill-violet-200/45 group-focus-visible:fill-violet-200/55 dark:group-hover:fill-violet-700/20 dark:group-focus-visible:fill-violet-700/25" d="M169.1 375.3A178 178 0 0 1 63.6 85.6L137.2 147.3A82 82 0 0 0 185.8 280.8Z" />
-          <circle aria-hidden="true" className="fill-[var(--explore)]" cx="50" cy="200" r="3.5" />
-          <foreignObject height="72" pointerEvents="none" width="116" x="28" y="225">
-            <div className="flex h-full items-center justify-center text-center text-sm font-semibold text-slate-950 sm:text-base dark:text-white">{messages.practicesTitle}</div>
-          </foreignObject>
+        <a aria-label={`${messages.practicesTitle}, ${practicesCountLabel}`} className="group outline-none" href={`/${locale}/map/practices`}>
+          <path className="fill-white/60 stroke-slate-300 transition-colors group-hover:fill-violet-50 group-focus-visible:fill-violet-50 dark:fill-slate-950/40 dark:stroke-slate-700 dark:group-hover:fill-violet-950/25 dark:group-focus-visible:fill-violet-950/25" d="M200 380A180 180 0 0 1 44.1 110L134.2 162A76 76 0 0 0 200 276Z" />
+          <Sprout aria-hidden="true" className="pointer-events-none text-violet-600 dark:text-violet-300" height="20" width="20" x="75" y="224" />
+          <text className="pointer-events-none fill-slate-950 text-[15px] font-semibold dark:fill-white" textAnchor="middle" x="85" y="263">{messages.practicesTitle}</text>
+          <text className="pointer-events-none fill-slate-500 text-[11px] dark:fill-slate-400" textAnchor="middle" x="85" y="283">{practicesCountLabel}</text>
         </a>
 
         <a aria-label={`${messages.chartTitle}. ${messages.chartDescription}`} className="group outline-none" href={`/${locale}/chart`}>
-          <circle className="fill-[var(--surface-strong)] stroke-blue-300/60 transition-colors group-hover:fill-blue-50 group-focus-visible:fill-blue-50 dark:stroke-blue-700/50 dark:group-hover:fill-blue-950/40 dark:group-focus-visible:fill-blue-950/40" cx="200" cy="200" r="72" strokeWidth="1.5" />
-          <circle aria-hidden="true" className="fill-none stroke-[var(--natal)] opacity-45" cx="200" cy="200" r="58" strokeDasharray="2 7" />
-          <circle aria-hidden="true" className="fill-[var(--natal)]" cx="200" cy="147" r="4" />
-          <foreignObject height="94" pointerEvents="none" width="124" x="138" y="164">
-            <div className="flex h-full flex-col items-center justify-center px-1 text-center text-slate-950 dark:text-white">
-              <span className="text-sm font-semibold sm:text-base">{messages.chartTitle}</span>
-              <span className="mt-1 text-[10px] leading-4 text-slate-500 sm:text-[11px] dark:text-slate-400">{messages.chartDescription}</span>
-            </div>
-          </foreignObject>
+          <circle className="fill-violet-50 stroke-violet-400 transition-colors group-hover:fill-violet-100 group-focus-visible:fill-violet-100 dark:fill-violet-950/40 dark:stroke-violet-700 dark:group-hover:fill-violet-950/65 dark:group-focus-visible:fill-violet-950/65" cx="200" cy="200" r="76" />
+          <ChartNoAxesCombined aria-hidden="true" className="pointer-events-none text-violet-700 dark:text-violet-300" height="21" width="21" x="189.5" y="161" />
+          <text className="pointer-events-none fill-slate-950 text-[15px] font-semibold dark:fill-white" textAnchor="middle" x="200" y="207">{messages.chartTitle}</text>
+          <text className="pointer-events-none fill-slate-500 text-[10px] dark:fill-slate-400" textAnchor="middle" x="200" y="227">{messages.chartDescription}</text>
         </a>
       </svg>
     </nav>

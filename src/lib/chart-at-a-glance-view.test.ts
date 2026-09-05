@@ -46,8 +46,8 @@ test("builds localized chart browsing data without changing stable theme ids", (
     spanish.themes.map((theme) => theme.id),
     english.themes.map((theme) => theme.id),
   );
-  assert.equal(english.themes[0].title, "Identity and approach to life");
-  assert.equal(spanish.themes[0].title, "Identidad y manera de entrar en la vida");
+  assert.equal(english.themes[0].title, "How you meet the world");
+  assert.equal(spanish.themes[0].title, "Cómo te muestras al mundo");
   assert.ok(spanish.themes[0].supportingFactors.includes("Sol en Capricornio, casa 10"));
   assert.ok(spanish.themes[0].supportingFactors.includes("Ascendente en Aries"));
   assert.ok(spanish.themes[2].supportingFactors.includes("Medio Cielo en Capricornio"));

@@ -12,12 +12,8 @@
   --chart-line: rgb(124 58 237);
   --chart-orbit-body: rgb(109 40 217);
   --chart-orbit-glow: rgb(139 92 246 / 0.65);
-  --surface-muted: #f4f5fb;
-  --surface-strong: #ffffff;
   --line: rgb(148 163 184 / 0.32);
-  --line-strong: rgb(100 116 139 / 0.46);
   --recognition: #b45309;
-  --recognition-soft: #fffbeb;
   --natal: #2563eb;
   --natal-soft: #eff6ff;
   --explore: #6d28d9;
@@ -34,12 +30,8 @@
   --chart-line: rgb(196 181 253);
   --chart-orbit-body: rgb(216 180 254);
   --chart-orbit-glow: rgb(192 132 252);
-  --surface-muted: #111522;
-  --surface-strong: #0f1420;
   --line: rgb(100 116 139 / 0.38);
-  --line-strong: rgb(148 163 184 / 0.42);
   --recognition: #fbbf24;
-  --recognition-soft: rgb(120 53 15 / 0.22);
   --natal: #60a5fa;
   --natal-soft: rgb(30 64 175 / 0.22);
   --explore: #c4b5fd;
@@ -75,7 +67,6 @@ a[href] {
 button:not(:disabled):active,
 a[href]:active {
   filter: brightness(0.92);
-  transform: scale(0.97);
   transition-duration: 80ms;
 }
 
@@ -118,12 +109,6 @@ a[href]:active {
 .chart-progress-dot:nth-child(2) { animation-delay: 0.2s; }
 .chart-progress-dot:nth-child(3) { animation-delay: 0.4s; }
 
-.map-orbit {
-  stroke: var(--line-strong);
-  stroke-dasharray: 2 8;
-  opacity: 0.72;
-}
-
 @keyframes chart-twinkle {
   0%, 100% { opacity: 0.2; transform: scale(0.7); }
   50% { opacity: 1; transform: scale(1.25); }
@@ -153,7 +138,6 @@ a[href]:active {
   button:not(:disabled):active,
   a[href]:active {
     filter: brightness(0.88);
-    transform: none;
   }
 
   .chart-star,

@@ -41,7 +41,7 @@ import {
   type PlanetSignSign,
 } from "@/lib/planet-sign-interpretations";
 
-export const NATAL_INTERPRETATION_SCHEMA_VERSION = 3;
+export const NATAL_INTERPRETATION_SCHEMA_VERSION = 4;
 export const NATAL_INTERPRETATION_SOURCE = "natal_interpretation" as const;
 export const NATAL_INTERPRETATION_EVIDENCE_STATUS = "symbolic_hypothesis_not_user_evidence" as const;
 
@@ -760,17 +760,17 @@ export function deterministicThemeFallback(
     .map((id) => factorMap.get(id))
     .filter((factor): factor is RankedNatalFactor => Boolean(factor));
   const labels = (factors: RankedNatalFactor[]) => factors.map((factor) => factor.label).join(" and ");
-  const possibilityNote = "These are symbolic possibilities to test against lived experience, not fixed traits or established biography.";
+  const possibilityNote = "Take this as a starting point to explore, not a fixed description of who you are.";
 
   return [
     buildTheme({
       id: "theme.identity",
       slot: "identity",
-      title: "Identity and approach to life",
-      synthesis: `${labels(factorsFor(anchors.identity))} anchor how identity, vitality, and the instinctive approach to life meet. Their interaction can describe both the center a person grows from and the way that center first enters experience. ${possibilityNote}`,
+      title: "How you meet the world",
+      synthesis: `${labels(factorsFor(anchors.identity))} bring together your inner sense of self and the way you first meet the world. You might notice places where those sides support each other—and places where they want different things. ${possibilityNote}`,
       spanish: {
-        title: "Identidad y manera de entrar en la vida",
-        synthesis: "Este tema reúne el centro de identidad, la vitalidad y la forma instintiva de acercarse a la experiencia. Puede describir tanto aquello desde lo que una persona crece como la manera en que ese centro se hace visible. Son posibilidades simbólicas para contrastar con la experiencia vivida, no rasgos fijos ni una biografía establecida.",
+        title: "Cómo te muestras al mundo",
+        synthesis: "Este tema reúne tu sentido interno de quién eres y la manera en que te muestras al mundo. Podrías notar momentos en que ambas partes se apoyan y otros en que quieren cosas distintas. Tómalo como un punto de partida para explorar, no como una descripción fija de quién eres.",
         possibleExpressions: [
           "Reconocer qué parte de la identidad busca expresión",
           "Observar cómo la presencia exterior acompaña o contrasta con el centro personal",
@@ -782,11 +782,11 @@ export function deterministicThemeFallback(
     buildTheme({
       id: "theme.karmic",
       slot: "karmic",
-      title: "Familiar patterns and deeper work",
-      synthesis: `${labels(factorsFor(anchors.karmic))} anchor a karmic and evolutionary lens on familiar emotional strategies, accumulated responsibilities, and the patterns growth repeatedly asks to make more conscious. ${possibilityNote}`,
+      title: "What feels familiar",
+      synthesis: `${labels(factorsFor(anchors.karmic))} point toward emotional habits and responsibilities that may feel deeply familiar. Some can offer real strength, while others may keep you returning to the same response after it stops helping. ${possibilityNote}`,
       spanish: {
-        title: "Patrones familiares y trabajo profundo",
-        synthesis: "Este tema ofrece una mirada kármica y evolutiva sobre estrategias emocionales conocidas, responsabilidades acumuladas y patrones que el crecimiento invita a volver más conscientes. Son posibilidades simbólicas para contrastar con la experiencia vivida, no afirmaciones sobre vidas pasadas ni un destino fijo.",
+        title: "Lo que se siente familiar",
+        synthesis: "Este tema señala hábitos emocionales y responsabilidades que podrían sentirse muy familiares. Algunos pueden darte una fuerza real; otros quizá te hagan volver a la misma respuesta cuando ya no te ayuda. Tómalo como algo para explorar, no como una afirmación sobre vidas pasadas ni un destino fijo.",
         possibleExpressions: [
           "Volver automáticamente a una estrategia emocional conocida",
           "Sentir que cierta responsabilidad pide una respuesta más consciente",
@@ -799,11 +799,11 @@ export function deterministicThemeFallback(
     buildTheme({
       id: "theme.mission",
       slot: "mission",
-      title: "Direction and contribution",
-      synthesis: `${labels(factorsFor(anchors.mission))} anchor a developmental direction: what draws life forward, how purpose seeks expression, and where that movement may become visible through contribution. ${possibilityNote}`,
+      title: "Where growth may lead",
+      synthesis: `${labels(factorsFor(anchors.mission))} suggest qualities that may pull you toward growth and more meaningful contribution. The path may feel less familiar than what comes naturally, but it can reveal new ways to use what is already yours. ${possibilityNote}`,
       spanish: {
-        title: "Dirección y contribución",
-        synthesis: "Este tema reúne una posible dirección de desarrollo: aquello que impulsa la vida hacia adelante, cómo busca expresarse el propósito y dónde ese movimiento podría hacerse visible como contribución. Son posibilidades simbólicas para explorar, no una profesión prometida ni un destino fijo.",
+        title: "Hacia dónde podrías crecer",
+        synthesis: "Este tema señala cualidades que podrían llevarte hacia el crecimiento y una contribución más significativa. El camino quizá se sienta menos familiar que aquello que te sale naturalmente, pero puede mostrarte nuevas formas de usar lo que ya tienes. Es algo para explorar, no una profesión prometida ni un destino fijo.",
         possibleExpressions: [
           "Sentirse llamado a desarrollar capacidades todavía poco familiares",
           "Buscar una forma de contribución que exprese el centro personal",
@@ -817,10 +817,10 @@ export function deterministicThemeFallback(
       id: "theme.emergent.1",
       slot: "emergent_1",
       title: titleFromTopics(emergentOne.flatMap((factor) => factor.topics)),
-      synthesis: `${labels(emergentOne)} form a distinct secondary pattern in the chart, emphasizing how ${unique(emergentOne.flatMap((factor) => factor.topics)).slice(0, 3).map((topic) => topic.replaceAll("_", " ")).join(", ")} may interact. ${possibilityNote}`,
+      synthesis: `${labels(emergentOne)} connect around ${unique(emergentOne.flatMap((factor) => factor.topics)).slice(0, 3).map((topic) => topic.replaceAll("_", " ")).join(", ")}. You might recognize moments when these needs pull together or compete for your attention. ${possibilityNote}`,
       spanish: {
-        title: "Un patrón particular de tu carta",
-        synthesis: "Estos factores forman un patrón secundario particular de la carta y señalan una posible interacción entre distintas necesidades, recursos o tensiones. Es una hipótesis simbólica para contrastar con la experiencia vivida, no un rasgo fijo.",
+        title: "Una conexión en tu carta",
+        synthesis: "Estos factores conectan distintas necesidades y recursos dentro de tu carta. Podrías reconocer momentos en que esas partes trabajan juntas y otros en que compiten por tu atención. Tómalo como algo para explorar, no como un rasgo fijo.",
         possibleExpressions: [
           "Notar que dos necesidades importantes se activan al mismo tiempo",
           "Encontrar un recurso inesperado dentro de una tensión recurrente",
@@ -833,10 +833,10 @@ export function deterministicThemeFallback(
       id: "theme.emergent.2",
       slot: "emergent_2",
       title: titleFromTopics(emergentTwo.flatMap((factor) => factor.topics)),
-      synthesis: `${labels(emergentTwo)} reveal another chart-specific thread, drawing attention to possible tensions and resources around ${unique(emergentTwo.flatMap((factor) => factor.topics)).slice(0, 3).map((topic) => topic.replaceAll("_", " ")).join(", ")}. ${possibilityNote}`,
+      synthesis: `${labels(emergentTwo)} connect around ${unique(emergentTwo.flatMap((factor) => factor.topics)).slice(0, 3).map((topic) => topic.replaceAll("_", " ")).join(", ")}. This may show up as a tension, but it can also become a useful strength when both sides have room. ${possibilityNote}`,
       spanish: {
-        title: "Otro hilo importante de tu carta",
-        synthesis: "Estos factores revelan otro hilo particular de la carta y llaman la atención sobre posibles tensiones y recursos que pueden operar juntos. Es una hipótesis simbólica para explorar, no una descripción definitiva de la persona.",
+        title: "Otra conexión importante",
+        synthesis: "Estos factores conectan otra serie de necesidades y recursos dentro de tu carta. Podría sentirse como una tensión, pero también convertirse en una fortaleza cuando ambas partes tienen espacio. Tómalo como algo para explorar, no como una descripción definitiva de quién eres.",
         possibleExpressions: [
           "Reconocer una tensión que también contiene una capacidad útil",
           "Observar cómo dos impulsos distintos pueden aprender a colaborar",

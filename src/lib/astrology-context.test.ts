@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  ASTROCOACH_GENERATED_CONTENT_STYLE_INSTRUCTIONS,
   ASTROCOACH_VOICE_INSTRUCTIONS,
   ASTROLOGY_COMMUNICATION_INSTRUCTIONS,
   ASTROLOGY_CONVERSATION_EXAMPLES,
@@ -21,6 +22,9 @@ test("shared astrology prompt preserves the worldview and its evidence boundarie
 });
 
 test("shared voice and examples encode human correction and holistic synthesis", () => {
+  assert.match(ASTROCOACH_GENERATED_CONTENT_STYLE_INSTRUCTIONS, /trusted friend/i);
+  assert.match(ASTROCOACH_GENERATED_CONTENT_STYLE_INSTRUCTIONS, /source provides meaning, not writing style/i);
+  assert.ok(ASTROCOACH_VOICE_INSTRUCTIONS.includes(ASTROCOACH_GENERATED_CONTENT_STYLE_INSTRUCTIONS));
   assert.match(ASTROCOACH_VOICE_INSTRUCTIONS, /trusted friend/i);
   assert.match(ASTROCOACH_VOICE_INSTRUCTIONS, /Begin with the substance/i);
   assert.match(ASTROCOACH_VOICE_INSTRUCTIONS, /without automatically turning each one into a question/i);
