@@ -19,18 +19,27 @@ function signal(overrides: Record<string, unknown> = {}) {
   };
 }
 
-test("recognition requires two recent qualifying EXPLORE responses", () => {
+test("the first qualifying EXPLORE response offers recognition immediately", () => {
   const first = { createdAt: new Date("2026-09-02T10:00:00Z"), internalSignals: signal() };
-  const second = { createdAt: new Date("2026-09-02T10:01:00Z"), internalSignals: signal() };
-  assert.equal(shouldOfferRecognition([first], null), false);
-  assert.equal(shouldOfferRecognition([first, second], null), true);
+  assert.equal(shouldOfferRecognition([first], null), true);
 });
 
-test("dismissal requires new evidence before recognition can be offered again", () => {
+test("an older qualifying response does not trigger an invitation after the latest response changes direction", () => {
+  const qualifying = { createdAt: new Date("2026-09-02T10:00:00Z"), internalSignals: signal() };
+  const latest = {
+    createdAt: new Date("2026-09-02T10:01:00Z"),
+    internalSignals: signal({ candidatePatternSignal: false, recommendedNextMode: "EXPLORE" }),
+  };
+  assert.equal(shouldOfferRecognition([qualifying, latest], null), false);
+});
+
+test("a declined invitation requires two subsequent qualifying responses before being offered again", () => {
   const beforeDismissal = { createdAt: new Date("2026-09-02T10:00:00Z"), internalSignals: signal() };
   const reference = new Date("2026-09-02T10:01:00Z");
-  const afterDismissal = { createdAt: new Date("2026-09-02T10:02:00Z"), internalSignals: signal() };
-  assert.equal(shouldOfferRecognition([beforeDismissal, afterDismissal], reference), false);
+  const firstAfterDismissal = { createdAt: new Date("2026-09-02T10:02:00Z"), internalSignals: signal() };
+  const secondAfterDismissal = { createdAt: new Date("2026-09-02T10:03:00Z"), internalSignals: signal() };
+  assert.equal(shouldOfferRecognition([beforeDismissal, firstAfterDismissal], reference), false);
+  assert.equal(shouldOfferRecognition([beforeDismissal, firstAfterDismissal, secondAfterDismissal], reference), true);
 });
 
 test("weak or ambiguous signals do not trigger recognition", () => {

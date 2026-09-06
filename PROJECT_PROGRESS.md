@@ -40,7 +40,7 @@ Last updated: 2026-09-05
 - Made Account appearance changes update optimistically with an explicit selected state and localized saving, success, and failure feedback while retaining the prior theme if persistence fails.
 - Prevented the authenticated database-theme initializer from overwriting live Account theme changes; it now initializes once per signed-in user on a device while later clicks apply immediately through `next-themes`.
 - Added returning-user stage resolution so sign-in and language selection resume the appropriate onboarding step, orientation, or main Home screen.
-- Added evidence-gated EXPLORE progression that requires multiple recent qualifying model signals before offering a user-controlled closer look, and requires fresh evidence before repeating a declined invitation.
+- Added evidence-gated EXPLORE progression that offers a user-controlled closer look on the first qualifying readiness signal, while retaining a stricter corroboration threshold before repeating a declined invitation.
 - Implemented the first RECOGNIZE loop with a distinct structured-output contract, tentative evidence-grounded Pattern formulation, user correction or rejection, and automatic return to EXPLORE when a proposition is rejected.
 - Added explicit Pattern saving: only a formulation the user has clearly accepted can be offered for My Map, saving requires a separate tap, and the completed conversation becomes read-only.
 - Replaced the My Map placeholder with a mobile-first list of the user's deliberately saved recognized Patterns.

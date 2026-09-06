@@ -1,7 +1,7 @@
 import { exploreSignalsSchema } from "./explore-contract";
 
 const READINESS_CONFIDENCE = 0.7;
-const REQUIRED_SUPPORTING_RESPONSES = 2;
+const REQUIRED_REOFFER_RESPONSES = 2;
 
 type SignalMessage = {
   createdAt: Date;
@@ -9,9 +9,13 @@ type SignalMessage = {
 };
 
 export function shouldOfferRecognition(messages: SignalMessage[], transitionReferenceAt: Date | null) {
-  const eligible = messages
-    .filter((message) => !transitionReferenceAt || message.createdAt > transitionReferenceAt)
-    .slice(-3)
+  const messagesSinceReference = messages.filter(
+    (message) => !transitionReferenceAt || message.createdAt > transitionReferenceAt,
+  );
+  const candidates = transitionReferenceAt
+    ? messagesSinceReference.slice(-3)
+    : messagesSinceReference.slice(-1);
+  const eligible = candidates
     .filter((message) => {
       const parsed = exploreSignalsSchema.safeParse(message.internalSignals);
       if (!parsed.success) return false;
@@ -24,5 +28,9 @@ export function shouldOfferRecognition(messages: SignalMessage[], transitionRefe
       );
     });
 
-  return eligible.length >= REQUIRED_SUPPORTING_RESPONSES;
+  // A qualifying latest signal is enough to invite the user into the mode
+  // designed to evaluate the candidate. After a decline, require corroborated
+  // readiness from subsequent turns before interrupting EXPLORE again.
+  const requiredResponses = transitionReferenceAt ? REQUIRED_REOFFER_RESPONSES : 1;
+  return eligible.length >= requiredResponses;
 }
