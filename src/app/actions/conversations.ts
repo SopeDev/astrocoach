@@ -11,6 +11,8 @@ function revalidateConversationLists(locale: Locale) {
   revalidatePath(`/${locale}/home`);
   revalidatePath(`/${locale}/map`);
   revalidatePath(`/${locale}/map/patterns`);
+  revalidatePath(`/${locale}/map/insights`);
+  revalidatePath(`/${locale}/map/practices`);
 }
 
 export async function archiveConversation(locale: Locale, conversationId: string) {
@@ -59,15 +61,22 @@ export async function deleteArchivedConversation(locale: Locale, conversationId:
     });
     if (!conversation) return null;
 
-    const deletedPatterns = await transaction.pattern.deleteMany({ where: { conversationId: conversation.id, userId: user.id } });
+    const rootedMapItems = await transaction.mapItem.findMany({ where: { conversationId: conversation.id, userId: user.id }, select: { id: true } });
+    if (rootedMapItems.length) {
+      await transaction.conversation.updateMany({
+        where: { userId: user.id, focalMapItemId: { in: rootedMapItems.map((item) => item.id) }, status: "active" },
+        data: { status: "closed", transitionState: "IDLE" },
+      });
+    }
+    const deletedMapItems = await transaction.mapItem.deleteMany({ where: { id: { in: rootedMapItems.map((item) => item.id) }, userId: user.id } });
     const deletedConversation = await transaction.conversation.deleteMany({ where: { id: conversation.id, userId: user.id, archivedAt: { not: null } } });
     if (deletedConversation.count !== 1) throw new Error("Archived conversation changed before deletion");
-    return { deletedPatterns: deletedPatterns.count };
+    return { deletedMapItems: deletedMapItems.count };
   });
   if (!result) return { ok: false as const };
 
   revalidateConversationLists(locale);
-  return { ok: true as const, deletedPatterns: result.deletedPatterns };
+  return { ok: true as const, deletedMapItems: result.deletedMapItems };
 }
 
 export async function exportConversation(locale: Locale, conversationId: string) {

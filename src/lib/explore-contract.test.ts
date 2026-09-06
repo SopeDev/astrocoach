@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { exploreMessageSchema, exploreResponseSchema, titleFromExploreMessage } from "./explore-contract";
+import { exploreMessageSchema, exploreResponseSchema, exploreSignalsSchema, hasConsistentExploreCandidate, titleFromExploreMessage } from "./explore-contract";
 
 test("EXPLORE output keeps the visible reply separate from valid internal signals", () => {
   const result = exploreResponseSchema.safeParse({
@@ -12,8 +12,9 @@ test("EXPLORE output keeps the visible reply separate from valid internal signal
     understandingStatus: "opening",
     importantObservations: ["The user described a recent decision."],
     unresolvedQuestions: ["What outcome were they hoping for?"],
-    candidatePatternSignal: false,
-    candidatePatternConfidence: 0.1,
+    candidateMapItemSignal: false,
+    candidateMapItemConfidence: 0.1,
+    candidateMapItemKind: null,
     recommendedNextMode: "EXPLORE",
     reasonForRecommendation: "Important context is still missing.",
   });
@@ -24,6 +25,27 @@ test("EXPLORE output keeps the visible reply separate from valid internal signal
 test("EXPLORE rejects invalid mode signals and empty messages", () => {
   assert.equal(exploreMessageSchema.safeParse("   ").success, false);
   assert.equal(exploreResponseSchema.safeParse({ reply: "Hello", currentMode: "ADVISE" }).success, false);
+});
+
+test("EXPLORE candidate state requires a classified item", () => {
+  const base = exploreResponseSchema.parse({
+    reply: "Something specific is taking shape.",
+    currentMode: "EXPLORE",
+    responseApproach: "CONNECT",
+    questionPurpose: null,
+    privateAstrologyInfluence: null,
+    understandingStatus: "clearer",
+    importantObservations: [],
+    unresolvedQuestions: [],
+    candidateMapItemSignal: true,
+    candidateMapItemConfidence: 0.8,
+    candidateMapItemKind: "INSIGHT",
+    recommendedNextMode: "RECOGNIZE",
+    reasonForRecommendation: "There is a specific understanding to evaluate.",
+  });
+  const signals = exploreSignalsSchema.parse(base);
+  assert.equal(hasConsistentExploreCandidate(signals), true);
+  assert.equal(hasConsistentExploreCandidate({ ...signals, candidateMapItemKind: null }), false);
 });
 
 test("conversation titles are compact and single-line", () => {

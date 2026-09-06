@@ -1,6 +1,6 @@
 # Project Progress
 
-Last updated: 2026-09-05
+Last updated: 2026-09-06
 
 ## Implemented
 
@@ -77,17 +77,23 @@ Last updated: 2026-09-05
 - Aligned Chart-at-a-glance synthesis with AstroCoach's shared trusted-friend voice. Theme generation now treats the authored catalogs as meaning rather than writing style, uses concrete everyday language and short sentences, includes positive style examples in English and equivalent natural-Spanish guidance, and versions the interpretation schema so previously stored themes regenerate under the updated prompt.
 - Added cached English and Spanish presentations for all five generated themes without duplicating the authored source catalogs or translating on page view. Each persistent theme card can open an editable conversation starter; the selected stable theme ID is authenticated against the user's current interpretation, stored separately from the visible user message, and pinned in first-response retrieval without changing its symbolic-not-evidence status.
 - Completed the chart-interpretation slice: the authored library, deterministic matching and ranking, anchored/emergent synthesis, provenance-safe retrieval, bilingual post-Discovery browsing experience, persistent chart route, and theme-to-conversation handoff are implemented and verified. Full placement/aspect browsing, aspect interpretations, dignity metadata, and richer Map content remain separate product slices.
-- Wired My Map as the parent navigation hub around the natal chart, with direct access to the existing `/{locale}/chart` experience and the nested Patterns route. The hub uses a clean, responsive radial arrangement with the natal chart at its center and simple product-consistent cards for Patterns, Insights, and Practices. Moved the existing active and archived Pattern management view behind `/{locale}/map/patterns`, kept My Map highlighted throughout chart and Map subsection navigation, and retained the prepared Insights and Practices destinations as empty future sections.
+- Wired My Map as the parent navigation hub around the natal chart, with direct access to the existing `/{locale}/chart` experience and nested Patterns, Insights, and Practices routes. The hub uses a clean, responsive radial arrangement with the natal chart at its center and keeps My Map highlighted throughout chart and Map subsection navigation.
 - Replaced raw-chart prompt dumps in Initial Discovery, EXPLORE, and RECOGNIZE with bounded topic-relevant retrieval of at most three themes and six matched factors. Stored and retrieved envelopes carry machine-readable natal-interpretation provenance and an evidence status that explicitly prevents symbolic material from counting toward lived observations, evidence strength, candidate confidence, or recognition thresholds.
 - Added authenticated JSON conversation export to the three-dot menu for active and archived conversations, with versioned conversation lifecycle metadata, chronologically ordered message content, reply linkage, model/provider identifiers, and structured internal signals. Current profile-level astrology preferences are intentionally omitted because they are not persisted per message.
+- Generalized recognized persistence from Pattern-only records to typed Map items while preserving existing Pattern rows and identifiers. RECOGNIZE now identifies “something worth keeping,” system-classifies it as Pattern or Insight, supports Insight recognition without artificial recurrence, and retains compatibility with earlier stored Pattern signals.
+- Added real Insights and Practices sections to My Map, shared editing and recoverable archiving for Patterns and Insights, item detail pages, and an authenticated handoff from either item type into INTEGRATE.
+- Implemented the first intentionally small INTEGRATE loop: explicit intention, one model-personalized Practice constrained to a supported purpose/primitive toolkit, activation, return to life, and small persisted observations as new evidence. Only one Practice may be active for a Map item, familiar choices remain valid evidence, and contradictory lived evidence can recommend renewed recognition.
+- Added code-level validation for model-owned versus application-owned state, supported Practice pairings, candidate classification consistency, and expanded provider-independent prompt regression scenarios for Insights and Integration.
+- Verified the completed slice with Prisma schema validation, linting, strict TypeScript checking, all 22 test files, and a production Next.js build.
 
 ## Remaining
 
 - Apply the pending natal-interpretation and Chart-at-a-glance onboarding-state migrations before deploying or manually testing the completed chart-interpretation feature against a database.
 - Add conversation-title editing after the core navigation is evaluated.
-- Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness and RECOGNIZE accuracy, especially cadence, premature invitations, partial agreement, rejection, and revised wording.
-- Add richer Pattern detail and conversation-provenance views after validating that saved formulations are useful.
-- Implement DEEP_EXPLORE only after recognized Patterns and their handoff behavior are stable.
+- Apply the pending Map-item/Insight/Integration migration before manually exercising the new loop against a database.
+- Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness, Pattern-versus-Insight classification, RECOGNIZE accuracy, and bounded Practice generation.
+- Add richer Map-item provenance and longitudinal Integration behavior only after the small intention → Practice → life → observation loop is useful in practice.
+- Implement DEEP_EXPLORE as a separate product slice; it is not a prerequisite for Insight recognition or persistence.
 - Manually verify microphone permission, recording, cancellation, and transcription on an installed iPhone and Android PWA.
 
 ## Known issues and open questions
@@ -103,6 +109,4 @@ Last updated: 2026-09-05
 
 ## Next planned slice
 
-The chart-interpretation slice and initial My Map route wiring are complete. Further Map layout or content changes should follow the user's dedicated Map design direction.
-
-Apply the Pattern and conversation archiving migrations, then manually exercise Pattern editing/archive/restore, conversation archive/restore/permanent deletion, the Conversations new-conversation entry point, Home and open-chat voice transcription on iPhone and Android, and all four RECOGNIZE candidate-evaluation paths. Run the expanded prompt regression set against the configured model before considering richer Pattern detail or DEEP_EXPLORE.
+Apply the pending migrations, then manually exercise both Pattern and Insight recognition, Map-item editing/archive/restore, intention-to-Practice activation, return-to-life observations, Practice editing/archive/reactivation, and all four RECOGNIZE evaluation paths. Run the expanded prompt regression set against the configured model before extending Integration longitudinally or starting DEEP_EXPLORE.

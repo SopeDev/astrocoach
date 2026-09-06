@@ -1,4 +1,4 @@
-import { exploreSignalsSchema } from "./explore-contract";
+import { parseStoredExploreSignals } from "./explore-contract";
 
 const READINESS_CONFIDENCE = 0.7;
 const REQUIRED_REOFFER_RESPONSES = 2;
@@ -17,12 +17,11 @@ export function shouldOfferRecognition(messages: SignalMessage[], transitionRefe
     : messagesSinceReference.slice(-1);
   const eligible = candidates
     .filter((message) => {
-      const parsed = exploreSignalsSchema.safeParse(message.internalSignals);
-      if (!parsed.success) return false;
-      const signal = parsed.data;
+      const signal = parseStoredExploreSignals(message.internalSignals);
+      if (!signal) return false;
       return (
-        signal.candidatePatternSignal &&
-        signal.candidatePatternConfidence >= READINESS_CONFIDENCE &&
+        signal.candidateMapItemSignal &&
+        signal.candidateMapItemConfidence >= READINESS_CONFIDENCE &&
         signal.recommendedNextMode === "RECOGNIZE" &&
         (signal.understandingStatus === "clearer" || signal.understandingStatus === "sufficient")
       );

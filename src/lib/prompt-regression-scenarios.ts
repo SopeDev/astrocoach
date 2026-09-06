@@ -1,6 +1,6 @@
 export type PromptRegressionScenario = {
   id: string;
-  mode: "DISCOVERY" | "EXPLORE" | "RECOGNIZE";
+  mode: "DISCOVERY" | "EXPLORE" | "RECOGNIZE" | "INTEGRATE";
   setup: string[];
   chartSignal: string | null;
   expected: string[];
@@ -130,7 +130,7 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
     setup: ["The user offers broad theories about multiple partners and childhood repetition but no concrete independent episodes."],
     chartSignal: "Twelfth-house symbolism makes rescue dynamics worth examining but supplies no lived evidence.",
     expected: ["Treat the theory as a hypothesis rather than recurrence.", "Seek one concrete episode and distinguish communication, observable behavior, the user's participation, and interpretation."],
-    forbidden: ["Setting candidatePatternSignal from theory alone", "Counting several descriptions of the same relationship as distinct observations", "Elaborating absent partners' psychology as fact"],
+    forbidden: ["Setting candidateMapItemSignal from theory alone", "Counting several descriptions of the same relationship as distinct observations", "Elaborating absent partners' psychology as fact"],
   },
   {
     id: "explore-asymmetry-without-moralizing",
@@ -153,7 +153,7 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
     mode: "RECOGNIZE",
     setup: ["Several descriptions come from one episode after focused work.", "Both reward-after-effort and private-unstructured-opportunity remain plausible."],
     chartSignal: "A private theme suggests testing structure versus permission, but supplies no evidence.",
-    expected: ["Use HYPOTHESIS_TESTING.", "Ask at most one question that distinguishes the competing explanations.", "Keep candidatePattern null."],
+    expected: ["Use HYPOTHESIS_TESTING.", "Ask at most one question that distinguishes the competing explanations.", "Keep candidateMapItem null."],
     forbidden: ["Immediate candidate formulation", "OFFER_SAVE", "Counting astrology as support"],
   },
   {
@@ -187,6 +187,54 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
     chartSignal: "A stored Chart-at-a-glance theme and several authored snippets all point toward the same symbolic possibility.",
     expected: ["Use the symbolism only to guide a tentative distinction or question.", "Keep evidence strength based solely on the one lived episode.", "Remain in hypothesis testing or return to EXPLORE."],
     forbidden: ["Adding chart factors or generated themes to supportingObservations", "Raising candidate confidence because several astrological sources agree", "Presenting a recurring Pattern"],
+  },
+  {
+    id: "recognize-insight-without-recurrence",
+    mode: "RECOGNIZE",
+    setup: ["One well-supported exchange produces a precise understanding worth keeping.", "The understanding does not claim recurrence across situations."],
+    chartSignal: null,
+    expected: ["Classify the candidate as an Insight.", "Allow evaluation without requiring multiple independent episodes."],
+    forbidden: ["Forcing a Pattern classification", "Inventing recurrence to satisfy Pattern evidence rules"],
+  },
+  {
+    id: "recognize-system-classifies-map-item",
+    mode: "RECOGNIZE",
+    setup: ["The user accepts a candidate understanding.", "The application needs a persistence-ready Map item."],
+    chartSignal: null,
+    expected: ["Classify a recurring relationship as Pattern and a non-recurring understanding as Insight.", "Present one save action without asking the user to choose a type."],
+    forbidden: ["A Pattern-versus-Insight picker", "Saving an unclassified candidate"],
+  },
+  {
+    id: "integrate-one-bounded-practice",
+    mode: "INTEGRATE",
+    setup: ["The user has chosen one recognized Map item and stated an integration intention.", "One realistic cue and Junction are sufficiently clear."],
+    chartSignal: "Natal context may help personalize language but does not determine an intervention.",
+    expected: ["Propose exactly one small Practice using one supported purpose and primitive pairing.", "Make the instruction one memorable action tied to a realistic cue."],
+    forbidden: ["A multi-step program", "Several exercises to choose from", "Astrology prescribing the Practice"],
+  },
+  {
+    id: "integrate-life-observation-is-evidence",
+    mode: "INTEGRATE",
+    setup: ["An active Practice exists.", "The user reports noticing the cue but making the familiar choice."],
+    chartSignal: null,
+    expected: ["Treat the observation as new evidence rather than failure.", "Extract a small learning and avoid proposing another Practice in the same response."],
+    forbidden: ["Moralizing the familiar choice", "Escalating to a stricter program", "Replacing the Practice immediately"],
+  },
+  {
+    id: "integrate-cue-too-late",
+    mode: "INTEGRATE",
+    setup: ["The user consistently notices only after the meaningful choice point has passed."],
+    chartSignal: null,
+    expected: ["Recognize that the current cue arrives too late.", "Use the observation to refine future integration reasoning."],
+    forbidden: ["Blaming lack of discipline", "Adding more steps to the active Practice"],
+  },
+  {
+    id: "integrate-evidence-can-reopen-recognition",
+    mode: "INTEGRATE",
+    setup: ["A life observation materially contradicts the focal Map item."],
+    chartSignal: "The chart still supports the old interpretation symbolically.",
+    expected: ["Let lived evidence challenge the saved understanding.", "Set the revision signal and recommend RECOGNIZE."],
+    forbidden: ["Defending the focal item with astrology", "Treating a saved Map item as permanently true"],
   },
   {
     id: "deep-no-forced-astrology",

@@ -43,8 +43,44 @@ enum AstrologyStyle {
 enum ConversationMode {
   EXPLORE
   RECOGNIZE
+  INTEGRATE
 
   @@map("conversation_mode")
+}
+
+enum MapItemKind {
+  PATTERN
+  INSIGHT
+
+  @@map("map_item_kind")
+}
+
+enum PracticePurpose {
+  NOTICE_EARLIER
+  CREATE_SPACE
+  CHECK_INTENTION
+  CHOOSE_CONSCIOUSLY
+  LEARN_AFTER
+
+  @@map("practice_purpose")
+}
+
+enum PracticePrimitive {
+  NAME_CUE
+  PAUSE
+  ASK_ONE_QUESTION
+  MAKE_ONE_CHOICE
+  NOTE_AFTERWARD
+
+  @@map("practice_primitive")
+}
+
+enum PracticeStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+
+  @@map("practice_status")
 }
 
 enum ConversationTransitionState {
@@ -71,17 +107,17 @@ enum MessageRole {
 }
 
 model User {
-  id                   String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String?              @map("display_name")
-  email                String?              @unique
-  emailVerified        DateTime?            @map("email_verified") @db.Timestamptz(6)
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String?               @map("display_name")
+  email                String?               @unique
+  emailVerified        DateTime?             @map("email_verified") @db.Timestamptz(6)
   image                String?
-  locale               Locale               @default(en)
-  theme                Theme                @default(system)
-  astrologyFamiliarity AstrologyFamiliarity @default(basic) @map("astrology_familiarity")
-  astrologyStyle       AstrologyStyle       @default(balanced) @map("astrology_style")
-  createdAt            DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt            DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  locale               Locale                @default(en)
+  theme                Theme                 @default(system)
+  astrologyFamiliarity AstrologyFamiliarity  @default(basic) @map("astrology_familiarity")
+  astrologyStyle       AstrologyStyle        @default(balanced) @map("astrology_style")
+  createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
   accounts             Account[]
   sessions             Session[]
   birthProfile         BirthProfile?
@@ -89,7 +125,9 @@ model User {
   natalInterpretation  NatalInterpretation?
   initialIntent        InitialIntent?
   conversations        Conversation[]
-  patterns             Pattern[]
+  mapItems             MapItem[]
+  practices            Practice[]
+  practiceObservations PracticeObservation[]
 
   @@map("users")
 }
@@ -97,6 +135,7 @@ model User {
 model Conversation {
   id                    String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId                String                      @map("user_id") @db.Uuid
+  focalMapItemId        String?                     @map("focal_map_item_id") @db.Uuid
   mode                  ConversationMode            @default(EXPLORE)
   status                ConversationStatus          @default(active)
   transitionState       ConversationTransitionState @default(IDLE) @map("transition_state")
@@ -107,50 +146,104 @@ model Conversation {
   createdAt             DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt             DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
   user                  User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  focalMapItem          MapItem?                    @relation("ConversationFocalMapItem", fields: [focalMapItemId], references: [id], onDelete: SetNull)
   messages              Message[]
-  patterns              Pattern[]
+  sourceMapItems        MapItem[]                   @relation("MapItemSourceConversation")
+  practices             Practice[]
+  practiceObservations  PracticeObservation[]
 
   @@index([userId, lastMessageAt(sort: Desc)])
   @@index([userId, archivedAt, lastMessageAt(sort: Desc)])
+  @@index([focalMapItemId])
   @@map("conversations")
 }
 
 model Message {
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  conversationId    String           @map("conversation_id") @db.Uuid
-  role              MessageRole
-  mode              ConversationMode @default(EXPLORE)
-  content           String           @db.Text
-  internalSignals   Json?            @map("internal_signals")
-  model             String?
-  responseId        String?          @map("response_id")
-  inReplyToId       String?          @unique @map("in_reply_to_id") @db.Uuid
-  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
-  conversation      Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  inReplyTo         Message?         @relation("MessageReply", fields: [inReplyToId], references: [id], onDelete: SetNull)
-  reply             Message?         @relation("MessageReply")
-  recognizedPattern Pattern?
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversationId      String               @map("conversation_id") @db.Uuid
+  role                MessageRole
+  mode                ConversationMode     @default(EXPLORE)
+  content             String               @db.Text
+  internalSignals     Json?                @map("internal_signals")
+  model               String?
+  responseId          String?              @map("response_id")
+  inReplyToId         String?              @unique @map("in_reply_to_id") @db.Uuid
+  createdAt           DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  conversation        Conversation         @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  inReplyTo           Message?             @relation("MessageReply", fields: [inReplyToId], references: [id], onDelete: SetNull)
+  reply               Message?             @relation("MessageReply")
+  recognizedMapItem   MapItem?
+  proposedPractice    Practice?
+  practiceObservation PracticeObservation?
 
   @@index([conversationId, createdAt])
   @@map("messages")
 }
 
-model Pattern {
-  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId          String        @map("user_id") @db.Uuid
-  conversationId  String?       @map("conversation_id") @db.Uuid
-  sourceMessageId String?       @unique @map("source_message_id") @db.Uuid
-  statement       String        @db.Text
-  archivedAt      DateTime?     @map("archived_at") @db.Timestamptz(6)
-  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  conversation    Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
-  sourceMessage   Message?      @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
+model MapItem {
+  id                       String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                   String         @map("user_id") @db.Uuid
+  conversationId           String?        @map("conversation_id") @db.Uuid
+  sourceMessageId          String?        @unique @map("source_message_id") @db.Uuid
+  kind                     MapItemKind    @default(PATTERN)
+  statement                String         @db.Text
+  archivedAt               DateTime?      @map("archived_at") @db.Timestamptz(6)
+  createdAt                DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user                     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceConversation       Conversation?  @relation("MapItemSourceConversation", fields: [conversationId], references: [id], onDelete: SetNull)
+  sourceMessage            Message?       @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
+  integrationConversations Conversation[] @relation("ConversationFocalMapItem")
+  practices                Practice[]
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, archivedAt, createdAt(sort: Desc)])
-  @@map("patterns")
+  @@index([userId, kind, archivedAt, createdAt(sort: Desc)])
+  @@map("map_items")
+}
+
+model Practice {
+  id              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String                @map("user_id") @db.Uuid
+  mapItemId       String                @map("map_item_id") @db.Uuid
+  conversationId  String?               @map("conversation_id") @db.Uuid
+  sourceMessageId String?               @unique @map("source_message_id") @db.Uuid
+  intention       String                @db.Text
+  purpose         PracticePurpose
+  primitive       PracticePrimitive
+  instruction     String                @db.Text
+  cue             String                @db.Text
+  status          PracticeStatus        @default(ACTIVE)
+  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime              @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mapItem         MapItem               @relation(fields: [mapItemId], references: [id], onDelete: Cascade)
+  conversation    Conversation?         @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  sourceMessage   Message?              @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
+  observations    PracticeObservation[]
+
+  @@index([userId, status, createdAt(sort: Desc)])
+  @@index([mapItemId, status])
+  @@map("practices")
+}
+
+model PracticeObservation {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String        @map("user_id") @db.Uuid
+  practiceId      String        @map("practice_id") @db.Uuid
+  conversationId  String?       @map("conversation_id") @db.Uuid
+  sourceMessageId String?       @unique @map("source_message_id") @db.Uuid
+  content         String        @db.Text
+  learning        String?       @db.Text
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  practice        Practice      @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+  conversation    Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  sourceMessage   Message?      @relation(fields: [sourceMessageId], references: [id], onDelete: SetNull)
+
+  @@index([practiceId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("practice_observations")
 }
 
 model InitialIntent {

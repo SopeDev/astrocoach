@@ -17,7 +17,7 @@ import {
   retrieveNatalInterpretation,
   type NatalInterpretationDocument,
 } from "@/lib/natal-interpretation";
-import { type CandidateEvaluationPromptContext, recognizeResponseSchema } from "@/lib/recognize-contract";
+import { isValidGeneratedRecognizeSignals, type CandidateEvaluationPromptContext, type CandidateMapItem, recognizeResponseSchema } from "@/lib/recognize-contract";
 
 type ThreadMessage = { role: "user" | "assistant"; content: string };
 
@@ -27,19 +27,21 @@ function exchanges(questions: unknown, answers: unknown) {
   return parsedQuestions.map((question, index) => ({ question, answer: parsedAnswers[index] ?? "" }));
 }
 
-const RECOGNIZE_INSTRUCTIONS = `Operate in RECOGNIZE. Determine whether the user's lived evidence supports a small, specific recurring relationship and formulate it collaboratively. Before proposing a Pattern, identify plausible competing explanations and test the strongest unresolved variable when its answer could materially change the formulation. When the user broadens a possible pattern beyond the examples already discussed, seek one independent lived example or cross-context contrast before persisting that broader scope. Do not prolong testing when the evidence already discriminates clearly, and do not force a Pattern when none is defensible.
+const RECOGNIZE_INSTRUCTIONS = `Operate in RECOGNIZE. Determine whether the conversation contains a specific understanding that is accurate enough and meaningful enough for the user to consider keeping. Classify it as PATTERN when it describes a recurring relationship supported by multiple distinct lived observations. Classify it as INSIGHT when it is a meaningful understanding that does not claim recurrence. The classification is application-facing; do not ask the user to choose a type. Before proposing an item, identify plausible competing explanations and test the strongest unresolved variable when its answer could materially change the formulation. When a proposed Pattern broadens beyond the examples already discussed, seek one independent lived example or cross-context contrast before persisting that broader scope. Do not prolong testing when the evidence already discriminates clearly, and do not manufacture an item merely to complete the conversation.
 
-During HYPOTHESIS_TESTING, candidatePattern must be null, userEvaluationStatus must be awaiting or uncertain, and proposedMapAction must be NONE. Ask at most one concise discriminating question, or reflect the unresolved distinction when a question is not yet useful. A user's answer to a testing question is evidence, not acceptance of a Pattern that has not yet been presented.
+During HYPOTHESIS_TESTING, candidateMapItem must be null, userEvaluationStatus must be awaiting or uncertain, and proposedMapAction must be NONE. Ask at most one concise discriminating question, or reflect the unresolved distinction when a question is not yet useful. A user's answer to a testing question is evidence, not acceptance of an item that has not yet been presented.
 
-Once the smallest defensible relationship is supported, move to CANDIDATE_EVALUATION, formulate it clearly and naturally rather than as a fixed identity, and briefly connect it to distinct lived observations when useful. The visible reply may introduce or contextualize what has been recognized, but must not ask the user to confirm, reject, revise, or save it. Do not end with questions such as "Does that fit?", "Does that feel accurate?", or "Would you like to save this?" The application renders candidate-evaluation controls. Whenever you present a candidate for evaluation, set userEvaluationStatus to awaiting and proposedMapAction to NONE. Never produce VALIDATED, accepted, or OFFER_SAVE from conversational text; explicit application evaluation owns those state changes.
+Once the smallest defensible understanding is supported, move to CANDIDATE_EVALUATION, formulate it clearly and naturally rather than as a fixed identity, classify it, and briefly connect it to lived observations when useful. A Pattern must describe a recurring relationship, while an Insight may name a meaningful non-recurring understanding. The visible reply may introduce or contextualize what has been recognized, but must not ask the user to confirm, reject, revise, or save it. Do not end with questions such as "Does that fit?", "Does that feel accurate?", or "Would you like to save this?" The application renders candidate-evaluation controls. Whenever you present a candidate for evaluation, set userEvaluationStatus to awaiting and proposedMapAction to NONE. Never produce VALIDATED, accepted, or OFFER_SAVE from conversational text; explicit application evaluation owns those state changes.
 
 Privately form a holistic evolutionary/Kabbalistic reading from the smallest set of natal factors relevant to the possible pattern. Use it to distinguish competing explanations, suggest a cross-domain test, or place an evidence-grounded recurrence in a larger developmental context. When relevant, make that interpretation substantive rather than ornamental. Record briefly in privateAstrologyInfluence how the synthesis changed the response, or null if it adds nothing. Use only lived observations for supportingObservations and evidenceStrength; astrology may enrich the interpretation but not those fields. Let astrologyStyle control visibility and astrologyFamiliarity control how visible terminology is explained.
 
-When candidateEvaluationContext is PARTLY, the user has recognized something in the prior candidate but has not validated it. Treat the latest message as a correction, qualification, narrowing, or rewording. Preserve the prior candidate and supporting evidence as context. Present a revised candidate for application evaluation when defensible; return to HYPOTHESIS_TESTING only if the correction materially undermines its evidence.
+When candidateEvaluationContext is PARTLY, the user has recognized something in the prior candidate but has not validated it. Treat the latest message as a correction, qualification, narrowing, reclassification, or rewording. Preserve the prior candidate and supporting evidence as context. Present a revised candidate for application evaluation when defensible; return to HYPOTHESIS_TESTING only if the correction materially undermines its evidence.
 
 When candidateEvaluationContext is LET_ME_EXPLAIN, the user has deliberately made no positive or negative evaluation. Treat the latest message as additional lived evidence. You may revise, narrow, abandon, or retest the candidate according to what they say. Do not interpret their explanation itself as application-owned acceptance, partial agreement, or rejection. If a candidate remains or becomes defensible, present it in CANDIDATE_EVALUATION with awaiting status so the controls appear again.
 
 Only the application's NO action creates REJECTED/rejected state. If conversational evidence undermines a candidate after PARTLY or LET_ME_EXPLAIN, return to HYPOTHESIS_TESTING with awaiting or uncertain status, or recommend EXPLORE without classifying the UI evaluation for the user.
+
+If focalMapItem is supplied, INTEGRATE produced lived evidence that may challenge that saved item. Treat the saved wording as revisable, not as a fact to defend. Evaluate the new evidence and present the smallest defensible revision or reclassification for application-owned evaluation when supported.
 
 If new lived evidence contradicts a proposition or astrological framing, respond naturally and visibly change your mind instead of defending it. Astrological interpretation may enrich the visible formulation according to the user's preferences, but a candidate must stand on lived evidence alone. Do not prescribe a solution or behavioral intervention.`;
 
@@ -59,6 +61,7 @@ export async function generateRecognizeResponse({
   latestMessage,
   opening,
   candidateEvaluationContext,
+  focalMapItem = null,
 }: {
   locale: Locale;
   lifeAreaKeys: LifeAreaKey[];
@@ -75,6 +78,7 @@ export async function generateRecognizeResponse({
   latestMessage: string | null;
   opening: boolean;
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
+  focalMapItem?: CandidateMapItem | null;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -106,6 +110,7 @@ export async function generateRecognizeResponse({
         privateInterpretationContext,
         astrologyFamiliarity,
         astrologyStyle,
+        focalMapItem,
       },
       candidateEvaluationContext: candidateEvaluationContext ?? null,
       conversationThread: thread,
@@ -116,5 +121,6 @@ export async function generateRecognizeResponse({
 
   if (!response.output_parsed) throw new Error("The model did not return a valid RECOGNIZE response");
   const { reply, ...signals } = response.output_parsed;
+  if (!isValidGeneratedRecognizeSignals(signals)) throw new Error("The model returned application-owned RECOGNIZE state");
   return { reply, signals, model: response.model, responseId: response.id };
 }

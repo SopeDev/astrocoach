@@ -195,7 +195,7 @@ Recurring relationships the user has explicitly recognized.
 
 A Pattern should describe a relationship rather than an identity.
 
-A system hypothesis is not yet a saved Pattern.
+A system hypothesis is not yet a saved Map item.
 
 The distinction is:
 
@@ -206,11 +206,13 @@ The distinction is:
 
 Meaningful understandings that do not necessarily describe repetition.
 
+An Insight can emerge naturally from EXPLORE, RECOGNIZE, or DEEP_EXPLORE. It does not need an artificial recurrence test merely to become persistable.
+
 ### Practices
 
 Small real-world experiments intended to help the user notice or work with something they already recognize.
 
-Practices are not rules. They are experiments.
+Practices are not rules. They are experiments and the main current tool of INTEGRATE, not its purpose.
 
 ### Possible Future Additions
 
@@ -268,9 +270,9 @@ Used when the user brings a new experience or when meaning remains unclear.
 
 Primary question:
 
-> **Is something meaningful repeating?**
+> **Is there something here worth keeping?**
 
-Used when enough lived evidence exists to formulate a Candidate Pattern.
+Used when enough lived evidence exists to formulate a Candidate Map item. AstroCoach classifies it as a Pattern when it claims supported recurrence or an Insight when it is a meaningful understanding without a recurrence claim; the user evaluates the formulation rather than choosing its type.
 
 ### DEEP_EXPLORE
 
@@ -290,16 +292,16 @@ Used when the user wants to notice a recognized Pattern in real time or work wit
 
 ---
 
-## 10. Pattern Lifecycle
+## 10. Recognition Lifecycle
 
-A typical Pattern lifecycle is:
+A typical recognition lifecycle is:
 
 1. User reports lived experiences.
 2. EXPLORE gathers observations and context.
-3. The system detects possible recurrence.
-4. A Candidate Pattern is formed.
+3. The system detects a specific understanding worth evaluating. Recurrence is required only when the candidate claims to be a Pattern.
+4. A Candidate Map item is formed and system-classified as a Pattern or Insight.
 5. RECOGNIZE presents the proposition naturally without asking for confirmation in its prose.
-6. Application controls let the user accept it exactly, mark it partial, reject it, or explain before evaluating.
+6. Application controls let the user accept it exactly, mark it partial, reject it, or explain before evaluating; they do not ask the user to classify it.
 7. If explicitly accepted, a separate application action can add it to My Map.
 8. The user chooses what to do next.
 
@@ -307,7 +309,7 @@ After recognition, the user may:
 
 ### Leave it here
 
-The Pattern remains in My Map.
+The Pattern or Insight remains in My Map.
 
 ### Understand it more deeply
 
@@ -337,11 +339,13 @@ It may be:
 - a familiar decision point,
 - or a specific sequence of events.
 
-Integration should help the user identify what their Pattern looks like while it is unfolding.
+Integration should help the user make the recognized understanding available while life is unfolding. For the first implementation, keep the loop small: intention → one Practice → life → a small observation → new evidence.
 
 A Practice may simply be:
 
 > When you notice the cue, name what is happening.
+
+Generate a Practice by choosing one purpose from a small supported toolkit — notice earlier, create space, check intention, choose consciously, or learn afterward — and one compatible primitive such as naming a cue, pausing, asking one question, making one choice, or noting afterward. Personalize the cue and wording; do not use canned exercises or generate an unrestricted program.
 
 The goal is to move through stages such as:
 
@@ -499,15 +503,16 @@ The MVP should demonstrate that AstroCoach can:
 2. use evolutionary/Kabbalistic astrology to create relevant holistic interpretations and inquiry,
 3. converse naturally about lived experience,
 4. remain in EXPLORE without forcing interpretation,
-5. detect when a Candidate Pattern may be warranted,
-6. present the Pattern through RECOGNIZE,
+5. detect when a Candidate Pattern or Insight may be warranted,
+6. present the system-classified Map item through RECOGNIZE,
 7. allow the user to accept, reject, or modify it,
 8. store user-confirmed Patterns and Insights in My Map,
-9. reopen a Map item for DEEP_EXPLORE,
+9. reopen a Map item for INTEGRATE, while keeping DEEP_EXPLORE as an independent later slice,
 10. use astrology as a deeper symbolic and developmental framework,
 11. let the user choose INTEGRATE,
-12. create a simple Practice,
-13. reuse relevant Map knowledge in future conversations.
+12. create one bounded, personalized Practice,
+13. return a small lived observation as new evidence,
+14. reuse relevant Map knowledge in future conversations.
 
 That is already a complete product experiment.
 

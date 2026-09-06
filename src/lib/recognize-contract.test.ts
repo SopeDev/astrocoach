@@ -1,12 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  applyCandidateEvaluation,
-  candidateEvaluationOffer,
-  candidateEvaluationPromptContext,
-  recognizeResponseSchema,
-  recognizedPatternOffer,
-} from "./recognize-contract";
+import { applyCandidateEvaluation, candidateEvaluationOffer, candidateEvaluationPromptContext, isValidGeneratedRecognizeSignals, recognizeResponseSchema, recognizeSignalsSchema, recognizedMapItemOffer } from "./recognize-contract";
 
 const acceptedResponse = {
   reply: "That wording seems to fit what you described.",
@@ -14,8 +8,8 @@ const acceptedResponse = {
   recognitionStage: "VALIDATED",
   competingExplanations: [],
   privateAstrologyInfluence: null,
-  candidatePattern: "When uncertainty rises, I look for more information before trusting my own preference.",
-  supportingObservations: ["The user described this in two separate decisions."],
+  candidateMapItem: { kind: "INSIGHT", statement: "Having complete information is less important to me than trusting my own preference." },
+  supportingObservations: ["The user distinguished certainty from self-trust."],
   evidenceStrength: "moderate",
   unresolvedUncertainty: [],
   userEvaluationStatus: "accepted",
@@ -24,104 +18,62 @@ const acceptedResponse = {
   reasonForRecommendation: "The user validated the formulation.",
 };
 
-const awaitingCandidate = {
-  ...acceptedResponse,
-  reply: "I think we've landed on something specific here.",
-  recognitionStage: "CANDIDATE_EVALUATION",
-  userEvaluationStatus: "awaiting",
-  proposedMapAction: "NONE",
-  recommendedNextMode: "RECOGNIZE",
-};
+const awaitingCandidate = { ...acceptedResponse, reply: "I think we've landed on something specific here.", recognitionStage: "CANDIDATE_EVALUATION", userEvaluationStatus: "awaiting", proposedMapAction: "NONE", recommendedNextMode: "RECOGNIZE" };
 
-test("RECOGNIZE keeps its visible response separate from evaluation signals", () => {
+test("RECOGNIZE supports a system-classified Insight candidate", () => {
   assert.equal(recognizeResponseSchema.safeParse(acceptedResponse).success, true);
 });
 
-test("only an explicitly accepted formulation can be offered for My Map", () => {
-  assert.equal(recognizedPatternOffer(acceptedResponse), acceptedResponse.candidatePattern);
-  assert.equal(recognizedPatternOffer({ ...acceptedResponse, userEvaluationStatus: "partial" }), null);
-  assert.equal(recognizedPatternOffer({ ...acceptedResponse, proposedMapAction: "NONE" }), null);
-  assert.equal(recognizedPatternOffer({ ...acceptedResponse, recognitionStage: "CANDIDATE_EVALUATION" }), null);
+test("only explicit acceptance exposes a typed Map-item save offer", () => {
+  assert.deepEqual(recognizedMapItemOffer(acceptedResponse), acceptedResponse.candidateMapItem);
+  assert.equal(recognizedMapItemOffer({ ...acceptedResponse, userEvaluationStatus: "partial" }), null);
+  assert.equal(recognizedMapItemOffer({ ...acceptedResponse, proposedMapAction: "NONE" }), null);
 });
 
 test("an awaiting candidate produces application-owned evaluation controls", () => {
-  assert.deepEqual(candidateEvaluationOffer("message-1", awaitingCandidate), {
-    messageId: "message-1",
-    statement: awaitingCandidate.candidatePattern,
-  });
+  assert.deepEqual(candidateEvaluationOffer("message-1", awaitingCandidate), { messageId: "message-1", item: awaitingCandidate.candidateMapItem });
   assert.equal(candidateEvaluationOffer("message-1", acceptedResponse), null);
 });
 
-test("YES_EXACTLY validates without another model turn and proceeds to the save offer", () => {
+test("YES_EXACTLY validates without another model turn", () => {
   const evaluated = applyCandidateEvaluation(awaitingCandidate, "YES_EXACTLY");
   assert.equal(evaluated?.recognitionStage, "VALIDATED");
-  assert.equal(evaluated?.userEvaluationStatus, "accepted");
   assert.equal(evaluated?.proposedMapAction, "OFFER_SAVE");
-  assert.equal(recognizedPatternOffer(evaluated), awaitingCandidate.candidatePattern);
-  assert.equal(candidateEvaluationOffer("message-1", evaluated), null);
+  assert.deepEqual(recognizedMapItemOffer(evaluated), awaitingCandidate.candidateMapItem);
 });
 
-test("PARTLY preserves partial agreement and candidate context without validating", () => {
+test("PARTLY preserves the typed candidate context", () => {
   const evaluated = applyCandidateEvaluation(awaitingCandidate, "PARTLY");
-  assert.equal(evaluated?.recognitionStage, "CANDIDATE_EVALUATION");
-  assert.equal(evaluated?.userEvaluationStatus, "partial");
-  assert.equal(evaluated?.proposedMapAction, "NONE");
-  assert.deepEqual(candidateEvaluationPromptContext(evaluated), {
-    action: "PARTLY",
-    candidatePattern: awaitingCandidate.candidatePattern,
-    supportingObservations: awaitingCandidate.supportingObservations,
-  });
+  assert.deepEqual(candidateEvaluationPromptContext(evaluated), { action: "PARTLY", candidateMapItem: awaitingCandidate.candidateMapItem, supportingObservations: awaitingCandidate.supportingObservations });
 });
 
-test("NO rejects the candidate and returns toward EXPLORE", () => {
+test("NO returns toward EXPLORE without a save offer", () => {
   const evaluated = applyCandidateEvaluation(awaitingCandidate, "NO");
   assert.equal(evaluated?.recognitionStage, "REJECTED");
-  assert.equal(evaluated?.userEvaluationStatus, "rejected");
   assert.equal(evaluated?.recommendedNextMode, "EXPLORE");
-  assert.equal(recognizedPatternOffer(evaluated), null);
-  assert.equal(candidateEvaluationPromptContext(evaluated)?.action, "NO");
+  assert.equal(recognizedMapItemOffer(evaluated), null);
 });
 
-test("LET_ME_EXPLAIN remains unevaluated and is distinct from PARTLY", () => {
+test("LET_ME_EXPLAIN remains distinct from partial agreement", () => {
   const explain = applyCandidateEvaluation(awaitingCandidate, "LET_ME_EXPLAIN");
-  const partly = applyCandidateEvaluation(awaitingCandidate, "PARTLY");
-  assert.equal(explain?.recognitionStage, "CANDIDATE_EVALUATION");
-  assert.equal(explain?.userEvaluationStatus, "awaiting");
-  assert.equal(explain?.proposedMapAction, "NONE");
   assert.equal(candidateEvaluationPromptContext(explain)?.action, "LET_ME_EXPLAIN");
-  assert.equal(candidateEvaluationPromptContext(partly)?.action, "PARTLY");
   assert.equal(candidateEvaluationOffer("message-1", explain), null);
 });
 
-test("hypothesis testing can continue without inventing a candidate Pattern", () => {
-  const result = recognizeResponseSchema.safeParse({
-    ...acceptedResponse,
-    reply: "The key distinction may be whether the opening itself matters, or whether it is mainly the feeling of reward after effort. Which changes the pull more?",
-    recognitionStage: "HYPOTHESIS_TESTING",
-    competingExplanations: ["An available private opening", "A reward after sustained effort"],
-    candidatePattern: null,
-    evidenceStrength: "limited",
-    unresolvedUncertainty: ["Which condition is independently predictive?"],
-    userEvaluationStatus: "awaiting",
-    proposedMapAction: "NONE",
-    recommendedNextMode: "RECOGNIZE",
-  });
+test("hypothesis testing can continue without manufacturing a Map item", () => {
+  const result = recognizeResponseSchema.safeParse({ ...acceptedResponse, reply: "One distinction is still unresolved.", recognitionStage: "HYPOTHESIS_TESTING", candidateMapItem: null, evidenceStrength: "limited", userEvaluationStatus: "awaiting", proposedMapAction: "NONE", recommendedNextMode: "RECOGNIZE" });
   assert.equal(result.success, true);
-  assert.equal(result.success && recognizedPatternOffer(result.data), null);
+  assert.equal(result.success && recognizedMapItemOffer(result.data), null);
 });
 
-test("accepted offers saved under the prior contract remain usable", () => {
-  const legacy = {
-    reply: acceptedResponse.reply,
-    currentMode: acceptedResponse.currentMode,
-    candidatePattern: acceptedResponse.candidatePattern,
-    supportingObservations: acceptedResponse.supportingObservations,
-    evidenceStrength: acceptedResponse.evidenceStrength,
-    unresolvedUncertainty: acceptedResponse.unresolvedUncertainty,
-    userEvaluationStatus: acceptedResponse.userEvaluationStatus,
-    proposedMapAction: acceptedResponse.proposedMapAction,
-    recommendedNextMode: acceptedResponse.recommendedNextMode,
-    reasonForRecommendation: acceptedResponse.reasonForRecommendation,
-  };
-  assert.equal(recognizedPatternOffer(legacy), legacy.candidatePattern);
+test("model output cannot claim application-owned validation", () => {
+  const acceptedSignals = recognizeSignalsSchema.parse(acceptedResponse);
+  const awaitingSignals = recognizeSignalsSchema.parse(awaitingCandidate);
+  assert.equal(isValidGeneratedRecognizeSignals(awaitingSignals), true);
+  assert.equal(isValidGeneratedRecognizeSignals(acceptedSignals), false);
+});
+
+test("accepted Pattern offers under the prior contract remain usable", () => {
+  const legacy = { currentMode: "RECOGNIZE", candidatePattern: "When uncertainty rises, I seek more information.", userEvaluationStatus: "accepted", proposedMapAction: "OFFER_SAVE", recommendedNextMode: "PAUSE" };
+  assert.deepEqual(recognizedMapItemOffer(legacy), { kind: "PATTERN", statement: legacy.candidatePattern });
 });

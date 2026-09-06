@@ -11,8 +11,9 @@ function signal(overrides: Record<string, unknown> = {}) {
     understandingStatus: "clearer",
     importantObservations: [],
     unresolvedQuestions: [],
-    candidatePatternSignal: true,
-    candidatePatternConfidence: 0.8,
+    candidateMapItemSignal: true,
+    candidateMapItemConfidence: 0.8,
+    candidateMapItemKind: "PATTERN",
     recommendedNextMode: "RECOGNIZE",
     reasonForRecommendation: "A relationship appears across distinct examples.",
     ...overrides,
@@ -28,7 +29,7 @@ test("an older qualifying response does not trigger an invitation after the late
   const qualifying = { createdAt: new Date("2026-09-02T10:00:00Z"), internalSignals: signal() };
   const latest = {
     createdAt: new Date("2026-09-02T10:01:00Z"),
-    internalSignals: signal({ candidatePatternSignal: false, recommendedNextMode: "EXPLORE" }),
+    internalSignals: signal({ candidateMapItemSignal: false, candidateMapItemKind: null, recommendedNextMode: "EXPLORE" }),
   };
   assert.equal(shouldOfferRecognition([qualifying, latest], null), false);
 });
@@ -44,7 +45,7 @@ test("a declined invitation requires two subsequent qualifying responses before 
 
 test("weak or ambiguous signals do not trigger recognition", () => {
   const messages = [
-    { createdAt: new Date("2026-09-02T10:00:00Z"), internalSignals: signal({ candidatePatternConfidence: 0.5 }) },
+    { createdAt: new Date("2026-09-02T10:00:00Z"), internalSignals: signal({ candidateMapItemConfidence: 0.5 }) },
     { createdAt: new Date("2026-09-02T10:01:00Z"), internalSignals: signal({ recommendedNextMode: "EXPLORE" }) },
   ];
   assert.equal(shouldOfferRecognition(messages, null), false);
