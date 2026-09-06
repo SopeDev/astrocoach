@@ -417,7 +417,7 @@ These fields should be implemented with Structured Outputs / JSON Schema rather 
 
 **RECOGNIZE:** current_mode, recognition_stage, competing_explanations, private_astrology_influence, candidate_map_item (kind and statement), supporting_observations, evidence_strength, unresolved_uncertainty, user_evaluation_status, proposed_map_action, recommended_next_mode, reason_for_recommendation
 
-**DEEP_EXPLORE:** current_mode, focal_map_item, exploration_dimension, new_observations, emerging_insights, candidate_pattern_signal, proposed_pattern_revision, proposed_map_connections, unresolved_questions, recommended_next_mode, reason_for_recommendation
+**DEEP_EXPLORE:** current_mode, exploration_dimension, private_astrology_influence, new_observations, emerging_insights, candidate_map_item (kind and statement), candidate_relationship_to_focal (new item or revise focal), proposed_map_connections, unresolved_questions, recommended_next_mode, reason_for_recommendation. The focal Map item is application-owned stable input rather than model-repeated output.
 
 **INTEGRATE:** current_mode, integration_stage, integration_intention, known_cues, proposed_junction, proposed_practice, new_lived_evidence, map_item_revision_signal, recommended_next_mode, reason_for_recommendation
 

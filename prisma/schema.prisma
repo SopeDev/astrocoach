@@ -44,6 +44,7 @@ enum ConversationMode {
   EXPLORE
   RECOGNIZE
   INTEGRATE
+  DEEP_EXPLORE
 
   @@map("conversation_mode")
 }

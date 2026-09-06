@@ -1,6 +1,6 @@
 export type PromptRegressionScenario = {
   id: string;
-  mode: "DISCOVERY" | "EXPLORE" | "RECOGNIZE" | "INTEGRATE";
+  mode: "DISCOVERY" | "EXPLORE" | "RECOGNIZE" | "INTEGRATE" | "DEEP_EXPLORE";
   setup: string[];
   chartSignal: string | null;
   expected: string[];
@@ -237,8 +237,40 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
     forbidden: ["Defending the focal item with astrology", "Treating a saved Map item as permanently true"],
   },
   {
+    id: "deep-starts-from-recognized-focal-item",
+    mode: "DEEP_EXPLORE",
+    setup: ["The user deliberately opens DEEP_EXPLORE from a recognized Pattern and names what they want to understand about it."],
+    chartSignal: null,
+    expected: ["Treat the focal Pattern as already recognized.", "Explore one material condition, function, need, contradiction, exception, or origin at a time."],
+    forbidden: ["Restarting basic exploration to prove the Pattern exists", "Assuming childhood, trauma, pathology, or a hidden cause"],
+  },
+  {
+    id: "deep-distinguishes-new-insight-from-revision",
+    mode: "DEEP_EXPLORE",
+    setup: ["Exploration of a focal Pattern yields a specific understanding that may either qualify the Pattern or stand beside it as a separate Insight."],
+    chartSignal: null,
+    expected: ["Classify the candidate as NEW_ITEM when it is distinct knowledge and REVISE_FOCAL when it materially changes the focal item.", "Route either candidate through RECOGNIZE for application-owned evaluation."],
+    forbidden: ["Silently overwriting the focal item", "Saving an emerging Insight directly from DEEP_EXPLORE", "Asking the user to choose Pattern versus Insight"],
+  },
+  {
+    id: "deep-astrology-opens-inquiry",
+    mode: "DEEP_EXPLORE",
+    setup: ["A recognized lived Pattern is being deepened and astrologyStyle permits visible astrology."],
+    chartSignal: "A small natal synthesis offers a plausible perspective on the Pattern's present function.",
+    expected: ["Move from the recognized lived experience to the astrological lens and then to one question that can produce new user evidence.", "Keep the synthesis bounded and corrigible."],
+    forbidden: ["Treating astrology as proof of origin or recurrence", "A placement-by-placement report", "Presenting the symbolic interpretation as new evidence"],
+  },
+  {
+    id: "deep-understanding-not-practice",
+    mode: "DEEP_EXPLORE",
+    setup: ["The user reaches a meaningful explanation of what the focal Pattern protects or provides."],
+    chartSignal: null,
+    expected: ["Deepen or summarize the understanding without turning it into behavioral change.", "Leave INTEGRATE as a separate user choice."],
+    forbidden: ["Generating a Practice", "Prescribing a behavioral program", "Treating increased insight as an obligation to change"],
+  },
+  {
     id: "deep-no-forced-astrology",
-    mode: "EXPLORE",
+    mode: "DEEP_EXPLORE",
     setup: ["astrologyStyle is deep and familiarity is advanced.", "The latest exchange is fully understood and natal context adds no useful distinction."],
     chartSignal: null,
     expected: ["Respond to the lived experience without inserting astrology.", "Set private astrology influence to null."],

@@ -5,6 +5,8 @@ import { db } from "@/db/client";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { requireCurrentUser } from "@/lib/auth-user";
+import { generateDeepExploreResponse } from "@/lib/deep-explore";
+import { deepExploreFocusSchema, deepRecognitionHandoff } from "@/lib/deep-explore-contract";
 import { generateExploreResponse } from "@/lib/explore";
 import { exploreMessageSchema, parseStoredExploreSignals, titleFromExploreMessage } from "@/lib/explore-contract";
 import { generateIntegrateResponse } from "@/lib/integrate";
@@ -30,10 +32,11 @@ import {
   type CandidateEvaluationAction,
   type CandidateEvaluationOffer,
 } from "@/lib/recognize-contract";
+import { recognitionHandoffFromOrigin, recognitionRejectionMode, shouldReviseFocalMapItem } from "@/lib/recognition-handoff";
 import { isSupportedPracticeProposal, practiceIntentionSchema, type PracticeProposal } from "@/lib/practices";
 import { mapItemIdSchema } from "@/lib/map-items";
 
-export type ConversationMode = "EXPLORE" | "RECOGNIZE" | "INTEGRATE";
+export type ConversationMode = "EXPLORE" | "RECOGNIZE" | "INTEGRATE" | "DEEP_EXPLORE";
 
 export type ConversationMessage = {
   id: string;
@@ -75,6 +78,15 @@ function evaluationOfferFromMessage(message: { id: string; internalSignals: unkn
 
 function practiceOfferFromMessage(message: { id: string; internalSignals: unknown }) {
   return practiceProposalOffer(message.id, message.internalSignals);
+}
+
+async function loadRecognitionHandoff(userId: string, conversationId: string) {
+  const origin = await db.message.findFirst({
+    where: { conversationId, role: "assistant", mode: { in: ["EXPLORE", "INTEGRATE", "DEEP_EXPLORE"] }, conversation: { userId } },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: { mode: true, internalSignals: true },
+  });
+  return recognitionHandoffFromOrigin(origin);
 }
 
 function serializePractice(practice: { id: string; intention: string; purpose: ActivePractice["purpose"]; primitive: ActivePractice["primitive"]; instruction: string; cue: string } | null): ActivePractice | null {
@@ -141,18 +153,29 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
         orderBy: { createdAt: "desc" },
       })
     : null;
+  const activeMapItems = conversation.mode === "DEEP_EXPLORE"
+    ? await db.mapItem.findMany({
+        where: { userId, archivedAt: null },
+        orderBy: { updatedAt: "desc" },
+        take: 12,
+        select: { id: true, kind: true, statement: true },
+      })
+    : [];
   const recentObservations = activePractice ? await db.practiceObservation.findMany({ where: { practiceId: activePractice.id, userId }, orderBy: { createdAt: "desc" }, take: 5, select: { content: true, learning: true } }) : [];
-  return { intent, conversation, thread, lifeAreaKeys, lifeAreas, natalInterpretation, preferences, evaluationContext, recentResponseApproaches, activePractice, recentObservations: recentObservations.reverse() };
+  return { intent, conversation, thread, lifeAreaKeys, lifeAreas, natalInterpretation, preferences, evaluationContext, recentResponseApproaches, activePractice, activeMapItems, recentObservations: recentObservations.reverse() };
 }
 
 async function generateReply(userId: string, locale: Locale, conversationId: string, userMessage: StoredMessage) {
   const context = await loadGenerationContext(userId, locale, conversationId, userMessage.id);
-  if (context.conversation.mode === "INTEGRATE" && !context.conversation.focalMapItem) {
-    throw new Error("INTEGRATE requires a focal Map item");
+  if ((context.conversation.mode === "INTEGRATE" || context.conversation.mode === "DEEP_EXPLORE") && !context.conversation.focalMapItem) {
+    throw new Error(`${context.conversation.mode} requires a focal Map item`);
   }
   const themeStarter = themeConversationStarterSchema.safeParse(userMessage.internalSignals);
+  const recognitionHandoff = context.conversation.mode === "RECOGNIZE" ? await loadRecognitionHandoff(userId, conversationId) : null;
   const generated = context.conversation.mode === "RECOGNIZE"
-    ? await generateRecognizeResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, opening: false, candidateEvaluationContext: context.evaluationContext, focalMapItem: context.conversation.focalMapItem ? { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement } : null })
+    ? await generateRecognizeResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, opening: false, candidateEvaluationContext: context.evaluationContext, focalMapItem: context.conversation.focalMapItem ? { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement } : null, recognitionHandoff })
+    : context.conversation.mode === "DEEP_EXPLORE" && context.conversation.focalMapItem
+      ? await generateDeepExploreResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, focalMapItem: { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement }, relatedMapItems: context.activeMapItems.filter((item) => item.id !== context.conversation.focalMapItemId).map((item) => ({ kind: item.kind, statement: item.statement })), activePractice: context.activePractice ? { intention: context.activePractice.intention, instruction: context.activePractice.instruction, cue: context.activePractice.cue } : null, deepeningFocus: context.thread.find((message) => message.role === "user")?.content ?? userMessage.content, thread: context.thread, latestMessage: userMessage.content, candidateEvaluationContext: context.evaluationContext })
     : context.conversation.mode === "INTEGRATE" && context.conversation.focalMapItem
       ? await generateIntegrateResponse({ locale, focalMapItem: { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement }, intention: context.activePractice?.intention ?? context.thread.find((message) => message.role === "user")?.content ?? userMessage.content, thread: context.thread, latestMessage: userMessage.content, activePractice: context.activePractice ? { intention: context.activePractice.intention, purpose: context.activePractice.purpose, primitive: context.activePractice.primitive, instruction: context.activePractice.instruction, cue: context.activePractice.cue } : null, recentObservations: context.recentObservations, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle })
       : await generateExploreResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: userMessage.content, candidateEvaluationContext: context.evaluationContext, recentResponseApproaches: context.recentResponseApproaches, preferredThemeId: themeStarter.success ? themeStarter.data.themeId : null });
@@ -179,6 +202,9 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
       transitionOffered = shouldOfferRecognition(recentSignals.reverse(), context.conversation.transitionReferenceAt);
     }
     if (mode === "INTEGRATE" && shouldOfferMapItemRevision(generated.signals)) {
+      transitionOffered = true;
+    }
+    if (mode === "DEEP_EXPLORE" && deepRecognitionHandoff(generated.signals)) {
       transitionOffered = true;
     }
 
@@ -308,7 +334,7 @@ export async function declineRecognitionTransition(locale: Locale, conversationI
   if (!isLocale(locale)) return { ok: false as const };
   const user = await requireCurrentUser(locale);
   const latestMessage = await db.message.findFirst({ where: { conversationId, conversation: { userId: user.id } }, orderBy: [{ createdAt: "desc" }, { id: "desc" }] });
-  const result = await db.conversation.updateMany({ where: { id: conversationId, userId: user.id, mode: { in: ["EXPLORE", "INTEGRATE"] }, status: "active", archivedAt: null, transitionState: "OFFERED" }, data: { transitionState: "DISMISSED", transitionReferenceAt: latestMessage?.createdAt ?? new Date() } });
+  const result = await db.conversation.updateMany({ where: { id: conversationId, userId: user.id, mode: { in: ["EXPLORE", "INTEGRATE", "DEEP_EXPLORE"] }, status: "active", archivedAt: null, transitionState: "OFFERED" }, data: { transitionState: "DISMISSED", transitionReferenceAt: latestMessage?.createdAt ?? new Date() } });
   return { ok: result.count === 1 } as const;
 }
 
@@ -317,11 +343,13 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
   const user = await requireCurrentUser(locale);
   const context = await loadGenerationContext(user.id, locale, conversationId);
   const sourceMode = context.conversation.mode;
-  if (context.conversation.status !== "active" || context.conversation.archivedAt || (sourceMode !== "EXPLORE" && sourceMode !== "INTEGRATE") || context.conversation.transitionState !== "OFFERED") return { ok: false as const, error: "message" as const };
+  if (context.conversation.status !== "active" || context.conversation.archivedAt || (sourceMode !== "EXPLORE" && sourceMode !== "INTEGRATE" && sourceMode !== "DEEP_EXPLORE") || context.conversation.transitionState !== "OFFERED") return { ok: false as const, error: "message" as const };
 
   try {
     const focalMapItem = context.conversation.focalMapItem ? { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement } : null;
-    const generated = await generateRecognizeResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: null, opening: true, focalMapItem });
+    const recognitionHandoff = await loadRecognitionHandoff(user.id, conversationId);
+    if (sourceMode === "DEEP_EXPLORE" && !recognitionHandoff) return { ok: false as const, error: "message" as const };
+    const generated = await generateRecognizeResponse({ locale, lifeAreaKeys: context.lifeAreaKeys, lifeAreas: context.lifeAreas, currentContext: context.intent.currentContext, initialQuestions: context.intent.discoveryQuestions, initialAnswers: context.intent.initialAnswers, finalQuestions: context.intent.finalQuestions, finalAnswers: context.intent.finalAnswers, natalInterpretation: context.natalInterpretation, astrologyFamiliarity: context.preferences.astrologyFamiliarity, astrologyStyle: context.preferences.astrologyStyle, thread: context.thread, latestMessage: null, opening: true, focalMapItem, recognitionHandoff });
     const assistantMessage = await db.$transaction(async (transaction) => {
       const updated = await transaction.conversation.updateMany({ where: { id: conversationId, userId: user.id, mode: sourceMode, status: "active", archivedAt: null, transitionState: "OFFERED" }, data: { mode: "RECOGNIZE", transitionState: "IDLE", transitionReferenceAt: new Date() } });
       if (updated.count !== 1) throw new Error("Recognition transition is no longer available");
@@ -341,6 +369,7 @@ export async function evaluateRecognizeCandidate(locale: Locale, conversationId:
   const parsedAction = candidateEvaluationActionSchema.safeParse(action);
   if (!parsedAction.success) return { ok: false as const };
   const user = await requireCurrentUser(locale);
+  const recognitionHandoff = await loadRecognitionHandoff(user.id, conversationId);
 
   const result = await db.$transaction(async (transaction) => {
     const conversation = await transaction.conversation.findFirst({
@@ -359,7 +388,8 @@ export async function evaluateRecognizeCandidate(locale: Locale, conversationId:
     if (!nextSignals) return null;
     await transaction.message.update({ where: { id: source.id }, data: { internalSignals: nextSignals } });
 
-    const mode: ConversationMode = parsedAction.data === "NO" ? (conversation.focalMapItemId ? "INTEGRATE" : "EXPLORE") : "RECOGNIZE";
+    const rejectionMode: ConversationMode = recognitionRejectionMode(recognitionHandoff, Boolean(conversation.focalMapItemId));
+    const mode: ConversationMode = parsedAction.data === "NO" ? rejectionMode : "RECOGNIZE";
     if (mode !== "RECOGNIZE") {
       await transaction.conversation.update({
         where: { id: conversationId },
@@ -380,6 +410,7 @@ export async function evaluateRecognizeCandidate(locale: Locale, conversationId:
 export async function saveRecognizedMapItem(locale: Locale, conversationId: string, sourceMessageId: string) {
   if (!isLocale(locale)) return { ok: false as const };
   const user = await requireCurrentUser(locale);
+  const recognitionHandoff = await loadRecognitionHandoff(user.id, conversationId);
   const source = await db.message.findFirst({ where: { id: sourceMessageId, conversationId, role: "assistant", mode: "RECOGNIZE", conversation: { userId: user.id, archivedAt: null } } });
   if (!source) return { ok: false as const };
   const item = recognizedMapItemOffer(source.internalSignals);
@@ -396,7 +427,8 @@ export async function saveRecognizedMapItem(locale: Locale, conversationId: stri
       data: { status: "closed" },
     });
     if (available.count !== 1) throw new Error("Conversation is no longer available for Map item saving");
-    const existingItem = conversation.focalMapItemId
+    const revisesFocal = shouldReviseFocalMapItem(recognitionHandoff, Boolean(conversation.focalMapItemId));
+    const existingItem = revisesFocal && conversation.focalMapItemId
       ? await transaction.mapItem.findFirst({ where: { id: conversation.focalMapItemId, userId: user.id } })
       : null;
     const saved = existingItem
@@ -435,6 +467,35 @@ export async function startIntegration(locale: Locale, mapItemId: string, intent
     return { ok: true as const, conversationId: conversation.id };
   } catch (error) {
     console.error("Starting INTEGRATE failed", error);
+    return { ok: false as const, error: "generation" as const, conversationId: conversation.id };
+  }
+}
+
+export async function startDeepExploration(locale: Locale, mapItemId: string, focus: string) {
+  if (!isLocale(locale)) return { ok: false as const, error: "message" as const };
+  const parsedMapItemId = mapItemIdSchema.safeParse(mapItemId);
+  const parsedFocus = deepExploreFocusSchema.safeParse(focus);
+  if (!parsedMapItemId.success || !parsedFocus.success) return { ok: false as const, error: "message" as const };
+  const user = await requireCurrentUser(locale);
+  const mapItem = await db.mapItem.findFirst({ where: { id: parsedMapItemId.data, userId: user.id, archivedAt: null } });
+  if (!mapItem) return { ok: false as const, error: "message" as const };
+
+  const conversation = await db.conversation.create({
+    data: {
+      userId: user.id,
+      mode: "DEEP_EXPLORE",
+      focalMapItemId: mapItem.id,
+      title: titleFromExploreMessage(parsedFocus.data),
+      messages: { create: { role: "user", mode: "DEEP_EXPLORE", content: parsedFocus.data } },
+    },
+    include: { messages: true },
+  });
+  const userMessage = conversation.messages[0];
+  try {
+    await generateReply(user.id, locale, conversation.id, userMessage);
+    return { ok: true as const, conversationId: conversation.id };
+  } catch (error) {
+    console.error("Starting DEEP_EXPLORE failed", error);
     return { ok: false as const, error: "generation" as const, conversationId: conversation.id };
   }
 }

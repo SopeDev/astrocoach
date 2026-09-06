@@ -507,7 +507,7 @@ The MVP should demonstrate that AstroCoach can:
 6. present the system-classified Map item through RECOGNIZE,
 7. allow the user to accept, reject, or modify it,
 8. store user-confirmed Patterns and Insights in My Map,
-9. reopen a Map item for INTEGRATE, while keeping DEEP_EXPLORE as an independent later slice,
+9. reopen a Map item through an explicit choice to understand it in DEEP_EXPLORE or make it more available in lived experience through INTEGRATE,
 10. use astrology as a deeper symbolic and developmental framework,
 11. let the user choose INTEGRATE,
 12. create one bounded, personalized Practice,

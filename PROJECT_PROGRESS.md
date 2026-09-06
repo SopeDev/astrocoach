@@ -85,6 +85,10 @@ Last updated: 2026-09-06
 - Implemented the first intentionally small INTEGRATE loop: explicit intention, one model-personalized Practice constrained to a supported purpose/primitive toolkit, activation, return to life, and small persisted observations as new evidence. Only one Practice may be active for a Map item, familiar choices remain valid evidence, and contradictory lived evidence can recommend renewed recognition.
 - Added code-level validation for model-owned versus application-owned state, supported Practice pairings, candidate classification consistency, and expanded provider-independent prompt regression scenarios for Insights and Integration.
 - Verified the completed slice with Prisma schema validation, linting, strict TypeScript checking, all 22 test files, and a production Next.js build.
+- Implemented DEEP_EXPLORE as a user-chosen action from any active Pattern or Insight. The mode starts from the recognized focal item, explores one meaningful dimension at a time, receives bounded relevant natal context, other active Map items, and the focal item's active Practice without counting them as evidence, and explicitly avoids Practice generation or automatic assumptions about trauma, childhood, and hidden causes.
+- Added the DEEP_EXPLORE-to-RECOGNIZE handoff for either a distinct new Map item or a revision to the focal item. Candidate evaluation remains application-owned, rejection returns to the originating mode, and only a separately confirmed RECOGNIZE result can be persisted.
+- Added structured-output validation, recognition-handoff tests, and prompt regression coverage for focal-item continuity, new-item-versus-revision semantics, astrology-led inquiry, and the boundary between understanding and Integration.
+- Verified the DEEP_EXPLORE slice with Prisma schema validation, linting, strict TypeScript checking, all 24 test files, and a production Next.js build.
 
 ## Remaining
 
@@ -93,7 +97,7 @@ Last updated: 2026-09-06
 - Apply the pending Map-item/Insight/Integration migration before manually exercising the new loop against a database.
 - Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness, Pattern-versus-Insight classification, RECOGNIZE accuracy, and bounded Practice generation.
 - Add richer Map-item provenance and longitudinal Integration behavior only after the small intention → Practice → life → observation loop is useful in practice.
-- Implement DEEP_EXPLORE as a separate product slice; it is not a prerequisite for Insight recognition or persistence.
+- Apply the DEEP_EXPLORE conversation-mode migration before manually exercising the new flow against a database.
 - Manually verify microphone permission, recording, cancellation, and transcription on an installed iPhone and Android PWA.
 
 ## Known issues and open questions
@@ -109,4 +113,4 @@ Last updated: 2026-09-06
 
 ## Next planned slice
 
-Apply the pending migrations, then manually exercise both Pattern and Insight recognition, Map-item editing/archive/restore, intention-to-Practice activation, return-to-life observations, Practice editing/archive/reactivation, and all four RECOGNIZE evaluation paths. Run the expanded prompt regression set against the configured model before extending Integration longitudinally or starting DEEP_EXPLORE.
+Apply the pending migrations, then manually exercise DEEP_EXPLORE from both Pattern and Insight detail pages, including a new-Insight handoff, a focal-item revision, candidate rejection back into Deep, and a generation retry. Run the expanded prompt regression set against the configured model before extending Integration longitudinally.

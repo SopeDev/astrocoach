@@ -18,6 +18,7 @@ import {
   type NatalInterpretationDocument,
 } from "@/lib/natal-interpretation";
 import { isValidGeneratedRecognizeSignals, type CandidateEvaluationPromptContext, type CandidateMapItem, recognizeResponseSchema } from "@/lib/recognize-contract";
+import type { RecognitionHandoffContext } from "@/lib/recognition-handoff";
 
 type ThreadMessage = { role: "user" | "assistant"; content: string };
 
@@ -41,7 +42,7 @@ When candidateEvaluationContext is LET_ME_EXPLAIN, the user has deliberately mad
 
 Only the application's NO action creates REJECTED/rejected state. If conversational evidence undermines a candidate after PARTLY or LET_ME_EXPLAIN, return to HYPOTHESIS_TESTING with awaiting or uncertain status, or recommend EXPLORE without classifying the UI evaluation for the user.
 
-If focalMapItem is supplied, INTEGRATE produced lived evidence that may challenge that saved item. Treat the saved wording as revisable, not as a fact to defend. Evaluate the new evidence and present the smallest defensible revision or reclassification for application-owned evaluation when supported.
+When recognitionHandoff is supplied, preserve its distinction between a new item and a revision to the focal item. Its candidateMapItem is a hypothesis emerging from prior exploration, not an already accepted conclusion. Treat saved wording as revisable rather than something to defend, and evaluate the full lived evidence before presenting the smallest defensible candidate. Do not turn a distinct new Insight into a revision merely because a focal item is present.
 
 If new lived evidence contradicts a proposition or astrological framing, respond naturally and visibly change your mind instead of defending it. Astrological interpretation may enrich the visible formulation according to the user's preferences, but a candidate must stand on lived evidence alone. Do not prescribe a solution or behavioral intervention.`;
 
@@ -62,6 +63,7 @@ export async function generateRecognizeResponse({
   opening,
   candidateEvaluationContext,
   focalMapItem = null,
+  recognitionHandoff = null,
 }: {
   locale: Locale;
   lifeAreaKeys: LifeAreaKey[];
@@ -79,6 +81,7 @@ export async function generateRecognizeResponse({
   opening: boolean;
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
   focalMapItem?: CandidateMapItem | null;
+  recognitionHandoff?: RecognitionHandoffContext | null;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -111,6 +114,7 @@ export async function generateRecognizeResponse({
         astrologyFamiliarity,
         astrologyStyle,
         focalMapItem,
+        recognitionHandoff,
       },
       candidateEvaluationContext: candidateEvaluationContext ?? null,
       conversationThread: thread,
