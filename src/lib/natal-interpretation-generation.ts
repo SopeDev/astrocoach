@@ -4,6 +4,10 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { getServerEnv } from "@/lib/env";
+import {
+  assertHumanFirstAstrologyLanguage,
+  TechnicalAstrologyLanguageError,
+} from "@/lib/human-first-astrology";
 import { NATAL_THEME_GENERATION_INSTRUCTIONS } from "@/lib/natal-interpretation-prompt";
 import {
   anchoredThemeFactorIds,
@@ -124,6 +128,21 @@ function normalizeGeneratedThemes(
   ];
 }
 
+function validateHumanFacingThemeLanguage(
+  generated: z.infer<typeof generatedThemesSchema>,
+) {
+  const anchored = Object.values(generated.anchored);
+  const presentations = [...anchored, ...generated.emergent].flatMap((theme) => [
+    theme,
+    theme.spanish,
+  ]);
+  assertHumanFirstAstrologyLanguage(presentations.flatMap((presentation) => [
+    presentation.title,
+    presentation.synthesis,
+    ...presentation.possibleExpressions,
+  ]));
+}
+
 async function generateThemes(
   factors: RankedNatalFactor[],
   timeAccuracy: string,
@@ -137,20 +156,34 @@ async function generateThemes(
   if (!env.OPENAI_API_KEY) return fallback();
 
   try {
-    const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
-      model: env.OPENAI_MODEL,
-      store: false,
-      instructions: NATAL_THEME_GENERATION_INSTRUCTIONS,
-      input: JSON.stringify(buildNatalThemeGenerationInput(factors, timeAccuracy)),
-      text: { format: zodTextFormat(generatedThemesSchema, "chart_at_a_glance") },
-    });
+    const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    let correction = "";
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const response = await client.responses.parse({
+        model: env.OPENAI_MODEL,
+        store: false,
+        instructions: NATAL_THEME_GENERATION_INSTRUCTIONS + correction,
+        input: JSON.stringify(buildNatalThemeGenerationInput(factors, timeAccuracy)),
+        text: { format: zodTextFormat(generatedThemesSchema, "chart_at_a_glance") },
+      });
 
-    if (!response.output_parsed) throw new Error("The model did not return chart themes");
-    return {
-      themes: normalizeGeneratedThemes(response.output_parsed, factors, timeAccuracy),
-      generationMethod: "model",
-      model: response.model,
-    };
+      if (!response.output_parsed) throw new Error("The model did not return chart themes");
+      try {
+        validateHumanFacingThemeLanguage(response.output_parsed);
+        return {
+          themes: normalizeGeneratedThemes(response.output_parsed, factors, timeAccuracy),
+          generationMethod: "model",
+          model: response.model,
+        };
+      } catch (error) {
+        if (attempt === 0 && error instanceof TechnicalAstrologyLanguageError) {
+          correction = `\n\nYour previous person-facing prose used prohibited technical language (${error.terms.join(", ")}). Rewrite every affected English and Spanish field as an ordinary human experience. Keep all exact technical facts only in supportingFactorIds.`;
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error("The model did not return usable chart themes");
   } catch (error) {
     console.warn("Chart-at-a-glance generation unavailable; using deterministic synthesis", error instanceof Error ? error.message : error);
     return fallback();

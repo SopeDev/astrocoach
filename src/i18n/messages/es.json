@@ -171,15 +171,15 @@
     "foundationsTitle": "Tus fundamentos",
     "emergentTitle": "Otros patrones fuertes",
     "slotLabels": {
-      "identity": "Identidad",
-      "karmic": "Patrón kármico",
-      "mission": "Misión y dirección",
-      "emergent_1": "Patrón de la carta",
-      "emergent_2": "Patrón de la carta"
+      "identity": "Cómo te mueves por la vida",
+      "karmic": "Patrones familiares",
+      "mission": "Crecimiento y dirección",
+      "emergent_1": "Otro patrón importante",
+      "emergent_2": "Otro patrón importante"
     },
     "unknownTimeTitle": "No conocemos tu hora de nacimiento",
     "unknownTimeDescription": "Estos temas usan posiciones de referencia al mediodía para los planetas y nodos lunares. Se omiten el Ascendente, el Medio Cielo y las casas. Tu carta conserva los aspectos mayores e indica si se mantienen estables durante el día de nacimiento.",
-    "details": "Posibles expresiones y factores de la carta",
+    "details": "Cómo podría manifestarse y por qué",
     "possibleExpressions": "Posibles expresiones",
     "supportingFactors": "Factores de la carta que lo sostienen",
     "explore": "Explorar este tema",
@@ -284,7 +284,12 @@
     "language": "Idioma",
     "languageDescription": "Elige el idioma que AstroCoach usa en la aplicación y en respuestas futuras.",
     "selected": "seleccionado",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "reset": {
+      "button": "Restablecer cuenta",
+      "resetting": "Restableciendo cuenta…",
+      "confirmation": "¿Quieres restablecer tu cuenta de AstroCoach? Esto elimina permanentemente tu información de nacimiento, carta, respuestas iniciales, conversaciones, elementos de Mi mapa y Prácticas. Mantendrás la sesión iniciada y volverás a la información de nacimiento."
+    }
   },
   "explore": {
     "title": "AstroCoach",

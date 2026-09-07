@@ -2,6 +2,7 @@ import { LogOut } from "lucide-react";
 import { signOut } from "@/auth";
 import { AstrologySettings } from "@/components/astrology-settings";
 import { LanguageSettings } from "@/components/language-settings";
+import { ResetAccountButton } from "@/components/reset-account-button";
 import { ThemeSettings } from "@/components/theme-settings";
 import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -22,6 +23,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
       <section className="mt-7 border-t border-slate-200 pt-7 dark:border-slate-800"><h2 className="font-semibold text-slate-950 dark:text-white">{messages.account.astrology}</h2><p className="mb-4 mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.account.astrologyDescription}</p><AstrologySettings initialFamiliarity={user.astrologyFamiliarity} initialStyle={user.astrologyStyle} labels={messages.astrologyPreferences} /></section>
       <section className="mt-7 border-t border-slate-200 pt-7 dark:border-slate-800"><h2 className="font-semibold text-slate-950 dark:text-white">{messages.account.language}</h2><p className="mb-4 mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.account.languageDescription}</p><LanguageSettings currentLocale={user.locale} selectedLabel={messages.account.selected} /></section>
       <form action={logOut} className="mt-10"><button className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900" type="submit"><LogOut aria-hidden="true" className="size-4" />{messages.account.signOut}</button></form>
+      <ResetAccountButton labels={messages.account.reset} locale={locale} />
     </main>
   );
 }

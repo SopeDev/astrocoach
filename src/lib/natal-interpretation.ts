@@ -48,7 +48,7 @@ import {
   type PlanetSignSign,
 } from "@/lib/planet-sign-interpretations";
 
-export const NATAL_INTERPRETATION_SCHEMA_VERSION = 6;
+export const NATAL_INTERPRETATION_SCHEMA_VERSION = 7;
 export const NATAL_INTERPRETATION_SOURCE = "natal_interpretation" as const;
 export const NATAL_INTERPRETATION_EVIDENCE_STATUS = "symbolic_hypothesis_not_user_evidence" as const;
 
@@ -888,13 +888,6 @@ export function retrieveNatalInterpretation(
   });
 }
 
-function titleFromTopics(topics: string[]) {
-  const labels = unique(topics)
-    .slice(0, 2)
-    .map((topic) => topic.replaceAll("_", " ").replace(/^./, (character) => character.toUpperCase()));
-  return labels.join(" and ") || "A central chart theme";
-}
-
 export type ChartThemeSlot = ChartTheme["slot"];
 
 function firstFactor(
@@ -1015,6 +1008,7 @@ function buildTheme({
   spanish,
   factors,
   timeAccuracy,
+  possibleExpressions,
 }: {
   id: ChartTheme["id"];
   slot: ChartThemeSlot;
@@ -1023,6 +1017,7 @@ function buildTheme({
   spanish: ChartThemePresentation;
   factors: RankedNatalFactor[];
   timeAccuracy: string;
+  possibleExpressions: string[];
 }): ChartTheme {
   const topics = unique(factors.flatMap((factor) => factor.topics)).slice(0, 10);
   return {
@@ -1030,9 +1025,7 @@ function buildTheme({
     slot,
     title,
     synthesis,
-    possibleExpressions: unique(
-      factors.flatMap((factor) => factor.interpretation.possibleExpressions.slice(0, 1)),
-    ).slice(0, 3),
+    possibleExpressions,
     supportingFactorIds: factors.map((factor) => factor.id).slice(0, 4),
     topics,
     uncertainty: timeAccuracy === "unknown",
@@ -1057,7 +1050,6 @@ export function deterministicThemeFallback(
   const emergentTwo = unique([fallbackPool[1]?.id, fallbackPool[3]?.id].filter(Boolean))
     .map((id) => factorMap.get(id))
     .filter((factor): factor is RankedNatalFactor => Boolean(factor));
-  const labels = (factors: RankedNatalFactor[]) => factors.map((factor) => factor.label).join(" and ");
   const possibilityNote = "Take this as a starting point to explore, not a fixed description of who you are.";
 
   return [
@@ -1065,7 +1057,11 @@ export function deterministicThemeFallback(
       id: "theme.identity",
       slot: "identity",
       title: "How you meet the world",
-      synthesis: `${labels(factorsFor(anchors.identity))} bring together your inner sense of self and the way you first meet the world. You might notice places where those sides support each other—and places where they want different things. ${possibilityNote}`,
+      synthesis: `Your inner sense of who you are and the way you first meet people may not always move at the same speed. You might notice places where those sides support each other—and places where they want different things. ${possibilityNote}`,
+      possibleExpressions: [
+        "Feeling at ease when your choices match how you present yourself",
+        "Noticing when keeping the peace makes your real opinion harder to hear",
+      ],
       spanish: {
         title: "Cómo te muestras al mundo",
         synthesis: "Este tema reúne tu sentido interno de quién eres y la manera en que te muestras al mundo. Podrías notar momentos en que ambas partes se apoyan y otros en que quieren cosas distintas. Tómalo como un punto de partida para explorar, no como una descripción fija de quién eres.",
@@ -1081,7 +1077,12 @@ export function deterministicThemeFallback(
       id: "theme.karmic",
       slot: "karmic",
       title: "What feels familiar",
-      synthesis: `${labels(factorsFor(anchors.karmic))} point toward emotional habits and responsibilities that may feel deeply familiar. Some can offer real strength, while others may keep you returning to the same response after it stops helping. ${possibilityNote}`,
+      synthesis: `Some emotional habits and responsibilities may feel so familiar that you reach for them without thinking. They can offer real strength, while also pulling you back to the same response after it stops helping. ${possibilityNote}`,
+      possibleExpressions: [
+        "Returning automatically to a familiar emotional strategy",
+        "Carrying a responsibility past the point where it is truly yours",
+        "Finding a more deliberate response inside a repeated pattern",
+      ],
       spanish: {
         title: "Lo que se siente familiar",
         synthesis: "Este tema señala hábitos emocionales y responsabilidades que podrían sentirse muy familiares. Algunos pueden darte una fuerza real; otros quizá te hagan volver a la misma respuesta cuando ya no te ayuda. Tómalo como algo para explorar, no como una afirmación sobre vidas pasadas ni un destino fijo.",
@@ -1098,7 +1099,12 @@ export function deterministicThemeFallback(
       id: "theme.mission",
       slot: "mission",
       title: "Where growth may lead",
-      synthesis: `${labels(factorsFor(anchors.mission))} suggest qualities that may pull you toward growth and more meaningful contribution. The path may feel less familiar than what comes naturally, but it can reveal new ways to use what is already yours. ${possibilityNote}`,
+      synthesis: `Certain qualities may keep pulling you toward growth and a more meaningful contribution. That direction may feel less familiar than what comes naturally, but it can reveal new ways to use strengths you already have. ${possibilityNote}`,
+      possibleExpressions: [
+        "Developing a capacity that still feels new or exposed",
+        "Looking for work that makes your strengths useful to others",
+        "Choosing growth as well as recognition when setting direction",
+      ],
       spanish: {
         title: "Hacia dónde podrías crecer",
         synthesis: "Este tema señala cualidades que podrían llevarte hacia el crecimiento y una contribución más significativa. El camino quizá se sienta menos familiar que aquello que te sale naturalmente, pero puede mostrarte nuevas formas de usar lo que ya tienes. Es algo para explorar, no una profesión prometida ni un destino fijo.",
@@ -1114,11 +1120,15 @@ export function deterministicThemeFallback(
     buildTheme({
       id: "theme.emergent.1",
       slot: "emergent_1",
-      title: titleFromTopics(emergentOne.flatMap((factor) => factor.topics)),
-      synthesis: `${labels(emergentOne)} connect around ${unique(emergentOne.flatMap((factor) => factor.topics)).slice(0, 3).map((topic) => topic.replaceAll("_", " ")).join(", ")}. You might recognize moments when these needs pull together or compete for your attention. ${possibilityNote}`,
+      title: "When important needs collide",
+      synthesis: `Two important needs may sometimes arrive together, even when they seem to want different things from you. You might recognize moments when they cooperate naturally and others when they compete for your attention. ${possibilityNote}`,
+      possibleExpressions: [
+        "Feeling two valid impulses become urgent at the same time",
+        "Discovering that a recurring tension also contains a useful strength",
+      ],
       spanish: {
-        title: "Una conexión en tu carta",
-        synthesis: "Estos factores conectan distintas necesidades y recursos dentro de tu carta. Podrías reconocer momentos en que esas partes trabajan juntas y otros en que compiten por tu atención. Tómalo como algo para explorar, no como un rasgo fijo.",
+        title: "Cuando chocan necesidades importantes",
+        synthesis: "Dos necesidades importantes podrían aparecer a la vez, incluso cuando parecen pedirte cosas distintas. Tal vez notes momentos en que colaboran con naturalidad y otros en que compiten por tu atención. Tómalo como algo para explorar, no como un rasgo fijo.",
         possibleExpressions: [
           "Notar que dos necesidades importantes se activan al mismo tiempo",
           "Encontrar un recurso inesperado dentro de una tensión recurrente",
@@ -1130,11 +1140,15 @@ export function deterministicThemeFallback(
     buildTheme({
       id: "theme.emergent.2",
       slot: "emergent_2",
-      title: titleFromTopics(emergentTwo.flatMap((factor) => factor.topics)),
-      synthesis: `${labels(emergentTwo)} connect around ${unique(emergentTwo.flatMap((factor) => factor.topics)).slice(0, 3).map((topic) => topic.replaceAll("_", " ")).join(", ")}. This may show up as a tension, but it can also become a useful strength when both sides have room. ${possibilityNote}`,
+      title: "A strength hidden in tension",
+      synthesis: `Another pair of needs may create a push and pull that is easy to experience as friction. It could also become a useful strength when neither side has to silence the other. ${possibilityNote}`,
+      possibleExpressions: [
+        "Recognizing when an inner conflict is asking for room on both sides",
+        "Turning two different impulses into a more flexible response",
+      ],
       spanish: {
-        title: "Otra conexión importante",
-        synthesis: "Estos factores conectan otra serie de necesidades y recursos dentro de tu carta. Podría sentirse como una tensión, pero también convertirse en una fortaleza cuando ambas partes tienen espacio. Tómalo como algo para explorar, no como una descripción definitiva de quién eres.",
+        title: "Una fortaleza dentro de la tensión",
+        synthesis: "Otro par de necesidades podría crear un tira y afloja que se siente fácilmente como fricción. También puede convertirse en una fortaleza cuando ninguna de las dos partes tiene que silenciar a la otra. Tómalo como algo para explorar, no como una descripción definitiva de quién eres.",
         possibleExpressions: [
           "Reconocer una tensión que también contiene una capacidad útil",
           "Observar cómo dos impulsos distintos pueden aprender a colaborar",

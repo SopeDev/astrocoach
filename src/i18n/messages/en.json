@@ -171,15 +171,15 @@
     "foundationsTitle": "Your foundations",
     "emergentTitle": "Other strong patterns",
     "slotLabels": {
-      "identity": "Identity",
-      "karmic": "Karmic pattern",
-      "mission": "Mission and direction",
-      "emergent_1": "Chart pattern",
-      "emergent_2": "Chart pattern"
+      "identity": "How you move through life",
+      "karmic": "Familiar patterns",
+      "mission": "Growth and direction",
+      "emergent_1": "Another strong pattern",
+      "emergent_2": "Another strong pattern"
     },
     "unknownTimeTitle": "Your birth time is unknown",
     "unknownTimeDescription": "These themes use noon-reference planet and lunar-node positions. Ascendant, Midheaven, and houses are omitted. Your chart retains major aspects and marks whether they remain stable across the birth day.",
-    "details": "Possible expressions and chart factors",
+    "details": "How this may show up and why",
     "possibleExpressions": "Possible expressions",
     "supportingFactors": "Supporting chart factors",
     "explore": "Explore this theme",
@@ -284,7 +284,12 @@
     "language": "Language",
     "languageDescription": "Choose the language AstroCoach uses for the app and future responses.",
     "selected": "selected",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "reset": {
+      "button": "Reset account",
+      "resetting": "Resetting account…",
+      "confirmation": "Reset your AstroCoach account? This permanently deletes your birth information, chart, onboarding answers, conversations, Map items, and Practices. You’ll stay signed in and return to birth information."
+    }
   },
   "explore": {
     "title": "AstroCoach",

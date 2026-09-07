@@ -4,22 +4,41 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import type { Locale } from "@/i18n/config";
-import { ASTROCOACH_VOICE_INSTRUCTIONS, ASTROLOGY_COMMUNICATION_INSTRUCTIONS } from "@/lib/astrology-context";
+import { ASTROCOACH_VOICE_INSTRUCTIONS } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
 import { getServerEnv } from "@/lib/env";
+import {
+  assertHumanFirstAstrologyLanguage,
+  DISCOVERY_QUESTION_STYLE_INSTRUCTIONS,
+  HUMAN_FIRST_ASTROLOGY_INSTRUCTIONS,
+  TechnicalAstrologyLanguageError,
+} from "@/lib/human-first-astrology";
 import type { LifeAreaKey } from "@/lib/life-areas";
 import {
   retrieveNatalInterpretation,
   type NatalInterpretationDocument,
 } from "@/lib/natal-interpretation";
 
+const generatedDiscoveryQuestionSchema = z.object({
+  privateBasis: z.string().trim().min(3).max(500),
+  question: z.string().trim().min(10).max(240),
+}).strict();
+
+const generatedInitialDiscoveryQuestionSchema = generatedDiscoveryQuestionSchema.extend({
+  basisKind: z.enum(["user_context", "chart_hypothesis"]),
+}).strict();
+
 const initialQuestionSetSchema = z.object({
-  questions: z.array(z.string().min(10).max(240)).length(3),
-});
+  questions: z.array(generatedInitialDiscoveryQuestionSchema).length(3),
+}).strict();
+
+const generatedFinalDiscoveryQuestionSchema = generatedDiscoveryQuestionSchema.extend({
+  userGrounding: z.string().trim().min(2).max(120),
+}).strict();
 
 const finalQuestionSetSchema = z.object({
-  questions: z.array(z.string().min(10).max(240)).length(2),
-});
+  questions: z.array(generatedFinalDiscoveryQuestionSchema).length(2),
+}).strict();
 
 export const discoveryQuestionsSchema = z.array(z.string().min(10).max(240)).length(3);
 export const finalDiscoveryQuestionsSchema = z.array(z.string().min(10).max(240)).length(2);
@@ -37,34 +56,101 @@ type DiscoveryContext = {
 };
 
 function sharedInstructions(locale: Locale) {
-  return `Write in ${locale === "es" ? "Spanish" : "English"}. Questions must be concise, natural, nonjudgmental, meaningfully distinct, and presented according to the supplied astrologyStyle and astrologyFamiliarity. The preferences affect presentation only; the holistic astrological framework should inform question selection at every style. Never assume a selected area is a problem, imply diagnosis, or state a chart-derived interpretation as lived fact. Prefer concrete inquiry about recent experiences, wants, needs, expectations, tensions, and uncertainty. Do not create a Pattern, Insight, recommendation, Practice, or intervention.\n\n${ASTROLOGY_COMMUNICATION_INSTRUCTIONS}\n\n${ASTROCOACH_VOICE_INSTRUCTIONS}`;
+  return `Write in ${locale === "es" ? "Spanish" : "English"}.
+
+${HUMAN_FIRST_ASTROLOGY_INSTRUCTIONS}
+
+${DISCOVERY_QUESTION_STYLE_INSTRUCTIONS}
+
+astrologyStyle and astrologyFamiliarity may influence the depth and directness of the private hypothesis, but never make technical astrology visible during Discovery. Put a brief account of the exact user detail or chart hypothesis used in privateBasis. privateBasis is never shown to the user.
+
+${ASTROCOACH_VOICE_INSTRUCTIONS}`;
 }
 
 function fallbackInitialQuestions(locale: Locale, areas: string[], context: string | null) {
-  const focus = areas.join(", ");
+  const focus = areas.length === 1
+    ? areas[0]
+    : locale === "es" ? "varias partes de tu vida" : "several parts of your life";
   return locale === "es"
     ? [
-        `¿Qué te gustaría comprender mejor sobre ${focus}?`,
-        "¿Qué experiencia reciente hizo que estas áreas se sintieran importantes ahora?",
-        context ? "De lo que compartiste, ¿qué parte te genera más incertidumbre o curiosidad?" : "¿Qué deseas o necesitas que todavía no has podido expresar con claridad?",
+        `Parece que ${focus} está ocupando bastante espacio en tu vida ahora. ¿Qué está pasando ahí?`,
+        "A veces lo que más nos importa también es donde más cuesta decir claramente lo que queremos. ¿Te está pasando algo así?",
+        context ? "Hay algo en lo que contaste que todavía parece abierto. ¿Qué parte te gustaría que entendiera mejor?" : "Puede que estés sosteniendo más de lo que muestras. ¿Dónde lo notas más últimamente?",
       ]
     : [
-        `What would you most like to understand about ${focus}?`,
-        "What recent experience made these areas feel important now?",
-        context ? "Of what you shared, which part creates the most uncertainty or curiosity?" : "What do you want or need that you have not yet been able to express clearly?",
+        `It sounds like ${focus} is taking up a fair amount of space in your life right now. What is going on there?`,
+        "Sometimes the things we care about most are also where it is hardest to say what we want. Is anything like that happening for you?",
+        context ? "Something in what you shared still feels open. What part would you most want me to understand better?" : "You may be carrying more than you let on. Where have you noticed that most lately?",
       ];
 }
 
-function fallbackFinalQuestions(locale: Locale) {
+function fallbackFinalQuestions(locale: Locale, answers: string[]) {
+  const firstAnswer = answers.find((answer) => answer.trim())?.trim();
+  const excerpt = firstAnswer
+    ? firstAnswer.replace(/[¿?]/g, "").split(/[.!;]/)[0].trim().split(/\s+/).slice(0, 14).join(" ")
+    : null;
   return locale === "es"
     ? [
-        "De todo lo que has descrito, ¿qué parte tendría que cambiar para que la situación se sintiera realmente diferente?",
-        "¿Qué detalle importante podría cambiar la forma en que estás entendiendo lo que ocurre?",
+        excerpt
+          ? `Cuando dices «${excerpt}», parece que ahí hay algo importante. ¿Qué es lo que más te pesa de eso?`
+          : "Hay algo importante en lo que contaste que aún no terminamos de mirar. ¿Qué parte te pesa más?",
+        "También quiero entender qué necesitas, no solo lo que estás resolviendo. ¿Qué cambio te haría sentir que esto va realmente en una mejor dirección?",
       ]
     : [
-        "Of everything you described, what would need to change for the situation to feel meaningfully different?",
-        "What important detail might change how you understand what is happening?",
+        excerpt
+          ? `When you say “${excerpt},” it sounds like there is something important there. What feels hardest about it?`
+          : "There is something important in what you shared that we have not quite looked at yet. What part weighs on you most?",
+        "I also want to understand what you need, not only what you are handling. What change would make this feel like it is genuinely moving in a better direction?",
       ];
+}
+
+function validateGeneratedQuestions(questions: string[]) {
+  assertHumanFirstAstrologyLanguage(questions);
+  if (questions.some((question) => (question.match(/\?/g) ?? []).length !== 1)) {
+    throw new Error("Each Discovery item must contain exactly one question");
+  }
+  return questions;
+}
+
+function validateInitialQuestionBasis(
+  generated: z.infer<typeof initialQuestionSetSchema>["questions"],
+) {
+  if (generated.filter(({ basisKind }) => basisKind === "chart_hypothesis").length < 2) {
+    throw new Error("At least two initial Discovery questions must test concrete chart hypotheses");
+  }
+}
+
+function normalizeGrounding(value: string) {
+  return value.normalize("NFKC").toLocaleLowerCase().replace(/[“”‘’'"¿?¡!.,;:—–-]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function validateFinalQuestionGrounding(
+  generated: z.infer<typeof finalQuestionSetSchema>["questions"],
+  answers: string[],
+) {
+  const answerText = normalizeGrounding(answers.join(" "));
+  const seenGroundings = new Set<string>();
+  const seenAnswers = new Set<number>();
+  for (const item of generated) {
+    const grounding = normalizeGrounding(item.userGrounding);
+    const question = normalizeGrounding(item.question);
+    const answerIndex = answers.findIndex((answer) => normalizeGrounding(answer).includes(grounding));
+    if (grounding.length < 4 || !answerText.includes(grounding) || answerIndex < 0) {
+      throw new Error("Each final Discovery question must cite an exact phrase from the user's answers");
+    }
+    if (!question.includes(grounding)) {
+      throw new Error("Each final Discovery question must visibly use its user-grounding phrase");
+    }
+    if (seenGroundings.has(grounding) || seenAnswers.has(answerIndex)) {
+      throw new Error("Final Discovery questions must use details from different user answers");
+    }
+    seenGroundings.add(grounding);
+    seenAnswers.add(answerIndex);
+  }
+}
+
+function retryInstruction(error: TechnicalAstrologyLanguageError) {
+  return `\n\nYour previous visible copy used prohibited technical language (${error.terms.join(", ")}). Rewrite it entirely as ordinary lived experience. Do not merely remove a degree or aspect word while leaving a chart explanation behind.`;
 }
 
 export async function generateInitialDiscoveryQuestions(context: DiscoveryContext) {
@@ -77,16 +163,34 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
       lifeAreas: context.lifeAreaKeys,
       text: context.currentContext,
     });
-    const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
-      model: env.OPENAI_MODEL,
-      store: false,
-      instructions: `${sharedInstructions(context.locale)} Generate exactly three initial discovery questions. Together they should establish a broad but personalized first picture and cover different dimensions rather than variations of one theme. Move from accessible lived experience toward slightly deeper inquiry. Do not ask for information already present in the user's context. Chart symbolism may select hypotheses worth testing; present that influence according to astrologyStyle without turning a question into a conclusion.`,
-      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
-      text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
-    });
+    const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    let correction = "";
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const response = await client.responses.parse({
+        model: env.OPENAI_MODEL,
+        store: false,
+        instructions: `${sharedInstructions(context.locale)} Generate exactly three initial Discovery questions. Together they should form a broad, personalized first picture across different dimensions. Move from an easy entry point toward slightly deeper inquiry. At least two questions must use basisKind chart_hypothesis and be shaped by a concrete relationship in the private chart material; the visible wording must describe only the human experience being explored. Use basisKind user_context only when a question is primarily grounded in selectedLifeAreas or currentContext. Do not ask for information already present in the user's context.${correction}`,
+        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
+        text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
+      });
 
-    if (!response.output_parsed) throw new Error("The model did not return initial discovery questions");
-    return response.output_parsed.questions;
+      if (!response.output_parsed) throw new Error("The model did not return initial discovery questions");
+      const questions = response.output_parsed.questions.map(({ question }) => question);
+      try {
+        validateGeneratedQuestions(questions);
+        validateInitialQuestionBasis(response.output_parsed.questions);
+        return questions;
+      } catch (error) {
+        if (attempt === 0) {
+          correction = error instanceof TechnicalAstrologyLanguageError
+            ? retryInstruction(error)
+            : `\n\nYour previous result failed this requirement: ${error instanceof Error ? error.message : "invalid question format"}. Regenerate all three items and follow the requirements exactly.`;
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error("The model did not return usable initial discovery questions");
   } catch (error) {
     console.warn("Initial discovery generation unavailable; using fallback questions", error instanceof Error ? error.message : error);
     return fallbackInitialQuestions(context.locale, context.areaLabels, context.currentContext);
@@ -98,7 +202,7 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
   initialAnswers: string[];
 }) {
   const env = getServerEnv();
-  if (!env.OPENAI_API_KEY) return fallbackFinalQuestions(context.locale);
+  if (!env.OPENAI_API_KEY) return fallbackFinalQuestions(context.locale, context.initialAnswers);
 
   try {
     const exchanges = context.initialQuestions.map((question, index) => ({ question, answer: context.initialAnswers[index] }));
@@ -107,18 +211,36 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
       lifeAreas: context.lifeAreaKeys,
       text: [context.currentContext, ...context.initialAnswers].filter(Boolean).join("\n"),
     });
-    const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
-      model: env.OPENAI_MODEL,
-      store: false,
-      instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing questions after examining the three initial exchanges. These are not generic extra questions. Identify the highest-value remaining uncertainties, contradictions, assumptions, competing explanations, or missing context. Treat the answers as more authoritative than chart symbolism. Do not repeat anything already answered. Prefer questions that distinguish between plausible understandings and materially improve the initial picture.`,
-      input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
-      text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
-    });
+    const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    let correction = "";
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const response = await client.responses.parse({
+        model: env.OPENAI_MODEL,
+        store: false,
+        instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing Discovery questions after examining the three initial exchanges. For each item, copy a short, meaningful, verbatim phrase from a different answer into userGrounding, and include that exact phrase naturally in the visible question. Choose words the person would recognize as their own; do not use punctuation from the source question as part of the phrase. Begin from that concrete detail, tension, or distinction, then ask what would most improve your understanding. These are attentive follow-ups, not generic extra questions or a new chart reading. Treat the answers as more authoritative than chart symbolism. Explore the highest-value unresolved point without repeating an answered question, summarizing everything, or offering a list of roles or priorities to choose among.${correction}`,
+        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
+        text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
+      });
 
-    if (!response.output_parsed) throw new Error("The model did not return final discovery questions");
-    return response.output_parsed.questions;
+      if (!response.output_parsed) throw new Error("The model did not return final discovery questions");
+      const questions = response.output_parsed.questions.map(({ question }) => question);
+      try {
+        validateGeneratedQuestions(questions);
+        validateFinalQuestionGrounding(response.output_parsed.questions, context.initialAnswers);
+        return questions;
+      } catch (error) {
+        if (attempt === 0) {
+          correction = error instanceof TechnicalAstrologyLanguageError
+            ? retryInstruction(error)
+            : `\n\nYour previous result failed this requirement: ${error instanceof Error ? error.message : "invalid grounding"}. Regenerate both items and follow the requirements exactly.`;
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error("The model did not return usable final discovery questions");
   } catch (error) {
     console.warn("Final discovery generation unavailable; using fallback questions", error instanceof Error ? error.message : error);
-    return fallbackFinalQuestions(context.locale);
+    return fallbackFinalQuestions(context.locale, context.initialAnswers);
   }
 }

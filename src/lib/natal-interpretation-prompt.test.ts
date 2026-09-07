@@ -10,10 +10,14 @@ test("chart theme generation uses the shared product voice and concrete readabil
   assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /ordinary life/i);
   assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /provide meaning, not voice/i);
   assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /equally natural, casual Spanish/i);
+  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /works backstage/i);
+  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /NEVER use astrological terminology/i);
+  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /what the person might recognize in life/i);
 });
 
 test("the interpretation schema invalidates themes that claimed unknown-time aspects were omitted", () => {
-  assert.equal(NATAL_INTERPRETATION_SCHEMA_VERSION, 6);
-  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /exact body pair, type, orb metadata/i);
+  assert.equal(NATAL_INTERPRETATION_SCHEMA_VERSION, 7);
+  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /exact body pair, type, orb metadata, timing reliability/i);
+  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /use.*internally/i);
   assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /only aspects stable across the sampled local day/i);
 });

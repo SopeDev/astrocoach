@@ -100,6 +100,10 @@ Last updated: 2026-09-07
 - Enforced independent per-conversation caps of 15 user messages and 15 AstroCoach messages in server-owned generation paths, including user sends, response retries, and assistant-only mode transitions. Serializable transaction checks prevent concurrent visible-message writes from crossing either limit, while a saved final user message may still retry if its response slot remains.
 - Added a localized mobile limit state that replaces the composer with a new-conversation action while leaving non-message candidate, Map, and Practice controls usable. Provider backfill now retains at most the newest 15 messages from each role, preserving the complete allowed exchange and immutable birth/chart context for the model.
 - Verified the conversation-limit slice with linting, strict TypeScript checking, all 27 test files, and a production Next.js build.
+- Refactored Initial Discovery so astrology determines what AstroCoach notices without appearing as chart jargon in the questions. Opening questions now favor direct, correctable human observations over technical explanations; final questions carry validated verbatim grounding from two different user answers instead of generic follow-ups or answer menus.
+- Refactored Chart at a glance so titles, syntheses, possible expressions, and visible slot labels spend their space on recognizable human experience. Exact aspect and placement provenance remains available through the expandable technical supporting-factor chips; technical-language validation applies only to the primary prose, triggers one corrective model retry, and schema version 7 lazily regenerates older stored themes.
+- Verified the human-first Discovery and Chart-at-a-glance refactor with linting, strict TypeScript checking, all 28 test files, and a production Next.js build.
+- Added a destructive, explicitly confirmed Account reset below Sign out. Reset preserves authentication and account preferences, deletes all personal product history locally plus linked provider conversation state on a best-effort basis, and returns the signed-in user to birth-information onboarding.
 
 ## Remaining
 

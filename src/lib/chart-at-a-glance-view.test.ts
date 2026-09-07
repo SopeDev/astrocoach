@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateNatalChart } from "./natal-chart";
 import { chartAtAGlanceView } from "./chart-at-a-glance-view";
+import { findTechnicalAstrologyLanguage } from "./human-first-astrology";
 import {
   CURRENT_CATALOG_VERSIONS,
   deterministicThemeFallback,
@@ -52,4 +53,11 @@ test("builds localized chart browsing data without changing stable theme ids", (
   assert.ok(spanish.themes[0].supportingFactors.includes("Ascendente en Aries"));
   assert.ok(spanish.themes[0].supportingFactors.some((factor) => factor.includes("trígono")));
   assert.ok(spanish.themes[2].supportingFactors.includes("Medio Cielo en Capricornio"));
+  assert.deepEqual(findTechnicalAstrologyLanguage(
+    [...english.themes, ...spanish.themes].flatMap((theme) => [
+      theme.title,
+      theme.synthesis,
+      ...theme.possibleExpressions,
+    ]),
+  ), []);
 });
