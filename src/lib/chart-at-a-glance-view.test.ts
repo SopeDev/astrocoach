@@ -50,5 +50,6 @@ test("builds localized chart browsing data without changing stable theme ids", (
   assert.equal(spanish.themes[0].title, "Cómo te muestras al mundo");
   assert.ok(spanish.themes[0].supportingFactors.includes("Sol en Capricornio, casa 10"));
   assert.ok(spanish.themes[0].supportingFactors.includes("Ascendente en Aries"));
+  assert.ok(spanish.themes[0].supportingFactors.some((factor) => factor.includes("trígono")));
   assert.ok(spanish.themes[2].supportingFactors.includes("Medio Cielo en Capricornio"));
 });

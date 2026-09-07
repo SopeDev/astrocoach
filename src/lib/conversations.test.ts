@@ -7,7 +7,7 @@ test("requires Conversation identifiers to be UUIDs", () => {
   assert.equal(conversationIdSchema.safeParse("not-a-conversation").success, false);
 });
 
-test("serializes persisted conversation and message metadata without profile preferences", () => {
+test("serializes the conversation context snapshot without copying preferences onto messages", () => {
   const exported = serializeConversationExport({
     id: "4f692409-3ad9-4ec6-b4de-7e251c418d45",
     title: "A turning point",
@@ -15,6 +15,9 @@ test("serializes persisted conversation and message metadata without profile pre
     status: "active",
     transitionState: "ACCEPTED",
     transitionReferenceAt: new Date("2026-09-04T10:00:00.000Z"),
+    contextVersion: 1,
+    contextSnapshot: { birth: { date: "2000-01-01" } },
+    contextInitializedAt: new Date("2026-09-04T10:00:01.000Z"),
     lastMessageAt: new Date("2026-09-04T10:02:00.000Z"),
     archivedAt: null,
     createdAt: new Date("2026-09-04T10:00:00.000Z"),
@@ -32,8 +35,10 @@ test("serializes persisted conversation and message metadata without profile pre
     }],
   }, new Date("2026-09-04T11:00:00.000Z"));
 
-  assert.equal(exported.version, 1);
+  assert.equal(exported.version, 2);
   assert.equal(exported.exportedAt, "2026-09-04T11:00:00.000Z");
+  assert.equal(exported.conversation.context.version, 1);
+  assert.deepEqual(exported.conversation.context.snapshot, { birth: { date: "2000-01-01" } });
   assert.equal(exported.conversation.messages[0].createdAt, "2026-09-04T10:02:00.000Z");
   assert.equal("astrologyFamiliarity" in exported.conversation.messages[0], false);
   assert.equal("astrologyStyle" in exported.conversation.messages[0], false);

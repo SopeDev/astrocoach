@@ -4,6 +4,7 @@ import { calculateNatalChart } from "./natal-chart";
 import {
   CURRENT_CATALOG_VERSIONS,
   anchoredThemeFactorIds,
+  buildNatalThemeGenerationInput,
   deterministicThemeFallback,
   interpretationIsCurrent,
   natalInterpretationDocumentSchema,
@@ -40,7 +41,7 @@ function documentFor(timeAccuracy: "exact" | "unknown") {
       themes: deterministicThemeFallback(rankedFactors, chart.timeAccuracy),
       uncertainty: chart.timeAccuracy === "unknown" ? {
         kind: "birth_time_unknown",
-        omittedFactors: ["ascendant", "houses", "aspects"],
+        omittedFactors: ["ascendant", "houses"],
         note: "Birth time is unknown.",
       } : null,
     },
@@ -56,8 +57,15 @@ test("matches and ranks exact-time chart factors from authored catalogs", () => 
   const nodes = factors.find((factor) => factor.kind === "lunar_node_axis");
   const moon = factors.find((factor) => factor.id === "placement.moon");
   const saturn = factors.find((factor) => factor.id === "placement.saturn");
+  const sunSaturnTrine = factors.find(
+    (factor) => factor.id === "aspect.saturn.trine.sun",
+  );
 
-  assert.equal(factors.length, 13);
+  assert.ok(factors.length > 13);
+  assert.equal(
+    factors.filter((factor) => factor.kind === "major_aspect").length,
+    chart.data.aspects.length,
+  );
   assert.ok(factors.every((factor, index) => index === 0 || factors[index - 1].score >= factor.score));
   assert.equal(sun?.label, "Sun in Capricorn, 10th house");
   assert.ok(sun?.rankingReasons.includes("angular_house"));
@@ -69,6 +77,12 @@ test("matches and ranks exact-time chart factors from authored catalogs", () => 
   assert.ok(nodes?.rankingReasons.includes("house_axis"));
   assert.ok(moon?.sourceReferences.some((source) => source.catalog === "karmic_planet_signs"));
   assert.ok(saturn?.sourceReferences.some((source) => source.catalog === "karmic_planet_signs"));
+  assert.equal(sunSaturnTrine?.label, "Sun trine Saturn");
+  assert.equal(sunSaturnTrine?.aspect?.type, "trine");
+  assert.equal(sunSaturnTrine?.aspect?.timeReliability, "exact_time");
+  assert.equal(sunSaturnTrine?.aspect?.applying, false);
+  assert.ok((sunSaturnTrine?.aspect?.orb ?? 0) > 0);
+  assert.ok(sunSaturnTrine?.sourceReferences.some((source) => source.entryId === "aspect.trine"));
 });
 
 test("stores three deterministic anchors followed by two emergent themes", () => {
@@ -86,10 +100,37 @@ test("stores three deterministic anchors followed by two emergent themes", () =>
   assert.deepEqual(themes[2].supportingFactorIds, anchors.mission);
   assert.ok(themes[0].supportingFactorIds.includes("placement.sun"));
   assert.ok(themes[0].supportingFactorIds.some((id) => id.startsWith("ascendant.")));
+  assert.ok(themes[0].supportingFactorIds.some((id) => id.startsWith("aspect.")));
   assert.ok(themes[1].supportingFactorIds.includes("placement.moon"));
   assert.ok(themes[1].supportingFactorIds.includes("placement.saturn"));
   assert.ok(themes[1].supportingFactorIds.some((id) => id.startsWith("lunar_node_axis.")));
   assert.ok(themes[2].supportingFactorIds.some((id) => id.startsWith("midheaven.")));
+});
+
+test("passes every eligible major aspect with exact geometry into theme generation", () => {
+  const chart = calculateNatalChart({ ...referenceInput, birthTimeMinutes: 12 * 60 });
+  const factors = rankNatalChartFactors(chart.data);
+  const input = buildNatalThemeGenerationInput(factors, chart.timeAccuracy);
+  const suppliedFactors = [
+    ...input.anchoredThemes.flatMap((theme) => theme.factors),
+    ...input.emergentCandidateFactors,
+  ];
+  const suppliedAspectIds = new Set(
+    suppliedFactors.filter((factor) => "aspectDetails" in factor).map((factor) => factor.id),
+  );
+  const rankedAspects = factors.filter((factor) => factor.kind === "major_aspect");
+
+  assert.deepEqual(
+    [...suppliedAspectIds].sort(),
+    rankedAspects.map((factor) => factor.id).sort(),
+  );
+  assert.ok(suppliedFactors.some((factor) => (
+    factor.id === "aspect.saturn.trine.sun"
+    && "aspectDetails" in factor
+    && factor.aspectDetails?.type === "trine"
+    && factor.aspectDetails?.strength === 100
+    && factor.aspectDetails?.timeReliability === "exact_time"
+  )));
 });
 
 test("secondary karmic material enriches Moon and Saturn without increasing significance", () => {
@@ -111,10 +152,79 @@ test("secondary karmic material enriches Moon and Saturn without increasing sign
   assert.ok(saturn?.sourceReferences.some((source) => source.catalog === "karmic_planet_signs"));
 });
 
+test("time-sensitive unknown-time aspects are excluded instead of changing placement significance", () => {
+  const factors = rankNatalChartFactors({
+    planets: [
+      { name: "Sun", sign: "Aries" },
+      { name: "Moon", sign: "Taurus" },
+    ],
+    nodes: [],
+    aspects: [{
+      body1: "Sun",
+      body2: "Moon",
+      type: "square",
+      angle: 90,
+      separation: 89,
+      deviation: 1,
+      orb: 8,
+      strength: 100,
+      applying: null,
+      outOfSign: false,
+      timeReliability: "time_sensitive",
+    }],
+    angles: null,
+  });
+  const sun = factors.find((factor) => factor.id === "placement.sun");
+  const moon = factors.find((factor) => factor.id === "placement.moon");
+
+  assert.equal(sun?.score, 90);
+  assert.equal(moon?.score, 88);
+  assert.ok(factors.every((factor) => factor.kind !== "major_aspect"));
+});
+
+test("stable unknown-time aspects become explicit factors without double-counting placements", () => {
+  const factors = rankNatalChartFactors({
+    planets: [
+      { name: "Sun", sign: "Aries" },
+      { name: "Moon", sign: "Taurus" },
+    ],
+    nodes: [],
+    aspects: [{
+      body1: "Sun",
+      body2: "Moon",
+      type: "trine",
+      angle: 120,
+      separation: 121,
+      deviation: 1,
+      orb: 8,
+      strength: 88,
+      applying: null,
+      outOfSign: false,
+      timeReliability: "stable_across_day",
+      referenceTimeMinutes: 720,
+      sampleCoverage: { present: 13, total: 13 },
+      strengthRange: { minimum: 82, maximum: 92 },
+      deviationRange: { minimum: 0.6, maximum: 1.4 },
+    }],
+    angles: null,
+  });
+  const sun = factors.find((factor) => factor.id === "placement.sun");
+  const moon = factors.find((factor) => factor.id === "placement.moon");
+  const aspect = factors.find((factor) => factor.kind === "major_aspect");
+
+  assert.equal(sun?.score, 90);
+  assert.equal(moon?.score, 88);
+  assert.equal(aspect?.id, "aspect.moon.trine.sun");
+  assert.equal(aspect?.aspect?.timeReliability, "stable_across_day");
+  assert.deepEqual(aspect?.aspect?.sampleCoverage, { present: 13, total: 13 });
+  assert.ok(aspect?.rankingReasons.includes("stable_across_day"));
+  assert.ok(aspect?.rankingReasons.includes("birth_time_unknown"));
+});
+
 test("unknown birth time excludes time-dependent factors and carries uncertainty", () => {
   const document = documentFor("unknown");
 
-  assert.equal(document.rankedFactors.length, 11);
+  assert.ok(document.rankedFactors.length > 11);
   assert.ok(document.rankedFactors.every((factor) => factor.kind !== "ascendant"));
   assert.ok(document.rankedFactors.every((factor) => factor.kind !== "midheaven"));
   assert.ok(document.rankedFactors
@@ -123,11 +233,15 @@ test("unknown birth time excludes time-dependent factors and carries uncertainty
   assert.ok(document.rankedFactors
     .flatMap((factor) => factor.sourceReferences)
     .every((source) => source.catalog !== "planet_houses" && source.catalog !== "house_archetypes"));
+  assert.ok(document.rankedFactors.some((factor) => factor.kind === "major_aspect"));
+  assert.ok(document.rankedFactors
+    .filter((factor) => factor.kind === "major_aspect")
+    .every((factor) => factor.aspect?.timeReliability === "stable_across_day"));
   assert.equal(document.chartAtAGlance.uncertainty?.kind, "birth_time_unknown");
   assert.ok(document.chartAtAGlance.themes.every((theme) => theme.uncertainty));
   assert.deepEqual(
     document.chartAtAGlance.themes[0].supportingFactorIds,
-    ["placement.sun", "placement.moon"],
+    anchoredThemeFactorIds(document.rankedFactors).identity,
   );
   assert.ok(!document.chartAtAGlance.themes[2].supportingFactorIds.some(
     (id) => id.startsWith("midheaven."),
@@ -150,6 +264,7 @@ test("retrieval returns only a bounded, provenance-safe relevant subset", () => 
   assert.ok(context?.factors.some((factor) => factor.topics.includes("relationships") || factor.topics.includes("partnership")));
   assert.equal("planets" in (context ?? {}), false);
   assert.equal("aspects" in (context ?? {}), false);
+  assert.ok(context?.factors.some((factor) => factor.kind === "major_aspect"));
 });
 
 test("preferred theme retrieval pins the selected theme without changing provenance", () => {

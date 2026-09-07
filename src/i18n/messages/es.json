@@ -178,7 +178,7 @@
       "emergent_2": "Patrón de la carta"
     },
     "unknownTimeTitle": "No conocemos tu hora de nacimiento",
-    "unknownTimeDescription": "Estos temas usan los signos de tus planetas y nodos lunares. El Ascendente, Medio Cielo, las casas y los aspectos se omiten en lugar de adivinarlos.",
+    "unknownTimeDescription": "Estos temas usan posiciones de referencia al mediodía para los planetas y nodos lunares. Se omiten el Ascendente, el Medio Cielo y las casas. Tu carta conserva los aspectos mayores e indica si se mantienen estables durante el día de nacimiento.",
     "details": "Posibles expresiones y factores de la carta",
     "possibleExpressions": "Posibles expresiones",
     "supportingFactors": "Factores de la carta que lo sostienen",
@@ -300,6 +300,9 @@
     "retry": "Intentar de nuevo",
     "generationError": "Tu mensaje está guardado, pero no pude responder en este momento.",
     "messageError": "Escribe un mensaje antes de enviarlo.",
+    "messageLimitTitle": "Esta conversación llegó a su límite",
+    "messageLimitDescription": "En esta versión de prueba, cada conversación puede incluir hasta 15 mensajes tuyos y 15 respuestas de AstroCoach. Inicia una conversación nueva para continuar; esta seguirá disponible en Conversaciones.",
+    "messageLimitAction": "Iniciar una conversación nueva",
     "recordAudio": "Grabar un mensaje de voz",
     "recording": "Grabando",
     "stopRecording": "Detener grabación",

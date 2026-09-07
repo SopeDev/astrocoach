@@ -178,7 +178,7 @@
       "emergent_2": "Chart pattern"
     },
     "unknownTimeTitle": "Your birth time is unknown",
-    "unknownTimeDescription": "These themes use your planet and lunar-node signs. Ascendant, Midheaven, houses, and aspects are omitted rather than guessed.",
+    "unknownTimeDescription": "These themes use noon-reference planet and lunar-node positions. Ascendant, Midheaven, and houses are omitted. Your chart retains major aspects and marks whether they remain stable across the birth day.",
     "details": "Possible expressions and chart factors",
     "possibleExpressions": "Possible expressions",
     "supportingFactors": "Supporting chart factors",
@@ -300,6 +300,9 @@
     "retry": "Try again",
     "generationError": "Your message is saved, but I couldn’t respond just now.",
     "messageError": "Write a message before sending.",
+    "messageLimitTitle": "This conversation has reached its limit",
+    "messageLimitDescription": "For this test version, each conversation can include up to 15 messages from you and 15 replies from AstroCoach. Start a new conversation to keep going; this one will remain available in Conversations.",
+    "messageLimitAction": "Start a new conversation",
     "recordAudio": "Record a voice message",
     "recording": "Recording",
     "stopRecording": "Stop recording",

@@ -9,6 +9,9 @@ type ExportableConversation = {
   status: string;
   transitionState: string;
   transitionReferenceAt: Date | null;
+  contextVersion: number | null;
+  contextSnapshot: unknown;
+  contextInitializedAt: Date | null;
   lastMessageAt: Date;
   archivedAt: Date | null;
   createdAt: Date;
@@ -29,7 +32,7 @@ type ExportableConversation = {
 export function serializeConversationExport(conversation: ExportableConversation, exportedAt = new Date()) {
   return {
     format: "astrocoach-conversation",
-    version: 1,
+    version: 2,
     exportedAt: exportedAt.toISOString(),
     conversation: {
       id: conversation.id,
@@ -38,6 +41,11 @@ export function serializeConversationExport(conversation: ExportableConversation
       status: conversation.status,
       transitionState: conversation.transitionState,
       transitionReferenceAt: conversation.transitionReferenceAt?.toISOString() ?? null,
+      context: {
+        version: conversation.contextVersion,
+        initializedAt: conversation.contextInitializedAt?.toISOString() ?? null,
+        snapshot: conversation.contextSnapshot,
+      },
       lastMessageAt: conversation.lastMessageAt.toISOString(),
       archivedAt: conversation.archivedAt?.toISOString() ?? null,
       createdAt: conversation.createdAt.toISOString(),

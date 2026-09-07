@@ -1,6 +1,12 @@
 import { z } from "zod";
 import type { LifeAreaKey } from "@/lib/life-areas";
 import {
+  aspectInterpretationCatalog,
+  getAspectInterpretation,
+  MAJOR_ASPECT_TYPES,
+  type MajorAspectType,
+} from "@/lib/aspect-interpretations";
+import {
   ascendantInterpretationCatalog,
   getAscendantInterpretation,
 } from "@/lib/ascendant-interpretations";
@@ -16,6 +22,7 @@ import {
   getHouseArchetype,
   getPlanetArchetype,
   getSignArchetype,
+  ARCHETYPE_PLANETS,
   houseArchetypeCatalog,
   planetArchetypeCatalog,
   signArchetypeCatalog,
@@ -41,7 +48,7 @@ import {
   type PlanetSignSign,
 } from "@/lib/planet-sign-interpretations";
 
-export const NATAL_INTERPRETATION_SCHEMA_VERSION = 4;
+export const NATAL_INTERPRETATION_SCHEMA_VERSION = 6;
 export const NATAL_INTERPRETATION_SOURCE = "natal_interpretation" as const;
 export const NATAL_INTERPRETATION_EVIDENCE_STATUS = "symbolic_hypothesis_not_user_evidence" as const;
 
@@ -56,6 +63,7 @@ const sourceReferenceSchema = z.object({
     "lunar_nodes",
     "karmic_planet_signs",
     "midheavens",
+    "aspects",
   ]),
   catalogVersion: z.number().int().positive(),
   entryId: z.string().trim().min(1),
@@ -69,7 +77,7 @@ const interpretationMaterialSchema = z.object({
 
 export const rankedNatalFactorSchema = z.object({
   id: z.string().trim().min(1),
-  kind: z.enum(["planet_placement", "ascendant", "midheaven", "lunar_node_axis"]),
+  kind: z.enum(["planet_placement", "ascendant", "midheaven", "lunar_node_axis", "major_aspect"]),
   label: z.string().trim().min(1),
   score: z.number().int().nonnegative(),
   topics: z.array(z.string().regex(/^[a-z][a-z0-9_]*$/)).min(1),
@@ -80,7 +88,11 @@ export const rankedNatalFactorSchema = z.object({
     "transpersonal_planet",
     "chart_ruler",
     "angular_house",
-    "aspect_emphasis",
+    "major_aspect",
+    "tight_orb",
+    "luminary_aspect",
+    "personal_planet_aspect",
+    "stable_across_day",
     "ascendant",
     "midheaven",
     "nodal_axis",
@@ -89,7 +101,48 @@ export const rankedNatalFactorSchema = z.object({
   ])),
   sourceReferences: z.array(sourceReferenceSchema).min(1),
   interpretation: interpretationMaterialSchema,
-}).strict();
+  aspect: z.object({
+    body1: z.string().trim().min(1),
+    body2: z.string().trim().min(1),
+    type: z.enum(MAJOR_ASPECT_TYPES),
+    angle: z.number().min(0).max(180),
+    separation: z.number().min(0).max(180),
+    deviation: z.number().nonnegative(),
+    orb: z.number().positive(),
+    strength: z.number().min(0).max(100),
+    applying: z.boolean().nullable(),
+    outOfSign: z.boolean(),
+    timeReliability: z.enum(["exact_time", "stable_across_day"]),
+    referenceTimeMinutes: z.number().int().min(0).max(1439).optional(),
+    sampleCoverage: z.object({
+      present: z.number().int().positive(),
+      total: z.number().int().positive(),
+    }).strict().optional(),
+    strengthRange: z.object({
+      minimum: z.number().min(0).max(100),
+      maximum: z.number().min(0).max(100),
+    }).strict().optional(),
+    deviationRange: z.object({
+      minimum: z.number().nonnegative(),
+      maximum: z.number().nonnegative(),
+    }).strict().optional(),
+  }).strict().optional(),
+}).strict().superRefine((factor, context) => {
+  if (factor.kind === "major_aspect" && !factor.aspect) {
+    context.addIssue({
+      code: "custom",
+      path: ["aspect"],
+      message: "Major aspect factors require exact aspect details",
+    });
+  }
+  if (factor.kind !== "major_aspect" && factor.aspect) {
+    context.addIssue({
+      code: "custom",
+      path: ["aspect"],
+      message: "Only major aspect factors may contain aspect details",
+    });
+  }
+});
 
 const chartThemePresentationSchema = z.object({
   title: z.string().trim().min(3).max(90),
@@ -127,11 +180,12 @@ const catalogVersionsSchema = z.object({
   lunarNodes: z.number().int().positive(),
   karmicPlanetSigns: z.number().int().positive(),
   midheavens: z.number().int().positive(),
+  aspects: z.number().int().positive(),
 }).strict();
 
 const uncertaintySchema = z.object({
   kind: z.literal("birth_time_unknown"),
-  omittedFactors: z.array(z.enum(["ascendant", "houses", "aspects"])).length(3),
+  omittedFactors: z.tuple([z.literal("ascendant"), z.literal("houses")]),
   note: z.string().trim().min(1),
 }).strict();
 
@@ -210,6 +264,16 @@ const SPANISH_PLANETS: Record<string, string> = {
   Uranus: "Urano",
   Neptune: "Neptuno",
   Pluto: "Plutón",
+  Chiron: "Quirón",
+  "Mean North Node": "Nodo Norte medio",
+};
+
+const SPANISH_ASPECTS: Record<MajorAspectType, string> = {
+  conjunction: "conjunción",
+  sextile: "sextil",
+  square: "cuadratura",
+  trine: "trígono",
+  opposition: "oposición",
 };
 
 const SPANISH_SIGNS: Record<string, string> = {
@@ -260,6 +324,11 @@ export function natalFactorLabel(
     return nodes[3] && nodes[4] ? signs + ", eje de casas " + nodes[3] + "/" + nodes[4] : signs;
   }
 
+  const aspect = /^(.+) (conjunction|sextile|square|trine|opposition) (.+)$/.exec(factor.label);
+  if (factor.kind === "major_aspect" && aspect) {
+    return `${SPANISH_PLANETS[aspect[1]] ?? aspect[1]} ${SPANISH_ASPECTS[aspect[2] as MajorAspectType]} ${SPANISH_PLANETS[aspect[3]] ?? aspect[3]}`;
+  }
+
   return factor.label;
 }
 
@@ -277,13 +346,35 @@ const chartSchema = z.object({
   aspects: z.array(z.object({
     body1: z.string(),
     body2: z.string(),
+    type: z.enum(MAJOR_ASPECT_TYPES),
+    angle: z.number().min(0).max(180),
+    separation: z.number().min(0).max(180),
+    deviation: z.number().nonnegative(),
+    orb: z.number().positive(),
     strength: z.number().min(0).max(100),
+    applying: z.boolean().nullable().optional(),
+    outOfSign: z.boolean(),
+    timeReliability: z.enum(["stable_across_day", "time_sensitive"]).optional(),
+    referenceTimeMinutes: z.number().int().min(0).max(1439).optional(),
+    sampleCoverage: z.object({
+      present: z.number().int().positive(),
+      total: z.number().int().positive(),
+    }).strict().optional(),
+    strengthRange: z.object({
+      minimum: z.number().min(0).max(100),
+      maximum: z.number().min(0).max(100),
+    }).strict().optional(),
+    deviationRange: z.object({
+      minimum: z.number().nonnegative(),
+      maximum: z.number().nonnegative(),
+    }).strict().optional(),
   }).passthrough()).default([]),
   angles: z.record(z.string(), z.object({ sign: z.string() }).passthrough()).nullable().default(null),
   uncertainty: z.unknown().optional(),
 }).passthrough();
 
 const supportedPlanets = new Set<string>(PLANET_SIGN_PLANETS);
+const supportedAspectPlanets = new Set<string>(ARCHETYPE_PLANETS);
 const supportedSigns = new Set<string>(PLANET_SIGN_SIGNS);
 const supportedHouses = new Set<number>(PLANET_HOUSE_HOUSES);
 const angularHouses = new Set([1, 4, 7, 10]);
@@ -332,14 +423,53 @@ function planetClassReason(planet: PlanetSignPlanet): RankedNatalFactor["ranking
   return "transpersonal_planet";
 }
 
-function aspectEmphasis(planet: PlanetSignPlanet, aspects: z.infer<typeof chartSchema>["aspects"]) {
-  const strengths = aspects
-    .filter((aspect) => aspect.body1 === planet || aspect.body2 === planet)
-    .map((aspect) => aspect.strength)
-    .filter((strength) => strength >= 40)
-    .sort((a, b) => b - a)
-    .slice(0, 3);
-  return Math.min(10, Math.round(strengths.reduce((total, strength) => total + strength / 30, 0)));
+function isNorthNode(body: string) {
+  return body.toLowerCase().includes("north node");
+}
+
+function isSupportedAspectBody(body: string) {
+  return supportedAspectPlanets.has(body) || isNorthNode(body);
+}
+
+function aspectBodySlug(body: string) {
+  return body.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+}
+
+function aspectFactorId(body1: string, body2: string, type: MajorAspectType) {
+  const [first, second] = [aspectBodySlug(body1), aspectBodySlug(body2)].sort();
+  return `aspect.${first}.${type}.${second}`;
+}
+
+function aspectEndpointMaterial(body: string) {
+  if (supportedAspectPlanets.has(body)) {
+    const archetype = getPlanetArchetype(body as ArchetypePlanet);
+    return {
+      topics: archetype.topics,
+      coreMeaning: archetype.interpretation.core_meaning,
+      sourceReference: {
+        catalog: "planet_archetypes" as const,
+        catalogVersion: planetArchetypeCatalog.version,
+        entryId: archetype.id,
+      },
+    };
+  }
+
+  return {
+    topics: ["development", "purpose", "growth"],
+    coreMeaning: "The North Node symbolizes a growth-oriented direction that may feel less familiar but can widen the range of conscious choice.",
+    sourceReference: null,
+  };
+}
+
+function aspectSignificanceScore(body1: string, body2: string, strength: number) {
+  const bodies = [body1, body2];
+  const luminaryCount = bodies.filter((body) => body === "Sun" || body === "Moon").length;
+  const personalPlanetCount = bodies.filter((body) => ["Mercury", "Venus", "Mars"].includes(body)).length;
+  const developmentalPointCount = bodies.filter((body) => body === "Chiron" || isNorthNode(body)).length;
+  return Math.min(
+    100,
+    45 + Math.round(strength * 0.4) + luminaryCount * 6 + personalPlanetCount * 3 + developmentalPointCount * 2,
+  );
 }
 
 export const CURRENT_CATALOG_VERSIONS = {
@@ -352,6 +482,7 @@ export const CURRENT_CATALOG_VERSIONS = {
   lunarNodes: interpretations.version,
   karmicPlanetSigns: karmicPlanetSignInterpretationCatalog.version,
   midheavens: midheavenInterpretationCatalog.version,
+  aspects: aspectInterpretationCatalog.version,
 } as const;
 
 export function rankNatalChartFactors(value: unknown): RankedNatalFactor[] {
@@ -382,17 +513,14 @@ export function rankNatalChartFactors(value: unknown): RankedNatalFactor[] {
       ? getPlanetHouseInterpretation(planet as PlanetHousePlanet, house)
       : null;
     const houseArchetype = house ? getHouseArchetype(house as ArchetypeHouse) : null;
-    const aspectBonus = aspectEmphasis(planet, chart.aspects);
     const isChartRuler = chartRulers.includes(planet);
     const isAngular = house ? angularHouses.has(house) : false;
     const score = planetBaseScores[planet]
       + (isChartRuler ? (chartRulers.length === 1 ? 10 : 7) : 0)
-      + (isAngular ? 8 : 0)
-      + aspectBonus;
+      + (isAngular ? 8 : 0);
     const rankingReasons: RankedNatalFactor["rankingReasons"] = [planetClassReason(planet)];
     if (isChartRuler) rankingReasons.push("chart_ruler");
     if (isAngular) rankingReasons.push("angular_house");
-    if (aspectBonus >= 4) rankingReasons.push("aspect_emphasis");
     if (!house) rankingReasons.push("birth_time_unknown");
 
     factors.push({
@@ -545,6 +673,81 @@ export function rankNatalChartFactors(value: unknown): RankedNatalFactor[] {
     });
   }
 
+  for (const aspect of chart.aspects) {
+    if (
+      aspect.timeReliability === "time_sensitive"
+      || !isSupportedAspectBody(aspect.body1)
+      || !isSupportedAspectBody(aspect.body2)
+    ) continue;
+
+    const interpretation = getAspectInterpretation(aspect.type);
+    const firstBody = aspectEndpointMaterial(aspect.body1);
+    const secondBody = aspectEndpointMaterial(aspect.body2);
+    const rankingReasons: RankedNatalFactor["rankingReasons"] = ["major_aspect"];
+    if (aspect.strength >= 75) rankingReasons.push("tight_orb");
+    if ([aspect.body1, aspect.body2].some((body) => body === "Sun" || body === "Moon")) {
+      rankingReasons.push("luminary_aspect");
+    }
+    if ([aspect.body1, aspect.body2].some((body) => ["Mercury", "Venus", "Mars"].includes(body))) {
+      rankingReasons.push("personal_planet_aspect");
+    }
+    if (aspect.timeReliability === "stable_across_day") {
+      rankingReasons.push("stable_across_day", "birth_time_unknown");
+    }
+
+    factors.push({
+      id: aspectFactorId(aspect.body1, aspect.body2, aspect.type),
+      kind: "major_aspect",
+      label: `${aspect.body1} ${aspect.type} ${aspect.body2}`,
+      score: aspectSignificanceScore(aspect.body1, aspect.body2, aspect.strength),
+      topics: unique([
+        ...interpretation.topics,
+        ...firstBody.topics,
+        ...secondBody.topics,
+      ]),
+      rankingReasons,
+      sourceReferences: [
+        {
+          catalog: "aspects",
+          catalogVersion: aspectInterpretationCatalog.version,
+          entryId: interpretation.id,
+        },
+        ...(firstBody.sourceReference ? [firstBody.sourceReference] : []),
+        ...(secondBody.sourceReference ? [secondBody.sourceReference] : []),
+      ],
+      interpretation: {
+        coreMeanings: [
+          interpretation.interpretation.core_meaning,
+          firstBody.coreMeaning,
+          secondBody.coreMeaning,
+        ],
+        possibleExpressions: interpretation.interpretation.possible_expressions,
+        developmentalDirections: [interpretation.interpretation.developmental_direction],
+      },
+      aspect: {
+        body1: aspect.body1,
+        body2: aspect.body2,
+        type: aspect.type,
+        angle: aspect.angle,
+        separation: aspect.separation,
+        deviation: aspect.deviation,
+        orb: aspect.orb,
+        strength: aspect.strength,
+        applying: aspect.applying ?? null,
+        outOfSign: aspect.outOfSign,
+        timeReliability: aspect.timeReliability === "stable_across_day"
+          ? "stable_across_day"
+          : "exact_time",
+        ...(aspect.referenceTimeMinutes === undefined ? {} : {
+          referenceTimeMinutes: aspect.referenceTimeMinutes,
+        }),
+        ...(aspect.sampleCoverage ? { sampleCoverage: aspect.sampleCoverage } : {}),
+        ...(aspect.strengthRange ? { strengthRange: aspect.strengthRange } : {}),
+        ...(aspect.deviationRange ? { deviationRange: aspect.deviationRange } : {}),
+      },
+    });
+  }
+
   return rankedNatalFactorSchema.array().parse(
     factors.sort((left, right) => right.score - left.score || left.id.localeCompare(right.id)),
   );
@@ -654,11 +857,25 @@ export function retrieveNatalInterpretation(
   const relevantFactorCandidates = rankedFactorCandidates.filter(
     (candidate) => candidate.support !== Number.MAX_SAFE_INTEGER || candidate.relevance > 0,
   );
-  const factors = (topics.length === 0
+  const selectedFactorCandidates = (topics.length === 0
     ? rankedFactorCandidates
     : relevantFactorCandidates.length > 0 ? relevantFactorCandidates : rankedFactorCandidates)
-    .slice(0, maxFactors)
-    .map(({ factor }) => factor);
+    .slice(0, maxFactors);
+  if (
+    topics.length > 0
+    && selectedFactorCandidates.length > 0
+    && !selectedFactorCandidates.some((candidate) => candidate.relevance > 0)
+  ) {
+    const mostRelevant = rankedFactorCandidates
+      .filter((candidate) => candidate.relevance > 0)
+      .sort((left, right) => (
+        right.relevance - left.relevance
+        || right.factor.score - left.factor.score
+        || left.index - right.index
+      ))[0];
+    if (mostRelevant) selectedFactorCandidates[selectedFactorCandidates.length - 1] = mostRelevant;
+  }
+  const factors = unique(selectedFactorCandidates.map(({ factor }) => factor));
 
   return natalInterpretationRetrievalSchema.parse({
     source: NATAL_INTERPRETATION_SOURCE,
@@ -692,6 +909,32 @@ function existingFactorIds(factors: Array<RankedNatalFactor | undefined>) {
     .map((factor) => factor.id));
 }
 
+function withRelatedAspects(
+  rankedFactors: RankedNatalFactor[],
+  baseFactorIds: string[],
+  bodies: string[],
+) {
+  const bodySet = new Set(bodies);
+  const relatedAspects = rankedFactors
+    .filter((factor) => (
+      factor.kind === "major_aspect"
+      && factor.aspect
+      && (bodySet.has(factor.aspect.body1) || bodySet.has(factor.aspect.body2))
+    ))
+    .sort((left, right) => {
+      const leftBoth = left.aspect
+        ? Number(bodySet.has(left.aspect.body1) && bodySet.has(left.aspect.body2))
+        : 0;
+      const rightBoth = right.aspect
+        ? Number(bodySet.has(right.aspect.body1) && bodySet.has(right.aspect.body2))
+        : 0;
+      return rightBoth - leftBoth || right.score - left.score || left.id.localeCompare(right.id);
+    })
+    .map((factor) => factor.id);
+
+  return unique([...baseFactorIds, ...relatedAspects]).slice(0, 4);
+}
+
 export function anchoredThemeFactorIds(
   rankedFactors: RankedNatalFactor[],
 ): Record<"identity" | "karmic" | "mission", string[]> {
@@ -702,10 +945,65 @@ export function anchoredThemeFactorIds(
   const midheaven = firstFactor(rankedFactors, (factor) => factor.kind === "midheaven");
   const nodes = firstFactor(rankedFactors, (factor) => factor.kind === "lunar_node_axis");
 
+  const identityBase = existingFactorIds([sun, ascendant ?? moon]);
+  const karmicBase = existingFactorIds([nodes, saturn, moon]);
+  const missionBase = existingFactorIds([nodes, midheaven, sun]);
+  const nodeBody = rankedFactors
+    .filter((factor) => factor.kind === "major_aspect" && factor.aspect)
+    .flatMap((factor) => [factor.aspect!.body1, factor.aspect!.body2])
+    .find(isNorthNode) ?? "Mean North Node";
+
   return {
-    identity: existingFactorIds([sun, ascendant ?? moon]),
-    karmic: existingFactorIds([nodes, saturn, moon]),
-    mission: existingFactorIds([nodes, midheaven, sun]),
+    identity: withRelatedAspects(
+      rankedFactors,
+      identityBase,
+      ascendant ? ["Sun"] : ["Sun", "Moon"],
+    ),
+    karmic: withRelatedAspects(rankedFactors, karmicBase, [nodeBody, "Saturn", "Moon"]),
+    mission: withRelatedAspects(rankedFactors, missionBase, [nodeBody, "Sun"]),
+  };
+}
+
+export function buildNatalThemeGenerationInput(
+  factors: RankedNatalFactor[],
+  timeAccuracy: string,
+) {
+  const sourceFactor = (factor: RankedNatalFactor) => ({
+    id: factor.id,
+    label: factor.label,
+    significanceScore: factor.score,
+    rankingReasons: factor.rankingReasons,
+    topics: factor.topics,
+    authoredInterpretation: factor.interpretation,
+    ...(factor.aspect ? { aspectDetails: factor.aspect } : {}),
+  });
+  const factorMap = new Map(factors.map((factor) => [factor.id, factor]));
+  const anchors = anchoredThemeFactorIds(factors);
+  const anchoredIds = new Set([...anchors.identity, ...anchors.karmic, ...anchors.mission]);
+  const anchorInput = (slot: keyof typeof anchors, purpose: string) => ({
+    slot,
+    purpose,
+    factors: anchors[slot]
+      .map((id) => factorMap.get(id))
+      .filter((factor): factor is RankedNatalFactor => Boolean(factor))
+      .map(sourceFactor),
+  });
+  const nonAnchoredFactors = factors.filter((factor) => !anchoredIds.has(factor.id));
+  const emergentCandidateFactors = [
+    ...nonAnchoredFactors.filter((factor) => factor.kind !== "major_aspect").slice(0, 8),
+    ...nonAnchoredFactors.filter((factor) => factor.kind === "major_aspect"),
+  ]
+    .sort((left, right) => right.score - left.score || left.id.localeCompare(right.id))
+    .map(sourceFactor);
+
+  return {
+    timeAccuracy,
+    anchoredThemes: [
+      anchorInput("identity", "Core identity and instinctive approach to life"),
+      anchorInput("karmic", "Familiar emotional patterns, accumulated responsibilities, and evolutionary work"),
+      anchorInput("mission", "Developmental direction, purpose, and public contribution"),
+    ],
+    emergentCandidateFactors,
   };
 }
 

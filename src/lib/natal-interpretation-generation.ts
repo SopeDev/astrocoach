@@ -7,6 +7,7 @@ import { getServerEnv } from "@/lib/env";
 import { NATAL_THEME_GENERATION_INSTRUCTIONS } from "@/lib/natal-interpretation-prompt";
 import {
   anchoredThemeFactorIds,
+  buildNatalThemeGenerationInput,
   CURRENT_CATALOG_VERSIONS,
   deterministicThemeFallback,
   natalInterpretationDocumentSchema,
@@ -135,44 +136,12 @@ async function generateThemes(
   });
   if (!env.OPENAI_API_KEY) return fallback();
 
-  const sourceFactor = (factor: RankedNatalFactor) => ({
-    id: factor.id,
-    label: factor.label,
-    significanceScore: factor.score,
-    rankingReasons: factor.rankingReasons,
-    topics: factor.topics,
-    authoredInterpretation: factor.interpretation,
-  });
-  const factorMap = new Map(factors.map((factor) => [factor.id, factor]));
-  const anchors = anchoredThemeFactorIds(factors);
-  const anchoredIds = new Set([...anchors.identity, ...anchors.karmic, ...anchors.mission]);
-  const anchorInput = (slot: keyof typeof anchors, purpose: string) => ({
-    slot,
-    purpose,
-    factors: anchors[slot]
-      .map((id) => factorMap.get(id))
-      .filter((factor): factor is RankedNatalFactor => Boolean(factor))
-      .map(sourceFactor),
-  });
-  const emergentCandidates = factors
-    .filter((factor) => !anchoredIds.has(factor.id))
-    .slice(0, 8)
-    .map(sourceFactor);
-
   try {
     const response = await new OpenAI({ apiKey: env.OPENAI_API_KEY }).responses.parse({
       model: env.OPENAI_MODEL,
       store: false,
       instructions: NATAL_THEME_GENERATION_INSTRUCTIONS,
-      input: JSON.stringify({
-        timeAccuracy,
-        anchoredThemes: [
-          anchorInput("identity", "Core identity and instinctive approach to life"),
-          anchorInput("karmic", "Familiar emotional patterns, accumulated responsibilities, and evolutionary work"),
-          anchorInput("mission", "Developmental direction, purpose, and public contribution"),
-        ],
-        emergentCandidateFactors: emergentCandidates,
-      }),
+      input: JSON.stringify(buildNatalThemeGenerationInput(factors, timeAccuracy)),
       text: { format: zodTextFormat(generatedThemesSchema, "chart_at_a_glance") },
     });
 
@@ -203,8 +172,8 @@ export async function prepareNatalInterpretation({
   const uncertainty = timeAccuracy === "unknown"
     ? {
         kind: "birth_time_unknown" as const,
-        omittedFactors: ["ascendant", "houses", "aspects"] as const,
-        note: "Birth time is unknown. Themes use noon-reference planet and lunar-node signs; Ascendant, houses, and aspects are omitted.",
+        omittedFactors: ["ascendant", "houses"] as const,
+        note: "Birth time is unknown. Themes use noon-reference planet and lunar-node signs; Ascendant and houses are omitted. Major aspects are retained with day-based timing uncertainty.",
       }
     : null;
   const document = natalInterpretationDocumentSchema.parse({

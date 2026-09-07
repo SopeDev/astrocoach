@@ -134,24 +134,28 @@ model User {
 }
 
 model Conversation {
-  id                    String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId                String                      @map("user_id") @db.Uuid
-  focalMapItemId        String?                     @map("focal_map_item_id") @db.Uuid
-  mode                  ConversationMode            @default(EXPLORE)
-  status                ConversationStatus          @default(active)
-  transitionState       ConversationTransitionState @default(IDLE) @map("transition_state")
-  transitionReferenceAt DateTime?                   @map("transition_reference_at") @db.Timestamptz(6)
-  title                 String?                     @db.VarChar(120)
-  lastMessageAt         DateTime                    @default(now()) @map("last_message_at") @db.Timestamptz(6)
-  archivedAt            DateTime?                   @map("archived_at") @db.Timestamptz(6)
-  createdAt             DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt             DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
-  user                  User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  focalMapItem          MapItem?                    @relation("ConversationFocalMapItem", fields: [focalMapItemId], references: [id], onDelete: SetNull)
-  messages              Message[]
-  sourceMapItems        MapItem[]                   @relation("MapItemSourceConversation")
-  practices             Practice[]
-  practiceObservations  PracticeObservation[]
+  id                     String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                 String                      @map("user_id") @db.Uuid
+  focalMapItemId         String?                     @map("focal_map_item_id") @db.Uuid
+  mode                   ConversationMode            @default(EXPLORE)
+  status                 ConversationStatus          @default(active)
+  transitionState        ConversationTransitionState @default(IDLE) @map("transition_state")
+  transitionReferenceAt  DateTime?                   @map("transition_reference_at") @db.Timestamptz(6)
+  contextVersion         Int?                        @map("context_version")
+  contextSnapshot        Json?                       @map("context_snapshot")
+  contextInitializedAt   DateTime?                   @map("context_initialized_at") @db.Timestamptz(6)
+  providerConversationId String?                     @unique @map("provider_conversation_id")
+  title                  String?                     @db.VarChar(120)
+  lastMessageAt          DateTime                    @default(now()) @map("last_message_at") @db.Timestamptz(6)
+  archivedAt             DateTime?                   @map("archived_at") @db.Timestamptz(6)
+  createdAt              DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user                   User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  focalMapItem           MapItem?                    @relation("ConversationFocalMapItem", fields: [focalMapItemId], references: [id], onDelete: SetNull)
+  messages               Message[]
+  sourceMapItems         MapItem[]                   @relation("MapItemSourceConversation")
+  practices              Practice[]
+  practiceObservations   PracticeObservation[]
 
   @@index([userId, lastMessageAt(sort: Desc)])
   @@index([userId, archivedAt, lastMessageAt(sort: Desc)])

@@ -12,6 +12,8 @@ test("chart theme generation uses the shared product voice and concrete readabil
   assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /equally natural, casual Spanish/i);
 });
 
-test("the interpretation schema invalidates themes generated before the voice update", () => {
-  assert.equal(NATAL_INTERPRETATION_SCHEMA_VERSION, 4);
+test("the interpretation schema invalidates themes that claimed unknown-time aspects were omitted", () => {
+  assert.equal(NATAL_INTERPRETATION_SCHEMA_VERSION, 6);
+  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /exact body pair, type, orb metadata/i);
+  assert.match(NATAL_THEME_GENERATION_INSTRUCTIONS, /only aspects stable across the sampled local day/i);
 });

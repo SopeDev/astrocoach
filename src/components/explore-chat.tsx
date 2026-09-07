@@ -19,6 +19,11 @@ import {
 } from "@/app/actions/explore";
 import type { Locale } from "@/i18n/config";
 import { MAX_RECORDING_SECONDS, MAX_TRANSCRIPT_CHARACTERS } from "@/lib/audio-transcription";
+import {
+  canAddAssistantMessage,
+  countConversationMessages,
+  hasReachedConversationLimit,
+} from "@/lib/conversation-limits";
 import type { CandidateEvaluationAction, CandidateEvaluationOffer } from "@/lib/recognize-contract";
 import type { PracticeProposalOffer } from "@/lib/integrate-contract";
 import { formatRecordingTime, useVoiceRecording } from "@/hooks/use-voice-recording";
@@ -37,6 +42,9 @@ type Messages = {
   retry: string;
   generationError: string;
   messageError: string;
+  messageLimitTitle: string;
+  messageLimitDescription: string;
+  messageLimitAction: string;
   backHome: string;
   account: string;
   transitionTitle: string;
@@ -121,7 +129,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   const [thread, setThread] = useState(initialMessages);
   const [draft, setDraft] = useState("");
   const [failedMessageId, setFailedMessageId] = useState(initialFailedMessageId);
-  const [error, setError] = useState<"message" | "generation" | "action" | null>(initialFailedMessageId ? "generation" : null);
+  const [error, setError] = useState<"message" | "generation" | "action" | "limit" | null>(initialFailedMessageId ? "generation" : null);
   const [mode, setMode] = useState<ConversationMode>(initialMode);
   const [transitionOffered, setTransitionOffered] = useState(initialTransitionOffered);
   const [candidateEvaluationOffer, setCandidateEvaluationOffer] = useState(initialCandidateEvaluationOffer);
@@ -135,11 +143,13 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   const [transitionPending, setTransitionPending] = useState(false);
   const [evaluationPending, setEvaluationPending] = useState<CandidateEvaluationAction | null>(null);
   const [pending, startTransition] = useTransition();
+  const messageCounts = countConversationMessages(thread);
+  const messageLimitReached = hasReachedConversationLimit(messageCounts) || error === "limit";
   const hasScrolledOnLoad = useRef(false);
   const composerInput = useRef<HTMLTextAreaElement>(null);
   const { audioStatus, audioError, recordingSeconds, startRecording, stopRecording, cancelRecording, clearAudioError } = useVoiceRecording({
     locale,
-    disabled: pending || Boolean(failedMessageId),
+    disabled: pending || Boolean(failedMessageId) || messageLimitReached,
     onTranscript(transcript) {
       const combinedDraft = draft.trim() ? `${draft.trim()} ${transcript}` : transcript;
       if (combinedDraft.length > MAX_TRANSCRIPT_CHARACTERS) return false;
@@ -201,7 +211,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
   function submit(event?: FormEvent) {
     event?.preventDefault();
     const content = draft.trim();
-    if (!content || pending || failedMessageId || closed || audioStatus !== "idle") {
+    if (!content || pending || failedMessageId || closed || messageLimitReached || audioStatus !== "idle") {
       if (!content) setError("message");
       return;
     }
@@ -216,6 +226,16 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
       const result = await sendExploreMessage(locale, initialConversationId, content);
       if (result.ok) {
         applyResult(result, optimisticId);
+        return;
+      }
+      if (result.error === "limit") {
+        setThread((existing) => {
+          const withoutOptimistic = existing.filter((message) => message.id !== optimisticId);
+          return result.userMessage && !withoutOptimistic.some((message) => message.id === result.userMessage?.id)
+            ? [...withoutOptimistic, result.userMessage]
+            : withoutOptimistic;
+        });
+        setError("limit");
         return;
       }
       if (result.error === "generation" && result.userMessage) {
@@ -240,12 +260,13 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
         setFailedMessageId(null);
       } else {
         setError(result.error);
+        if (result.error === "limit") setFailedMessageId(null);
       }
     });
   }
 
   function acceptTransition() {
-    if (pending) return;
+    if (pending || !canAddAssistantMessage(messageCounts)) return;
     setError(null);
     setTransitionPending(true);
     startTransition(async () => {
@@ -258,7 +279,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
           setCandidateEvaluationOffer(result.candidateEvaluationOffer);
           return;
         }
-        setError("action");
+        setError(result.error === "limit" ? "limit" : "action");
       } catch {
         setError("action");
       } finally {
@@ -381,7 +402,8 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
               {thread.map((message) => <article className={message.role === "user" ? "ml-auto max-w-[88%] rounded-2xl rounded-br-md bg-violet-700 px-4 py-3 text-white dark:bg-violet-600" : "mr-auto max-w-[92%] text-slate-800 dark:text-slate-100"} key={message.id} translate="no">{message.role === "user" ? <p className="whitespace-pre-wrap text-[0.98rem] leading-7">{message.content}</p> : <AssistantMessageContent content={message.content} />}</article>)}
               {pending && !savingMapItem && !practicePending && !transitionPending && !evaluationPending ? <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400"><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.thinking}</div> : null}
               {failedMessageId && !pending ? <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-100"><p>{messages.generationError}</p><button className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-amber-300 px-4 py-2 font-semibold transition hover:bg-amber-100 dark:border-amber-800 dark:hover:bg-amber-950" onClick={retry} type="button"><RefreshCw aria-hidden="true" className="size-4" />{messages.retry}</button></div> : null}
-              {transitionOffered && !failedMessageId ? <section className="rounded-3xl border border-violet-200 bg-violet-50 p-5 dark:border-violet-800 dark:bg-violet-950/45"><Sparkles aria-hidden="true" className="size-5 text-violet-700 dark:text-violet-300" /><h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{mode === "INTEGRATE" ? messages.integrationRevisionTitle : mode === "DEEP_EXPLORE" ? messages.deepRecognitionTitle : messages.transitionTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{mode === "INTEGRATE" ? messages.integrationRevisionDescription : mode === "DEEP_EXPLORE" ? messages.deepRecognitionDescription : messages.transitionDescription}</p><div className="mt-4 grid gap-2"><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-4 py-3 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} onClick={acceptTransition} type="button">{transitionPending ? <><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.lookingCloser}</> : messages.transitionAccept}</button><button className="min-h-11 cursor-pointer rounded-xl px-4 py-2 font-semibold text-slate-600 transition hover:bg-white/70 disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-900/60" disabled={pending} onClick={declineTransition} type="button">{messages.transitionDecline}</button></div></section> : null}
+              {messageLimitReached && !failedMessageId && !pending ? <section className="rounded-3xl border border-slate-200 bg-white/75 p-5 dark:border-slate-800 dark:bg-slate-950/50"><h2 className="font-semibold text-slate-950 dark:text-white">{messages.messageLimitTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.messageLimitDescription}</p><Link className="mt-4 flex min-h-12 items-center justify-center rounded-xl bg-violet-700 px-4 py-3 text-center font-semibold text-white transition hover:bg-violet-800 dark:bg-violet-600 dark:hover:bg-violet-500" href={`/${locale}/home#new-conversation`}>{messages.messageLimitAction}</Link></section> : null}
+              {transitionOffered && !failedMessageId && !messageLimitReached ? <section className="rounded-3xl border border-violet-200 bg-violet-50 p-5 dark:border-violet-800 dark:bg-violet-950/45"><Sparkles aria-hidden="true" className="size-5 text-violet-700 dark:text-violet-300" /><h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{mode === "INTEGRATE" ? messages.integrationRevisionTitle : mode === "DEEP_EXPLORE" ? messages.deepRecognitionTitle : messages.transitionTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{mode === "INTEGRATE" ? messages.integrationRevisionDescription : mode === "DEEP_EXPLORE" ? messages.deepRecognitionDescription : messages.transitionDescription}</p><div className="mt-4 grid gap-2"><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-4 py-3 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} onClick={acceptTransition} type="button">{transitionPending ? <><LoaderCircle aria-hidden="true" className="size-4 animate-spin" />{messages.lookingCloser}</> : messages.transitionAccept}</button><button className="min-h-11 cursor-pointer rounded-xl px-4 py-2 font-semibold text-slate-600 transition hover:bg-white/70 disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-900/60" disabled={pending} onClick={declineTransition} type="button">{messages.transitionDecline}</button></div></section> : null}
               {candidateEvaluationOffer && !failedMessageId ? <section aria-labelledby="candidate-evaluation-title" className="rounded-3xl border border-violet-200 bg-violet-50 p-5 dark:border-violet-800 dark:bg-violet-950/45"><div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-violet-700 dark:text-violet-300">{candidateEvaluationOffer.item.kind === "PATTERN" ? <Repeat2 aria-hidden="true" className="size-4" /> : <Lightbulb aria-hidden="true" className="size-4" />}{candidateEvaluationOffer.item.kind === "PATTERN" ? messages.patternLabel : messages.insightLabel}</div><h2 className="mt-3 font-semibold text-slate-950 dark:text-white" id="candidate-evaluation-title">{messages.candidateEvaluationTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.candidateEvaluationDescription}</p><div className="mt-4 grid grid-cols-2 gap-2"><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-violet-700 px-3 py-3 text-sm font-semibold text-white transition hover:bg-violet-800 active:scale-[0.98] disabled:opacity-60 dark:bg-violet-600 dark:hover:bg-violet-500" disabled={pending} onClick={() => evaluateCandidate("YES_EXACTLY")} type="button">{evaluationPending === "YES_EXACTLY" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidateYesExactly}</button><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-violet-300 bg-white px-3 py-3 text-sm font-semibold text-violet-900 transition hover:bg-violet-100 active:scale-[0.98] disabled:opacity-60 dark:border-violet-700 dark:bg-slate-950 dark:text-violet-100 dark:hover:bg-violet-950" disabled={pending} onClick={() => evaluateCandidate("PARTLY")} type="button">{evaluationPending === "PARTLY" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidatePartly}</button><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900" disabled={pending} onClick={() => evaluateCandidate("NO")} type="button">{evaluationPending === "NO" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidateNo}</button><button className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900" disabled={pending} onClick={() => evaluateCandidate("LET_ME_EXPLAIN")} type="button">{evaluationPending === "LET_ME_EXPLAIN" ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{messages.candidateLetMeExplain}</button></div></section> : null}
               {mapItemSaveOffer ? <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900 dark:bg-emerald-950/40">{mapItemSaved ? <Check aria-hidden="true" className="size-5 text-emerald-700 dark:text-emerald-300" /> : <Bookmark aria-hidden="true" className="size-5 text-emerald-700 dark:text-emerald-300" />}<div className="mt-3 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-700 dark:text-emerald-300">{mapItemSaveOffer.kind === "PATTERN" ? messages.patternLabel : messages.insightLabel}</div><h2 className="mt-2 font-semibold text-slate-950 dark:text-white">{mapItemSaved ? messages.patternSaved : messages.patternTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-700 dark:text-slate-200">{mapItemSaveOffer.statement}</p>{mapItemSaved ? <div className="mt-4 grid grid-cols-2 gap-2">{mapItemSaveOffer.mapItemId ? <Link className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white" href={`/${locale}/map/${mapItemSaveOffer.mapItemId}`}>{messages.openMapItem}</Link> : <Link className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white" href={`/${locale}/map`}>{messages.viewMap}</Link>}<Link className="flex min-h-11 items-center justify-center rounded-xl border border-emerald-300 px-3 py-2 text-center text-sm font-semibold text-emerald-900 dark:border-emerald-800 dark:text-emerald-100" href={`/${locale}/home`}>{messages.returnHome}</Link></div> : <><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.patternDescription}</p><button className="mt-4 min-h-12 w-full cursor-pointer rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60" disabled={pending} onClick={saveMapItem} type="button">{savingMapItem ? messages.savingPattern : messages.savePattern}</button></>}</section> : null}
               {practiceProposal && !failedMessageId ? <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900 dark:bg-emerald-950/40"><Sprout aria-hidden="true" className="size-5 text-emerald-700 dark:text-emerald-300" /><h2 className="mt-3 font-semibold text-slate-950 dark:text-white">{messages.practiceProposalTitle}</h2><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{messages.practiceProposalDescription}</p><p className="mt-3 leading-7 text-slate-900 dark:text-slate-100">{practiceProposal.proposal.instruction}</p><p className="mt-2 text-sm text-slate-600 dark:text-slate-300"><span className="font-semibold">{messages.practiceCueLabel}:</span> {practiceProposal.proposal.cue}</p><button className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:opacity-60" disabled={pending} onClick={activateProposedPractice} type="button">{practicePending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}{practicePending ? messages.activatingPractice : messages.activatePractice}</button></section> : null}
@@ -391,7 +413,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
           )}
         </div>
 
-        {!closed && !transitionOffered && !candidateEvaluationOffer && !mapItemSaveOffer && !practiceProposal ? (
+        {!closed && !messageLimitReached && !transitionOffered && !candidateEvaluationOffer && !mapItemSaveOffer && !practiceProposal ? (
           <form className="sticky bottom-0 border-t border-slate-200/70 bg-[color:var(--background)]/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur dark:border-slate-800/80" onSubmit={submit}>
             {audioStatus === "recording" ? (
               <div className="flex min-h-14 items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 dark:border-red-900 dark:bg-red-950/45">

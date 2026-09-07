@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "language": "en",
+  "adapted_from": "AstroCoach product interpretation framework",
+  "kind": "major_aspect",
+  "entries": [
+    {
+      "id": "aspect.conjunction",
+      "kind": "major_aspect",
+      "factors": { "type": "conjunction" },
+      "topics": ["integration", "focus", "intensity", "identity"],
+      "interpretation": {
+        "core_meaning": "A conjunction brings two symbolic functions into the same field, intensifying their combined expression and making them difficult to separate in experience.",
+        "possible_expressions": ["Experiencing two needs as one concentrated impulse", "Giving unusual focus to the life areas represented by both functions", "Finding that one function strongly colors how the other is expressed"],
+        "developmental_direction": "Learn to recognize both functions inside the combined impulse so that neither is unconsciously overshadowed by the other."
+      }
+    },
+    {
+      "id": "aspect.sextile",
+      "kind": "major_aspect",
+      "factors": { "type": "sextile" },
+      "topics": ["opportunity", "cooperation", "learning", "resourcefulness"],
+      "interpretation": {
+        "core_meaning": "A sextile describes compatible symbolic functions that can open useful opportunities when they are consciously engaged rather than simply assumed to work on their own.",
+        "possible_expressions": ["Finding practical ways for two different strengths to cooperate", "Recognizing an opening that becomes useful through participation", "Developing a capacity by moving between curiosity and action"],
+        "developmental_direction": "Actively use the available cooperation between both functions instead of waiting for its possibilities to develop automatically."
+      }
+    },
+    {
+      "id": "aspect.square",
+      "kind": "major_aspect",
+      "factors": { "type": "square" },
+      "topics": ["tension", "action", "conflict", "development"],
+      "interpretation": {
+        "core_meaning": "A square describes friction between symbolic functions whose competing demands create pressure for action, adjustment, and a more capable way of holding both.",
+        "possible_expressions": ["Feeling pushed to respond when two needs demand different actions", "Repeating a friction until a more workable response is developed", "Turning internal pressure into effort, skill, or decisive change"],
+        "developmental_direction": "Use the friction as information and motivation, making room for both functions without treating either one as the problem to eliminate."
+      }
+    },
+    {
+      "id": "aspect.trine",
+      "kind": "major_aspect",
+      "factors": { "type": "trine" },
+      "topics": ["flow", "talent", "ease", "integration"],
+      "interpretation": {
+        "core_meaning": "A trine describes an easy flow between symbolic functions, often experienced as a familiar resource or ability that requires little internal negotiation.",
+        "possible_expressions": ["Drawing naturally on two strengths at the same time", "Experiencing a capacity as familiar or readily available", "Overlooking an ability because it operates with little friction"],
+        "developmental_direction": "Use the available ease deliberately so that a natural resource becomes an active contribution rather than an unexamined comfort zone."
+      }
+    },
+    {
+      "id": "aspect.opposition",
+      "kind": "major_aspect",
+      "factors": { "type": "opposition" },
+      "topics": ["polarity", "relationships", "awareness", "integration"],
+      "interpretation": {
+        "core_meaning": "An opposition places two symbolic functions across a polarity, increasing awareness through contrast and often inviting balance between alternating or projected positions.",
+        "possible_expressions": ["Alternating between two needs that initially feel incompatible", "Meeting one side of an inner polarity through another person", "Developing perspective by recognizing value at both ends of a tension"],
+        "developmental_direction": "Build a conscious relationship between both sides of the polarity instead of identifying with one and locating the other entirely outside oneself."
+      }
+    }
+  ]
+}

@@ -5,6 +5,12 @@ import { z } from "zod";
 import { db } from "@/db/client";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
+import {
+  calculateNatalChart,
+  NATAL_ENGINE,
+  NATAL_ENGINE_VERSION,
+  NATAL_SCHEMA_VERSION,
+} from "@/lib/natal-chart";
 import { resolveBirthInstant } from "@/lib/birth-timezone";
 import { getPlace, getTimezone } from "@/lib/geonames";
 
@@ -42,19 +48,56 @@ export async function saveBirthLocation(
       birthTimeMinutes: birthProfile.birthTimeMinutes,
       timezoneId,
     });
-    await db.birthProfile.update({
-      where: { id: birthProfile.id },
-      data: {
-        geonameId: place.geonameId,
-        locationName: place.name,
-        adminName: place.adminName1 ?? null,
-        countryName: place.countryName,
-        countryCode: place.countryCode,
+    await db.$transaction(async (transaction) => {
+      const updatedProfile = await transaction.birthProfile.update({
+        where: { id: birthProfile.id },
+        data: {
+          geonameId: place.geonameId,
+          locationName: place.name,
+          adminName: place.adminName1 ?? null,
+          countryName: place.countryName,
+          countryCode: place.countryCode,
+          latitude: place.lat,
+          longitude: place.lng,
+          timezoneId,
+          ...historicalTime,
+        },
+      });
+      const calculation = calculateNatalChart({
+        birthDate: updatedProfile.birthDate,
+        birthTimeMinutes: updatedProfile.birthTimeMinutes,
         latitude: place.lat,
         longitude: place.lng,
         timezoneId,
-        ...historicalTime,
-      },
+      });
+      const calculatedAt = new Date();
+
+      await transaction.natalChart.upsert({
+        where: { userId: user.id },
+        create: {
+          userId: user.id,
+          engine: NATAL_ENGINE,
+          engineVersion: NATAL_ENGINE_VERSION,
+          schemaVersion: NATAL_SCHEMA_VERSION,
+          inputHash: calculation.inputHash,
+          timeAccuracy: calculation.timeAccuracy,
+          houseSystem: calculation.houseSystem,
+          sourceProfileUpdated: updatedProfile.updatedAt,
+          calculatedAt,
+          data: calculation.data,
+        },
+        update: {
+          engine: NATAL_ENGINE,
+          engineVersion: NATAL_ENGINE_VERSION,
+          schemaVersion: NATAL_SCHEMA_VERSION,
+          inputHash: calculation.inputHash,
+          timeAccuracy: calculation.timeAccuracy,
+          houseSystem: calculation.houseSystem,
+          sourceProfileUpdated: updatedProfile.updatedAt,
+          calculatedAt,
+          data: calculation.data,
+        },
+      });
     });
   } catch (error) {
     console.error("Saving birth location failed", error);

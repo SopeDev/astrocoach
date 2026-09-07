@@ -5,6 +5,7 @@ import { db } from "@/db/client";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
 import { conversationIdSchema, serializeConversationExport } from "@/lib/conversations";
+import { deleteProviderConversation } from "@/lib/openai-conversation-state";
 
 function revalidateConversationLists(locale: Locale) {
   revalidatePath(`/${locale}/conversations`);
@@ -57,7 +58,7 @@ export async function deleteArchivedConversation(locale: Locale, conversationId:
   const result = await db.$transaction(async (transaction) => {
     const conversation = await transaction.conversation.findFirst({
       where: { id: parsedId.data, userId: user.id, archivedAt: { not: null } },
-      select: { id: true },
+      select: { id: true, providerConversationId: true },
     });
     if (!conversation) return null;
 
@@ -71,9 +72,20 @@ export async function deleteArchivedConversation(locale: Locale, conversationId:
     const deletedMapItems = await transaction.mapItem.deleteMany({ where: { id: { in: rootedMapItems.map((item) => item.id) }, userId: user.id } });
     const deletedConversation = await transaction.conversation.deleteMany({ where: { id: conversation.id, userId: user.id, archivedAt: { not: null } } });
     if (deletedConversation.count !== 1) throw new Error("Archived conversation changed before deletion");
-    return { deletedMapItems: deletedMapItems.count };
+    return {
+      deletedMapItems: deletedMapItems.count,
+      providerConversationId: conversation.providerConversationId,
+    };
   });
   if (!result) return { ok: false as const };
+
+  if (result.providerConversationId) {
+    try {
+      await deleteProviderConversation(result.providerConversationId);
+    } catch (error) {
+      console.error("Deleted the local conversation but could not delete its provider state", error);
+    }
+  }
 
   revalidateConversationLists(locale);
   return { ok: true as const, deletedMapItems: result.deletedMapItems };
