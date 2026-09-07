@@ -252,21 +252,22 @@ model PracticeObservation {
 }
 
 model InitialIntent {
-  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId                 String    @unique @map("user_id") @db.Uuid
-  lifeAreas              String[]  @map("life_areas")
-  currentContext         String?   @map("current_context") @db.Text
-  discoveryQuestions     Json?     @map("discovery_questions")
-  initialAnswers         Json?     @map("initial_answers")
-  finalQuestions         Json?     @map("final_questions")
-  finalAnswers           Json?     @map("final_answers")
-  questionsGenerated     DateTime? @map("questions_generated_at") @db.Timestamptz(6)
-  discoveryCompletedAt   DateTime? @map("discovery_completed_at") @db.Timestamptz(6)
-  chartAtAGlanceViewedAt DateTime? @map("chart_at_a_glance_viewed_at") @db.Timestamptz(6)
-  orientationCompletedAt DateTime? @map("orientation_completed_at") @db.Timestamptz(6)
-  createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt              DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
-  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                    String    @unique @map("user_id") @db.Uuid
+  lifeAreas                 String[]  @map("life_areas")
+  currentContext            String?   @map("current_context") @db.Text
+  discoveryQuestions        Json?     @map("discovery_questions")
+  discoveryAstrologyContext Json?     @map("discovery_astrology_context")
+  initialAnswers            Json?     @map("initial_answers")
+  finalQuestions            Json?     @map("final_questions")
+  finalAnswers              Json?     @map("final_answers")
+  questionsGenerated        DateTime? @map("questions_generated_at") @db.Timestamptz(6)
+  discoveryCompletedAt      DateTime? @map("discovery_completed_at") @db.Timestamptz(6)
+  chartAtAGlanceViewedAt    DateTime? @map("chart_at_a_glance_viewed_at") @db.Timestamptz(6)
+  orientationCompletedAt    DateTime? @map("orientation_completed_at") @db.Timestamptz(6)
+  createdAt                 DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                 DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("initial_intents")
 }

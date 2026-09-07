@@ -6,6 +6,10 @@ import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { requireCurrentUser } from "@/lib/auth-user";
 import {
+  createDiscoveryAstrologyContext,
+  discoveryAstrologyContextSchema,
+} from "@/lib/discovery-astrology";
+import {
   discoveryAnswersSchema,
   discoveryQuestionsSchema,
   finalDiscoveryAnswersSchema,
@@ -47,12 +51,24 @@ export async function prepareFinalDiscoveryQuestions(locale: Locale, answers: st
     const lifeAreaKeys = parseLifeAreaKeys(intent.lifeAreas);
     const areaLabels = lifeAreaKeys.map((key: LifeAreaKey) => messages.initialIntent.areas[key]);
     const natalInterpretation = await ensureNatalInterpretation(user.id, natalChart);
+    const storedAstrologyContext = discoveryAstrologyContextSchema.safeParse(
+      intent.discoveryAstrologyContext,
+    );
+    const discoveryAstrologyContext = storedAstrologyContext.success
+      && storedAstrologyContext.data.sourceChartInputHash === natalChart.inputHash
+      ? storedAstrologyContext.data
+      : createDiscoveryAstrologyContext({
+          natalChart: natalChart.data,
+          natalInterpretation,
+          natalTimeAccuracy: z.enum(["exact", "unknown"]).parse(natalChart.timeAccuracy),
+          engineVersion: natalChart.engineVersion,
+          calculatedAt: intent.questionsGenerated ?? new Date(),
+        });
     const questions = await generateFinalDiscoveryQuestions({
       locale,
-      lifeAreaKeys,
       areaLabels,
       currentContext: intent.currentContext,
-      natalInterpretation,
+      discoveryAstrologyContext,
       astrologyFamiliarity: user.astrologyFamiliarity,
       astrologyStyle: user.astrologyStyle,
       initialQuestions: initialQuestions.data,
@@ -61,7 +77,11 @@ export async function prepareFinalDiscoveryQuestions(locale: Locale, answers: st
 
     await db.initialIntent.update({
       where: { id: intent.id },
-      data: { initialAnswers: parsedAnswers.data, finalQuestions: questions },
+      data: {
+        initialAnswers: parsedAnswers.data,
+        finalQuestions: questions,
+        discoveryAstrologyContext,
+      },
     });
 
     return { questions };

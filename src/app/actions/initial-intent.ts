@@ -7,6 +7,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
 import { astrologyFamiliaritySchema, astrologyStyleSchema } from "@/lib/astrology-preferences";
+import { createDiscoveryAstrologyContext } from "@/lib/discovery-astrology";
 import { generateInitialDiscoveryQuestions } from "@/lib/initial-discovery";
 import { LIFE_AREA_KEYS } from "@/lib/life-areas";
 import { calculateNatalChart, NATAL_ENGINE, NATAL_ENGINE_VERSION, NATAL_SCHEMA_VERSION } from "@/lib/natal-chart";
@@ -85,12 +86,17 @@ export async function saveInitialIntent(
         });
     const messages = getDictionary(locale);
     const areaLabels = result.data.lifeAreas.map((key) => messages.initialIntent.areas[key]);
+    const discoveryAstrologyContext = createDiscoveryAstrologyContext({
+      natalChart: calculation.data,
+      natalInterpretation: preparedInterpretation.document,
+      natalTimeAccuracy: calculation.timeAccuracy,
+      engineVersion: NATAL_ENGINE_VERSION,
+    });
     const questions = await generateInitialDiscoveryQuestions({
       locale,
-      lifeAreaKeys: result.data.lifeAreas,
       areaLabels,
       currentContext: result.data.currentContext || null,
-      natalInterpretation: preparedInterpretation.document,
+      discoveryAstrologyContext,
       astrologyFamiliarity: result.data.astrologyFamiliarity,
       astrologyStyle: result.data.astrologyStyle,
     });
@@ -147,6 +153,7 @@ export async function saveInitialIntent(
           lifeAreas: result.data.lifeAreas,
           currentContext: result.data.currentContext || null,
           discoveryQuestions: questions,
+          discoveryAstrologyContext,
           initialAnswers: [],
           finalQuestions: [],
           finalAnswers: [],
@@ -158,6 +165,7 @@ export async function saveInitialIntent(
           lifeAreas: result.data.lifeAreas,
           currentContext: result.data.currentContext || null,
           discoveryQuestions: questions,
+          discoveryAstrologyContext,
           initialAnswers: [],
           finalQuestions: [],
           finalAnswers: [],

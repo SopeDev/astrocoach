@@ -6,6 +6,10 @@ import { z } from "zod";
 import type { Locale } from "@/i18n/config";
 import { ASTROCOACH_VOICE_INSTRUCTIONS } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
+import {
+  DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS,
+  type DiscoveryAstrologyContext,
+} from "@/lib/discovery-astrology";
 import { getServerEnv } from "@/lib/env";
 import {
   assertHumanFirstAstrologyLanguage,
@@ -13,11 +17,6 @@ import {
   HUMAN_FIRST_ASTROLOGY_INSTRUCTIONS,
   TechnicalAstrologyLanguageError,
 } from "@/lib/human-first-astrology";
-import type { LifeAreaKey } from "@/lib/life-areas";
-import {
-  retrieveNatalInterpretation,
-  type NatalInterpretationDocument,
-} from "@/lib/natal-interpretation";
 
 const generatedDiscoveryQuestionSchema = z.object({
   privateBasis: z.string().trim().min(3).max(500),
@@ -25,7 +24,8 @@ const generatedDiscoveryQuestionSchema = z.object({
 }).strict();
 
 const generatedInitialDiscoveryQuestionSchema = generatedDiscoveryQuestionSchema.extend({
-  basisKind: z.enum(["user_context", "chart_hypothesis"]),
+  basisKind: z.enum(["user_context", "natal_pattern", "current_activation"]),
+  supportingAstrologyIds: z.array(z.string().trim().min(1)).max(6),
 }).strict();
 
 const initialQuestionSetSchema = z.object({
@@ -47,10 +47,9 @@ export const finalDiscoveryAnswersSchema = z.array(z.string().trim().min(1).max(
 
 type DiscoveryContext = {
   locale: Locale;
-  lifeAreaKeys: LifeAreaKey[];
   areaLabels: string[];
   currentContext: string | null;
-  natalInterpretation: NatalInterpretationDocument;
+  discoveryAstrologyContext: DiscoveryAstrologyContext;
   astrologyFamiliarity: AstrologyFamiliarity;
   astrologyStyle: AstrologyStyle;
 };
@@ -61,6 +60,8 @@ function sharedInstructions(locale: Locale) {
 ${HUMAN_FIRST_ASTROLOGY_INSTRUCTIONS}
 
 ${DISCOVERY_QUESTION_STYLE_INSTRUCTIONS}
+
+${DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS}
 
 astrologyStyle and astrologyFamiliarity may influence the depth and directness of the private hypothesis, but never make technical astrology visible during Discovery. Put a brief account of the exact user detail or chart hypothesis used in privateBasis. privateBasis is never shown to the user.
 
@@ -114,9 +115,36 @@ function validateGeneratedQuestions(questions: string[]) {
 
 function validateInitialQuestionBasis(
   generated: z.infer<typeof initialQuestionSetSchema>["questions"],
+  astrologyContext: DiscoveryAstrologyContext,
 ) {
-  if (generated.filter(({ basisKind }) => basisKind === "chart_hypothesis").length < 2) {
-    throw new Error("At least two initial Discovery questions must test concrete chart hypotheses");
+  const astrologyQuestions = generated.filter(({ basisKind }) => basisKind !== "user_context");
+  if (astrologyQuestions.length < 2) {
+    throw new Error("At least two initial Discovery questions must test concrete astrological hypotheses");
+  }
+  if (!generated.some(({ basisKind }) => basisKind === "natal_pattern")) {
+    throw new Error("At least one initial Discovery question must synthesize the natal chart");
+  }
+  if (
+    astrologyContext.currentTransits.activeAspects.length > 0
+    && !generated.some(({ basisKind }) => basisKind === "current_activation")
+  ) {
+    throw new Error("At least one initial Discovery question must test a current transit activation");
+  }
+  const natalIds = new Set([
+    ...astrologyContext.natalPoints.map(({ id }) => id),
+    ...astrologyContext.natalThemes.flatMap((theme) => [
+      theme.id,
+      ...theme.supportingFactorIds,
+    ]),
+  ]);
+  const transitIds = new Set(astrologyContext.currentTransits.activeAspects.map(({ id }) => id));
+  for (const item of generated) {
+    if (item.basisKind === "natal_pattern" && !item.supportingAstrologyIds.some((id) => natalIds.has(id))) {
+      throw new Error("Each natal-pattern question must cite a supplied natal theme or factor ID");
+    }
+    if (item.basisKind === "current_activation" && !item.supportingAstrologyIds.some((id) => transitIds.has(id))) {
+      throw new Error("Each current-activation question must cite a supplied transit ID");
+    }
   }
 }
 
@@ -158,19 +186,14 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
   if (!env.OPENAI_API_KEY) return fallbackInitialQuestions(context.locale, context.areaLabels, context.currentContext);
 
   try {
-    const privateInterpretationContext = retrieveNatalInterpretation(context.natalInterpretation, {
-      reason: "initial_discovery",
-      lifeAreas: context.lifeAreaKeys,
-      text: context.currentContext,
-    });
     const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
     let correction = "";
     for (let attempt = 0; attempt < 2; attempt += 1) {
       const response = await client.responses.parse({
         model: env.OPENAI_MODEL,
         store: false,
-        instructions: `${sharedInstructions(context.locale)} Generate exactly three initial Discovery questions. Together they should form a broad, personalized first picture across different dimensions. Move from an easy entry point toward slightly deeper inquiry. At least two questions must use basisKind chart_hypothesis and be shaped by a concrete relationship in the private chart material; the visible wording must describe only the human experience being explored. Use basisKind user_context only when a question is primarily grounded in selectedLifeAreas or currentContext. Do not ask for information already present in the user's context.${correction}`,
-        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
+        instructions: `${sharedInstructions(context.locale)} Generate exactly three initial Discovery questions. Together they should form a broad, personalized first picture across different dimensions. Move from an easy entry point toward slightly deeper inquiry. Use basisKind natal_pattern for a question primarily shaped by the stable natal chart, current_activation for one materially shaped by the frozen transit snapshot, and user_context only when primarily grounded in selectedLifeAreas or currentContext. At least one item must use natal_pattern; when active transit aspects are supplied, at least one must use current_activation. For natal_pattern, supportingAstrologyIds must contain exact supplied theme, natal-point, or supporting-factor IDs. For current_activation, it must contain at least one exact supplied transit ID and may also name an activated natal-aspect ID. Use an empty array for user_context when no astrological source materially shaped it. Explain the synthesis briefly in privateBasis. The visible wording must describe only the human experience being explored. Do not ask for information already present in the user's context.${correction}`,
+        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext: context.discoveryAstrologyContext }),
         text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
       });
 
@@ -178,7 +201,7 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
       const questions = response.output_parsed.questions.map(({ question }) => question);
       try {
         validateGeneratedQuestions(questions);
-        validateInitialQuestionBasis(response.output_parsed.questions);
+        validateInitialQuestionBasis(response.output_parsed.questions, context.discoveryAstrologyContext);
         return questions;
       } catch (error) {
         if (attempt === 0) {
@@ -206,19 +229,14 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
 
   try {
     const exchanges = context.initialQuestions.map((question, index) => ({ question, answer: context.initialAnswers[index] }));
-    const privateInterpretationContext = retrieveNatalInterpretation(context.natalInterpretation, {
-      reason: "initial_discovery",
-      lifeAreas: context.lifeAreaKeys,
-      text: [context.currentContext, ...context.initialAnswers].filter(Boolean).join("\n"),
-    });
     const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
     let correction = "";
     for (let attempt = 0; attempt < 2; attempt += 1) {
       const response = await client.responses.parse({
         model: env.OPENAI_MODEL,
         store: false,
-        instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing Discovery questions after examining the three initial exchanges. For each item, copy a short, meaningful, verbatim phrase from a different answer into userGrounding, and include that exact phrase naturally in the visible question. Choose words the person would recognize as their own; do not use punctuation from the source question as part of the phrase. Begin from that concrete detail, tension, or distinction, then ask what would most improve your understanding. These are attentive follow-ups, not generic extra questions or a new chart reading. Treat the answers as more authoritative than chart symbolism. Explore the highest-value unresolved point without repeating an answered question, summarizing everything, or offering a list of roles or priorities to choose among.${correction}`,
-        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, privateInterpretationContext }),
+        instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing Discovery questions after examining the three initial exchanges alongside the same frozen natal-and-transit snapshot used for the opening stage. For each item, copy a short, meaningful, verbatim phrase from a different answer into userGrounding, and include that exact phrase naturally in the visible question. Choose words the person would recognize as their own; do not use punctuation from the source question as part of the phrase. Begin from that concrete detail, tension, or distinction, then ask what would most improve your understanding. These are attentive follow-ups, not generic extra questions or a new chart reading. Treat the answers as more authoritative than natal or transit symbolism: use the astrology to notice what remains unresolved, never to override what the person just told you. Do not repeat an answered question, summarize everything, or offer a list of roles or priorities to choose among.${correction}`,
+        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext: context.discoveryAstrologyContext }),
         text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
       });
 
