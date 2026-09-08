@@ -111,10 +111,11 @@ Last updated: 2026-09-07
 - Added one shared, house-free transit-position cache that refreshes lazily when its singleton database snapshot reaches 12 hours old. Registration-time Discovery and conversation creation reuse a fresh snapshot; optimistic replacement prevents concurrent stale readers from overwriting the winning refresh.
 - Upgraded new immutable conversation contexts to version 2 with the dated shared positions, server-calculated transit-to-natal aspects, and natal-aspect activation links. Existing version 1 conversations remain readable and unchanged, while every new conversation freezes its transit context once for the complete exchange.
 - Verified the shared-transit cache and conversation-context upgrade with Prisma schema validation, linting, strict TypeScript checking, all 29 test files, and a production Next.js build.
+- Repaired the Vercel install failure caused by a generic upgrade to the incompatible Prisma 8 prerelease CLI. The Prisma CLI, client, and PostgreSQL adapter are now pinned together at 7.10.0; clean installation, Prisma Client generation, linting, strict TypeScript checking, all 29 test files, and the production build pass.
 
 ## Remaining
 
-- Apply the pending natal-interpretation, Chart-at-a-glance onboarding-state, conversation-context, Discovery astrology-context, and shared transit-snapshot migrations before deploying or manually testing the completed features against a database.
+- Confirm the newly applied migrations and transit-informed flows against the deployed application after the corrected Prisma dependency deployment succeeds.
 - Add conversation-title editing after the core navigation is evaluated.
 - Apply the pending Map-item/Insight/Integration migration before manually exercising the new loop against a database.
 - Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness, Pattern-versus-Insight classification, RECOGNIZE accuracy, and bounded Practice generation.
