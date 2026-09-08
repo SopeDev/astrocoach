@@ -15,6 +15,8 @@ import {
 } from "@/lib/natal-interpretation";
 
 export const DISCOVERY_ASTROLOGY_CONTEXT_VERSION = 1;
+export const CURRENT_TRANSIT_SNAPSHOT_VERSION = 1;
+export const CURRENT_TRANSIT_SNAPSHOT_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 export const DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS = `The private discoveryAstrologyContext is a frozen symbolic snapshot, not lived evidence. Inspect its complete natalChart, all five natalThemes, currentTransits.positions, every currentTransits.activeAspects entry, and the explicit currentTransits.natalAspectActivations before deciding what is most worth asking. Look for a coherent whole rather than listing placements or mechanically choosing the largest strength number. Give longer-running transits more interpretive weight than brief contacts, while allowing an exact fast transit to sharpen the timing of a larger natal or slow-transit story. A transit may suggest what is especially active now; it does not prove an event occurred or cause the person's circumstances.
 
 When natalTimeAccuracy is unknown, angles and houses are absent and natal points are marked noon_reference. Treat contacts to those points as time-uncertain possibilities rather than exact personal timing, and prefer activations that remain coherent with stable natal aspects or slower-moving natal bodies.`;
@@ -31,6 +33,20 @@ export const DISCOVERY_TRANSIT_BODY_NAMES = [
   CelestialBody.Pluto,
   CelestialBody.Chiron,
   CelestialBody.NorthNode,
+] as const;
+const TRANSIT_BODY_DISPLAY_NAMES = [
+  "Sun",
+  "Moon",
+  "Mercury",
+  "Venus",
+  "Mars",
+  "Jupiter",
+  "Saturn",
+  "Uranus",
+  "Neptune",
+  "Pluto",
+  "Chiron",
+  "North Node",
 ] as const;
 
 const chartPlanetSchema = z.object({
@@ -67,8 +83,8 @@ const natalTransitPointSchema = z.object({
   natalPositionReliability: z.enum(["exact_time", "noon_reference"]),
 }).strict();
 
-const currentTransitPositionSchema = z.object({
-  body: z.string().trim().min(1),
+export const currentTransitPositionSchema = z.object({
+  body: z.enum(TRANSIT_BODY_DISPLAY_NAMES),
   longitude: z.number().min(0).max(360),
   longitudeSpeed: z.number().finite(),
   retrograde: z.boolean(),
@@ -76,6 +92,30 @@ const currentTransitPositionSchema = z.object({
   degree: z.number().int().min(0).max(29),
   minute: z.number().int().min(0).max(59),
 }).strict();
+
+export const currentTransitSnapshotSchema = z.object({
+  schemaVersion: z.literal(CURRENT_TRANSIT_SNAPSHOT_VERSION),
+  source: z.literal("shared_current_transit_snapshot"),
+  calculatedAt: z.string().datetime(),
+  engine: z.object({
+    name: z.literal("celestine"),
+    version: z.string().trim().min(1),
+    transitAspectTypes: z.array(z.enum(MAJOR_ASPECT_TYPES)).length(5),
+    transitingBodies: z.array(z.string().trim().min(1)).min(1),
+  }).strict(),
+  positions: z.array(currentTransitPositionSchema).length(DISCOVERY_TRANSIT_BODY_NAMES.length),
+}).strict().superRefine((snapshot, context) => {
+  const bodies = new Set(snapshot.positions.map((position) => position.body));
+  if (bodies.size !== TRANSIT_BODY_DISPLAY_NAMES.length) {
+    context.addIssue({
+      code: "custom",
+      path: ["positions"],
+      message: "Current transit snapshot must contain each configured body exactly once",
+    });
+  }
+});
+
+export type CurrentTransitSnapshot = z.infer<typeof currentTransitSnapshotSchema>;
 
 const activeTransitSchema = z.object({
   id: z.string().trim().min(1),
@@ -106,6 +146,14 @@ const natalAspectActivationSchema = z.object({
   bothEndpointsActivated: z.boolean(),
   strongestContactStrength: z.number().min(0).max(100),
 }).strict();
+
+export const personalizedCurrentTransitsSchema = z.object({
+  snapshot: currentTransitSnapshotSchema,
+  activeAspects: z.array(activeTransitSchema),
+  natalAspectActivations: z.array(natalAspectActivationSchema),
+}).strict();
+
+export type PersonalizedCurrentTransits = z.infer<typeof personalizedCurrentTransitsSchema>;
 
 export const discoveryAstrologyContextSchema = z.object({
   schemaVersion: z.literal(DISCOVERY_ASTROLOGY_CONTEXT_VERSION),
@@ -190,51 +238,109 @@ function buildNatalPoints(
   ];
 }
 
-export function createDiscoveryAstrologyContext({
+export function createCurrentTransitSnapshot({
+  engineVersion,
+  calculatedAt = new Date(),
+}: {
+  engineVersion: string;
+  calculatedAt?: Date;
+}): CurrentTransitSnapshot {
+  const julianDate = dateToJulianDate(calculatedAt);
+  const currentPositions = transits.getTransitingBodies(julianDate, DISCOVERY_TRANSIT_BODY_NAMES);
+
+  return currentTransitSnapshotSchema.parse({
+    schemaVersion: CURRENT_TRANSIT_SNAPSHOT_VERSION,
+    source: "shared_current_transit_snapshot",
+    calculatedAt: calculatedAt.toISOString(),
+    engine: {
+      name: "celestine",
+      version: engineVersion,
+      transitAspectTypes: [...MAJOR_ASPECT_TYPES],
+      transitingBodies: [...DISCOVERY_TRANSIT_BODY_NAMES],
+    },
+    positions: currentPositions.map((position) => {
+      const zodiac = eclipticToZodiac(position.longitude);
+      return {
+        body: position.name,
+        longitude: position.longitude,
+        longitudeSpeed: position.longitudeSpeed,
+        retrograde: position.isRetrograde,
+        sign: zodiac.signName,
+        degree: zodiac.degree,
+        minute: zodiac.minute,
+      };
+    }),
+  });
+}
+
+export function transitSnapshotIsFresh(
+  snapshot: CurrentTransitSnapshot,
+  now = new Date(),
+  maxAgeMs = CURRENT_TRANSIT_SNAPSHOT_MAX_AGE_MS,
+) {
+  const age = now.getTime() - new Date(snapshot.calculatedAt).getTime();
+  return age >= 0 && age < maxAgeMs;
+}
+
+function celestialBodyForTransitName(name: z.infer<typeof currentTransitPositionSchema>["body"]) {
+  const body = DISCOVERY_TRANSIT_BODY_NAMES.find((candidate) => (
+    candidate === name || (candidate === CelestialBody.NorthNode && name === "North Node")
+  ));
+  if (!body) throw new Error(`Unsupported cached transiting body ${name}`);
+  return body;
+}
+
+export function createPersonalizedCurrentTransits({
   natalChart,
   natalInterpretation,
   natalTimeAccuracy,
-  engineVersion,
-  calculatedAt = new Date(),
+  transitSnapshot,
 }: {
   natalChart: unknown;
   natalInterpretation: NatalInterpretationDocument;
   natalTimeAccuracy: "exact" | "unknown";
-  engineVersion: string;
-  calculatedAt?: Date;
-}) {
+  transitSnapshot: CurrentTransitSnapshot;
+}): PersonalizedCurrentTransits {
   const chart = natalChartSourceSchema.parse(natalChart);
+  const snapshot = currentTransitSnapshotSchema.parse(transitSnapshot);
   const natalPoints = buildNatalPoints(chart, natalTimeAccuracy);
   const pointMap = new Map(natalPoints.map((point) => [point.id, point]));
-  const julianDate = dateToJulianDate(calculatedAt);
-  const currentPositions = transits.getTransitingBodies(julianDate, DISCOVERY_TRANSIT_BODY_NAMES);
-  const transitResult = transits.calculateTransits(
-    natalPoints.map((point): NatalPoint => ({
-      name: point.id,
-      longitude: point.longitude,
-      type: point.type,
-      ...("house" in point && point.house ? { house: point.house } : {}),
-    })),
-    julianDate,
-    {
-      aspectTypes: [
-        AspectType.Conjunction,
-        AspectType.Sextile,
-        AspectType.Square,
-        AspectType.Trine,
-        AspectType.Opposition,
-      ],
-      transitingBodies: [...DISCOVERY_TRANSIT_BODY_NAMES],
-      calculateExactTimes: false,
-      includeHouseIngress: false,
-      includeOutOfSign: true,
-      minimumStrength: 0,
-    },
-  );
+  const transitConfig = {
+    aspectTypes: [
+      AspectType.Conjunction,
+      AspectType.Sextile,
+      AspectType.Square,
+      AspectType.Trine,
+      AspectType.Opposition,
+    ],
+    includeHouseIngress: false,
+    calculateExactTimes: false,
+    includeOutOfSign: true,
+    minimumStrength: 0,
+  };
+  const detectedTransits = natalPoints.flatMap((point) => snapshot.positions.flatMap((position) => {
+    const transit = transits.detectTransit(
+      {
+        name: point.id,
+        longitude: point.longitude,
+        type: point.type,
+        ...("house" in point && point.house ? { house: point.house } : {}),
+      },
+      {
+        name: position.body,
+        body: celestialBodyForTransitName(position.body),
+        longitude: position.longitude,
+        longitudeSpeed: position.longitudeSpeed,
+        isRetrograde: position.retrograde,
+      },
+      transitConfig,
+    );
+    return transit ? [transit] : [];
+  }));
   const natalAspectFactors = natalInterpretation.rankedFactors.filter(
     (factor) => factor.kind === "major_aspect" && factor.aspect,
   );
-  const activeAspects = transitResult.transits
+  const activeAspects = detectedTransits
     .map((transit) => {
       const point = pointMap.get(transit.natalPoint);
       if (!point) throw new Error(`Transit references unknown natal point ${transit.natalPoint}`);
@@ -292,37 +398,58 @@ export function createDiscoveryAstrologyContext({
     || left.natalAspectId.localeCompare(right.natalAspectId)
   ));
 
+  return personalizedCurrentTransitsSchema.parse({
+    snapshot,
+    activeAspects,
+    natalAspectActivations,
+  });
+}
+
+export function createDiscoveryAstrologyContext({
+  natalChart,
+  natalInterpretation,
+  natalTimeAccuracy,
+  engineVersion,
+  calculatedAt = new Date(),
+  transitSnapshot,
+}: {
+  natalChart: unknown;
+  natalInterpretation: NatalInterpretationDocument;
+  natalTimeAccuracy: "exact" | "unknown";
+  engineVersion: string;
+  calculatedAt?: Date;
+  transitSnapshot?: CurrentTransitSnapshot;
+}) {
+  const chart = natalChartSourceSchema.parse(natalChart);
+  const natalPoints = buildNatalPoints(chart, natalTimeAccuracy);
+  const resolvedTransitSnapshot = transitSnapshot ?? createCurrentTransitSnapshot({
+    engineVersion,
+    calculatedAt,
+  });
+  const personalizedTransits = createPersonalizedCurrentTransits({
+    natalChart,
+    natalInterpretation,
+    natalTimeAccuracy,
+    transitSnapshot: resolvedTransitSnapshot,
+  });
+
   return discoveryAstrologyContextSchema.parse({
     schemaVersion: DISCOVERY_ASTROLOGY_CONTEXT_VERSION,
     source: "discovery_astrology_context",
     evidenceStatus: NATAL_INTERPRETATION_EVIDENCE_STATUS,
-    calculatedAt: calculatedAt.toISOString(),
+    calculatedAt: personalizedTransits.snapshot.calculatedAt,
     sourceChartInputHash: natalInterpretation.sourceChartInputHash,
     natalTimeAccuracy,
     engine: {
-      name: "celestine",
-      version: engineVersion,
-      transitAspectTypes: [...MAJOR_ASPECT_TYPES],
-      transitingBodies: [...DISCOVERY_TRANSIT_BODY_NAMES],
+      ...personalizedTransits.snapshot.engine,
     },
     natalChart,
     natalThemes: natalInterpretation.chartAtAGlance.themes,
     natalPoints,
     currentTransits: {
-      positions: currentPositions.map((position) => {
-        const zodiac = eclipticToZodiac(position.longitude);
-        return {
-          body: position.name,
-          longitude: position.longitude,
-          longitudeSpeed: position.longitudeSpeed,
-          retrograde: position.isRetrograde,
-          sign: zodiac.signName,
-          degree: zodiac.degree,
-          minute: zodiac.minute,
-        };
-      }),
-      activeAspects,
-      natalAspectActivations,
+      positions: personalizedTransits.snapshot.positions,
+      activeAspects: personalizedTransits.activeAspects,
+      natalAspectActivations: personalizedTransits.natalAspectActivations,
     },
   });
 }

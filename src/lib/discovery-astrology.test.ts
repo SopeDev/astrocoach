@@ -11,9 +11,13 @@ import {
   rankNatalChartFactors,
 } from "./natal-interpretation";
 import {
+  createCurrentTransitSnapshot,
   createDiscoveryAstrologyContext,
+  createPersonalizedCurrentTransits,
+  currentTransitSnapshotSchema,
   DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS,
   DISCOVERY_TRANSIT_BODY_NAMES,
+  transitSnapshotIsFresh,
 } from "./discovery-astrology";
 
 function source(timeAccuracy: "exact" | "unknown") {
@@ -68,6 +72,51 @@ test("freezes the complete chart, all themes, current positions, and transit con
   assert.ok(context.currentTransits.activeAspects.every((transit) => (
     ["conjunction", "sextile", "square", "trine", "opposition"].includes(transit.aspectType)
   )));
+});
+
+test("reuses one house-free transit snapshot and derives personal aspects from its positions", () => {
+  const { chart, interpretation } = source("exact");
+  const transitSnapshot = createCurrentTransitSnapshot({
+    engineVersion: NATAL_ENGINE_VERSION,
+    calculatedAt: new Date("2026-09-07T00:00:00.000Z"),
+  });
+  const personalized = createPersonalizedCurrentTransits({
+    natalChart: chart.data,
+    natalInterpretation: interpretation,
+    natalTimeAccuracy: chart.timeAccuracy,
+    transitSnapshot,
+  });
+  const context = createDiscoveryAstrologyContext({
+    natalChart: chart.data,
+    natalInterpretation: interpretation,
+    natalTimeAccuracy: chart.timeAccuracy,
+    engineVersion: NATAL_ENGINE_VERSION,
+    calculatedAt: new Date("2026-09-07T08:00:00.000Z"),
+    transitSnapshot,
+  });
+
+  assert.equal(currentTransitSnapshotSchema.safeParse(transitSnapshot).success, true);
+  assert.equal(currentTransitSnapshotSchema.safeParse({
+    ...transitSnapshot,
+    positions: transitSnapshot.positions.map((position, index) => (
+      index === 0 ? { ...position, house: 1 } : position
+    )),
+  }).success, false);
+  assert.equal(context.calculatedAt, transitSnapshot.calculatedAt);
+  assert.deepEqual(context.currentTransits.positions, transitSnapshot.positions);
+  assert.deepEqual(context.currentTransits.activeAspects, personalized.activeAspects);
+  assert.ok(transitSnapshot.positions.every((position) => !("house" in position)));
+});
+
+test("treats a transit snapshot as reusable for less than twelve hours", () => {
+  const transitSnapshot = createCurrentTransitSnapshot({
+    engineVersion: NATAL_ENGINE_VERSION,
+    calculatedAt: new Date("2026-09-07T00:00:00.000Z"),
+  });
+
+  assert.equal(transitSnapshotIsFresh(transitSnapshot, new Date("2026-09-07T11:59:59.999Z")), true);
+  assert.equal(transitSnapshotIsFresh(transitSnapshot, new Date("2026-09-07T12:00:00.000Z")), false);
+  assert.equal(transitSnapshotIsFresh(transitSnapshot, new Date("2026-09-06T23:59:59.999Z")), false);
 });
 
 test("links current contacts to supported natal aspects", () => {

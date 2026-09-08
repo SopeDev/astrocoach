@@ -29,6 +29,7 @@ test("prompt regression set covers the observed conversational failures", () => 
       "recognize-candidate-evaluation-is-ui-owned",
       "recognize-natal-envelope-is-not-evidence",
       "recognize-insight-without-recurrence",
+      "recognize-situational-summary-is-not-insight",
       "recognize-system-classifies-map-item",
       "integrate-one-bounded-practice",
       "integrate-life-observation-is-evidence",

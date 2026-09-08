@@ -314,6 +314,18 @@ model NatalChart {
   @@map("natal_charts")
 }
 
+model TransitSnapshot {
+  id            String   @id @db.VarChar(32)
+  schemaVersion Int      @map("schema_version")
+  engineVersion String   @map("engine_version")
+  calculatedAt  DateTime @map("calculated_at") @db.Timestamptz(6)
+  data          Json
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("transit_snapshots")
+}
+
 model NatalInterpretation {
   id                   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId               String     @unique @map("user_id") @db.Uuid

@@ -2,10 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   CONVERSATION_CONTEXT_VERSION,
+  conversationContextSnapshotSchema,
   createConversationContextSnapshot,
   providerConversationSeedItems,
   providerHistoryItems,
 } from "./conversation-context";
+import {
+  createCurrentTransitSnapshot,
+  createPersonalizedCurrentTransits,
+} from "./discovery-astrology";
 import { calculateNatalChart } from "./natal-chart";
 import {
   CURRENT_CATALOG_VERSIONS,
@@ -40,6 +45,16 @@ function snapshot() {
     },
   });
 
+  const currentTransits = createPersonalizedCurrentTransits({
+    natalChart: chart.data,
+    natalInterpretation: interpretation,
+    natalTimeAccuracy: chart.timeAccuracy,
+    transitSnapshot: createCurrentTransitSnapshot({
+      engineVersion: "0.2.1",
+      calculatedAt: new Date("2026-09-06T06:00:00.000Z"),
+    }),
+  });
+
   return createConversationContextSnapshot({
     localeAtStart: "en",
     birth: {
@@ -71,6 +86,7 @@ function snapshot() {
       data: chart.data,
     },
     natalInterpretation: interpretation,
+    currentTransits,
     onboarding: {
       selectedLifeAreaKeys: ["relationships"],
       selectedLifeAreas: ["Relationships"],
@@ -91,6 +107,9 @@ test("conversation context captures complete birth and chart data once", () => {
   const chartData = context.natalChart.data as { aspects: unknown[] };
   assert.equal(chartData.aspects.length > 0, true);
   assert.equal(context.natalInterpretation.rankedFactors.some((factor) => factor.kind === "major_aspect"), true);
+  assert.equal(context.currentTransits.snapshot.calculatedAt, "2026-09-06T06:00:00.000Z");
+  assert.ok(context.currentTransits.snapshot.positions.every((position) => !("house" in position)));
+  assert.ok(context.currentTransits.activeAspects.length > 0);
 });
 
 test("provider seed identifies the snapshot as persistent context rather than a request", () => {
@@ -101,6 +120,20 @@ test("provider seed identifies the snapshot as persistent context rather than a 
   assert.equal(items[1].role, "user");
   assert.match(items[1].content, /astrocoachConversationContext/);
   assert.match(items[1].content, /London/);
+  assert.match(items[1].content, /shared_current_transit_snapshot/);
+});
+
+test("legacy conversation snapshots remain readable without retroactively adding transits", () => {
+  const current = snapshot();
+  const { currentTransits: _currentTransits, ...withoutTransits } = current;
+  assert.ok(_currentTransits.activeAspects.length > 0);
+  const legacy = conversationContextSnapshotSchema.parse({
+    ...withoutTransits,
+    schemaVersion: 1,
+  });
+
+  assert.equal(legacy.schemaVersion, 1);
+  assert.equal("currentTransits" in legacy, false);
 });
 
 test("legacy history can be added to a newly initialized provider conversation", () => {

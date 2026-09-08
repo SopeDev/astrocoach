@@ -20,6 +20,7 @@ import {
   prepareNatalInterpretation,
   type PreparedNatalInterpretation,
 } from "@/lib/natal-interpretation-generation";
+import { getCurrentTransitSnapshot } from "@/lib/transit-snapshot-persistence";
 
 export type InitialIntentFormState = { error?: "areas" | "context" | "astrology" | "service" };
 
@@ -86,11 +87,13 @@ export async function saveInitialIntent(
         });
     const messages = getDictionary(locale);
     const areaLabels = result.data.lifeAreas.map((key) => messages.initialIntent.areas[key]);
+    const transitSnapshot = await getCurrentTransitSnapshot();
     const discoveryAstrologyContext = createDiscoveryAstrologyContext({
       natalChart: calculation.data,
       natalInterpretation: preparedInterpretation.document,
       natalTimeAccuracy: calculation.timeAccuracy,
       engineVersion: NATAL_ENGINE_VERSION,
+      transitSnapshot,
     });
     const questions = await generateInitialDiscoveryQuestions({
       locale,

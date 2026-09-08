@@ -10,6 +10,7 @@ import {
   createConversationContextSnapshot,
   type ConversationContextSnapshot,
 } from "@/lib/conversation-context";
+import { createPersonalizedCurrentTransits } from "@/lib/discovery-astrology";
 import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
 import {
   calculateNatalChart,
@@ -22,6 +23,7 @@ import {
   createProviderConversation,
   deleteProviderConversation,
 } from "@/lib/openai-conversation-state";
+import { getCurrentTransitSnapshot } from "@/lib/transit-snapshot-persistence";
 
 type ConversationStart = {
   mode: "EXPLORE" | "RECOGNIZE" | "INTEGRATE" | "DEEP_EXPLORE";
@@ -118,7 +120,16 @@ export async function captureConversationContextSnapshot(
     return key.success ? [key.data as LifeAreaKey] : [];
   });
   const dictionary = getDictionary(locale);
-  const natalInterpretation = await ensureNatalInterpretation(userId, natalChart);
+  const [natalInterpretation, transitSnapshot] = await Promise.all([
+    ensureNatalInterpretation(userId, natalChart),
+    getCurrentTransitSnapshot(),
+  ]);
+  const currentTransits = createPersonalizedCurrentTransits({
+    natalChart: natalChart.data,
+    natalInterpretation,
+    natalTimeAccuracy: parsedTimeAccuracy,
+    transitSnapshot,
+  });
 
   return createConversationContextSnapshot({
     localeAtStart: locale,
@@ -151,6 +162,7 @@ export async function captureConversationContextSnapshot(
       data: z.json().parse(natalChart.data),
     },
     natalInterpretation,
+    currentTransits,
     onboarding: {
       selectedLifeAreaKeys: lifeAreaKeys,
       selectedLifeAreas: lifeAreaKeys.map((key) => dictionary.initialIntent.areas[key]),

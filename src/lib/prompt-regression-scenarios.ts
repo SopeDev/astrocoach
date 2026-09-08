@@ -191,10 +191,18 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
   {
     id: "recognize-insight-without-recurrence",
     mode: "RECOGNIZE",
-    setup: ["One well-supported exchange produces a precise understanding worth keeping.", "The understanding does not claim recurrence across situations."],
+    setup: ["One well-supported exchange produces a precise understanding about the person's need, assumption, or way of making meaning.", "The immediate situation could disappear while the understanding would still tell us something useful about the person, but the evidence does not establish recurrence across situations."],
     chartSignal: null,
-    expected: ["Classify the candidate as an Insight.", "Allow evaluation without requiring multiple independent episodes."],
+    expected: ["Classify the candidate as an Insight.", "Allow evaluation without requiring multiple independent episodes because its person-level value survives the immediate circumstances."],
     forbidden: ["Forcing a Pattern classification", "Inventing recurrence to satisfy Pattern evidence rules"],
+  },
+  {
+    id: "recognize-situational-summary-is-not-insight",
+    mode: "RECOGNIZE",
+    setup: ["The user describes a temporary cash-access problem in detail and explicitly links it to their current stress.", "A proposed candidate restates that they have money in theory but cannot access it now, which is feeding anxiety and irritability."],
+    chartSignal: "A security-related chart theme can make the summary sound more interpretive but adds no lived knowledge.",
+    expected: ["Apply the counterfactual test: once the cash-access problem disappears, the proposed understanding no longer tells us anything useful about the person.", "Treat the cash-access description as important context, not an Insight.", "Return to EXPLORE or pause unless a consequential distinction, function, need, assumption, or implication emerges beyond what the user already said."],
+    forbidden: ["Promoting a polished situational summary to CANDIDATE_EVALUATION", "Treating accuracy or astrological resonance alone as durable Map value"],
   },
   {
     id: "recognize-system-classifies-map-item",
