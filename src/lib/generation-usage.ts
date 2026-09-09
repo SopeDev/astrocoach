@@ -23,6 +23,7 @@ export type GenerationUsageContext = {
   messageId?: string | null;
   providerConversationId?: string | null;
   conversationResponseNumber?: number | null;
+  contextSelection?: object | null;
 };
 
 export async function recordGenerationUsage(
@@ -54,6 +55,7 @@ export async function recordGenerationUsage(
         reasoningTokens: usage.output_tokens_details.reasoning_tokens,
         totalTokens: usage.total_tokens,
         computeUnits: usage.compute_units,
+        contextSelection: context.contextSelection ?? undefined,
       },
       update: {},
     });

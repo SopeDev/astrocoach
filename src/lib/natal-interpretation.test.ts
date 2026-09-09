@@ -264,7 +264,34 @@ test("retrieval returns only a bounded, provenance-safe relevant subset", () => 
   assert.ok(context?.factors.some((factor) => factor.topics.includes("relationships") || factor.topics.includes("partnership")));
   assert.equal("planets" in (context ?? {}), false);
   assert.equal("aspects" in (context ?? {}), false);
-  assert.ok(context?.factors.some((factor) => factor.kind === "major_aspect"));
+  assert.ok(context?.selection.factorSelections.every((selection) => selection.reasons.length > 0));
+});
+
+test("conversation retrieval treats factor limits as ceilings and preserves continuity", () => {
+  const document = documentFor("exact");
+  const noSignalContext = retrieveNatalInterpretation(document, {
+    reason: "conversation",
+    lifeAreas: [],
+    maxThemes: 0,
+    maxFactors: 4,
+  });
+  assert.equal(noSignalContext?.themes.length, 0);
+  assert.equal(noSignalContext?.factors.length, 0);
+
+  const continuityContext = retrieveNatalInterpretation(document, {
+    reason: "conversation",
+    lifeAreas: [],
+    text: "I mentioned my career in passing.",
+    continuityFactorIds: ["placement.saturn", "placement.moon"],
+    maxThemes: 0,
+    maxFactors: 2,
+  });
+  assert.deepEqual(
+    continuityContext?.factors.map((factor) => factor.id),
+    ["placement.saturn", "placement.moon"],
+  );
+  assert.equal(continuityContext?.selection.maxFactors, 2);
+  assert.equal(continuityContext?.selection.expandedThemeIds.length, 0);
 });
 
 test("preferred theme retrieval pins the selected theme without changing provenance", () => {

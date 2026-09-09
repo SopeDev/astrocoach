@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { astrologyProvenanceFields } from "./astrology-provenance";
 
 export const exploreMessageSchema = z.string().trim().min(1).max(4000);
 
@@ -7,6 +8,7 @@ export const exploreSignalsSchema = z.object({
   responseApproach: z.enum(["REFLECT", "CONTRAST", "CONNECT", "COMPETING_INTERPRETATION", "QUESTION", "OPEN_SPACE"]),
   questionPurpose: z.string().max(300).nullable(),
   privateAstrologyInfluence: z.string().max(500).nullable(),
+  ...astrologyProvenanceFields,
   understandingStatus: z.enum(["opening", "developing", "clearer", "sufficient"]),
   importantObservations: z.array(z.string().max(300)).max(6),
   unresolvedQuestions: z.array(z.string().max(300)).max(5),
@@ -46,6 +48,16 @@ const legacyExploreSignalsSchema = z.object({
 export function parseStoredExploreSignals(value: unknown): ExploreSignals | null {
   const current = exploreSignalsSchema.safeParse(value);
   if (current.success) return current.data;
+  const currentWithoutProvenance = exploreSignalsSchema
+    .partial({ usedAstrologyFactorIds: true, usedTransitIds: true })
+    .safeParse(value);
+  if (currentWithoutProvenance.success) {
+    return {
+      ...currentWithoutProvenance.data,
+      usedAstrologyFactorIds: currentWithoutProvenance.data.usedAstrologyFactorIds ?? [],
+      usedTransitIds: currentWithoutProvenance.data.usedTransitIds ?? [],
+    } as ExploreSignals;
+  }
   const legacy = legacyExploreSignalsSchema.safeParse(value);
   if (!legacy.success) return null;
   const { candidatePatternSignal, candidatePatternConfidence, ...signals } = legacy.data;
@@ -54,6 +66,8 @@ export function parseStoredExploreSignals(value: unknown): ExploreSignals | null
     candidateMapItemSignal: candidatePatternSignal,
     candidateMapItemConfidence: candidatePatternConfidence,
     candidateMapItemKind: candidatePatternSignal ? "PATTERN" : null,
+    usedAstrologyFactorIds: [],
+    usedTransitIds: [],
     recommendedNextMode: signals.recommendedNextMode === "RECOGNIZE" ? "RECOGNIZE"
       : signals.recommendedNextMode === "PAUSE" ? "PAUSE" : "EXPLORE",
   };

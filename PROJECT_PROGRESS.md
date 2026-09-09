@@ -115,10 +115,12 @@ Last updated: 2026-09-07
 
 - Added backend-only OpenAI generation telemetry for natal-theme synthesis, both Initial Discovery stages, and every EXPLORE, RECOGNIZE, DEEP_EXPLORE, and INTEGRATE response. Each provider-returned attempt, including corrective retries, now records model/response provenance, full token and cache breakdowns, reasoning tokens, user/conversation/message linkage, and a conversation response number that isolates the context-heavy first turn; telemetry failures remain non-blocking to the product flow.
 - Upgraded conversation exports to version 3 with focal Map provenance and all conversation-scoped generation telemetry, including chronological request details, explicit first-response identification, and overall and per-operation token totals while continuing to omit the private provider conversation identifier.
+- Added the first context-cost optimization without changing the lossless PostgreSQL snapshot: new provider conversations receive a compact bootstrap with complete chart facts, all five localized themes, all onboarding evidence, preferences, Map context, and compact frozen transit awareness, while every cognitive mode can receive a bounded deeper authored-factor packet per turn. A real 110,312-character snapshot projects to 32,527 characters (70.5% smaller); existing initialized provider conversations remain unchanged.
+- Corrected bounded astrology retrieval so limits behave as ceilings: global themes are no longer redundantly resent, zero detailed factors is valid, and factors must clear a scored material-relevance threshold. Retrieval now carries forward the latest materially used factor/transit provenance and considers current cognitive state, focal Map context, handoffs, Practices, observations, and frozen transit activation links before lexical recency. All modes emit validated used-factor/used-transit IDs, while generation telemetry and version 3 conversation exports include selected count, maximum, scores, reasons, and retrieval payload size; older stored messages remain readable.
 
 ## Remaining
 
-- Apply the generation-usage migration, then decide whether usage summaries need an owner-only UI or export surface.
+- Apply the generation-context-selection telemetry migration, then evaluate real selected-factor counts, reasons, continuity, token usage, and cache behavior before optimizing provider history or instructions.
 
 - Confirm the newly applied migrations and transit-informed flows against the deployed application after the corrected Prisma dependency deployment succeeds.
 - Add conversation-title editing after the core navigation is evaluated.

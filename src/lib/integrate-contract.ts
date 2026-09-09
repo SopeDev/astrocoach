@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { isSupportedPracticeProposal, practiceProposalSchema, type PracticeProposal } from "./practices";
+import { astrologyProvenanceFields } from "./astrology-provenance";
 
 export const integrateSignalsSchema = z.object({
   currentMode: z.literal("INTEGRATE"),
   integrationStage: z.enum(["CLARIFY_INTENTION", "PRACTICE_PROPOSAL", "LIFE_OBSERVATION"]),
+  ...astrologyProvenanceFields,
   integrationIntention: z.string().min(1).max(300),
   knownCues: z.array(z.string().max(200)).max(5),
   proposedJunction: z.string().max(300).nullable(),
@@ -18,7 +20,10 @@ export const integrateResponseSchema = integrateSignalsSchema.extend({
   reply: z.string().min(1).max(4000),
 });
 
-const storedIntegrateSignalsSchema = integrateSignalsSchema.extend({
+const storedIntegrateSignalsSchema = integrateSignalsSchema.partial({
+  usedAstrologyFactorIds: true,
+  usedTransitIds: true,
+}).extend({
   practiceActivation: z.object({ practiceId: z.string().uuid() }).optional(),
 });
 

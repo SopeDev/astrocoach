@@ -11,6 +11,7 @@ import { deepExploreResponseSchema, hasConsistentDeepExploreCandidate } from "@/
 import { CORE_INSTRUCTIONS } from "@/lib/explore";
 import { getServerEnv } from "@/lib/env";
 import { recordGenerationUsage, type GenerationUsageContext } from "@/lib/generation-usage";
+import type { NatalInterpretationRetrieval } from "@/lib/natal-interpretation";
 import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
 
 const DEEP_EXPLORE_INSTRUCTIONS = `Operate in DEEP_EXPLORE. Begin from the supplied focal Pattern or Insight as something the user has already recognized. The user has deliberately chosen to understand it more deeply. Do not restart basic exploration, try to prove the item exists, or treat depth as increasingly elaborate interpretation.
@@ -35,6 +36,7 @@ export async function generateDeepExploreResponse({
   latestMessage,
   providerConversationId,
   candidateEvaluationContext,
+  privateInterpretationContext,
   usageContext,
 }: {
   locale: Locale;
@@ -42,6 +44,7 @@ export async function generateDeepExploreResponse({
   latestMessage: string;
   providerConversationId: string;
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
+  privateInterpretationContext: NatalInterpretationRetrieval | null;
   usageContext: Omit<GenerationUsageContext, "operation">;
 }) {
   const env = getServerEnv();
@@ -57,6 +60,7 @@ export async function generateDeepExploreResponse({
       event: "user_message",
       activePractice,
       candidateEvaluationContext: candidateEvaluationContext ?? null,
+      privateInterpretationContext,
       latestUserMessage: latestMessage,
     }),
     text: { format: zodTextFormat(deepExploreResponseSchema, "deep_explore_response") },

@@ -4,6 +4,7 @@ import {
   CONVERSATION_CONTEXT_VERSION,
   conversationContextSnapshotSchema,
   createConversationContextSnapshot,
+  providerConversationContext,
   providerConversationSeedItems,
   providerHistoryItems,
 } from "./conversation-context";
@@ -120,7 +121,19 @@ test("provider seed identifies the snapshot as persistent context rather than a 
   assert.equal(items[1].role, "user");
   assert.match(items[1].content, /astrocoachConversationContext/);
   assert.match(items[1].content, /London/);
-  assert.match(items[1].content, /shared_current_transit_snapshot/);
+  assert.match(items[1].content, /currentTransits/);
+});
+
+test("provider context preserves broad awareness without the full authored interpretation library", () => {
+  const context = snapshot();
+  const providerContext = providerConversationContext(context);
+  assert.equal(providerContext.natalInterpretation.themes.length, 5);
+  assert.equal(providerContext.onboarding.exchanges.length, context.onboarding.exchanges.length);
+  assert.deepEqual(providerContext.natalChart.data, context.natalChart.data);
+  assert.equal("rankedFactors" in providerContext.natalInterpretation, false);
+  assert.equal("translations" in providerContext.natalInterpretation.themes[0], false);
+  assert.ok("currentTransits" in providerContext);
+  assert.ok(JSON.stringify(providerContext).length < JSON.stringify(context).length * 0.6);
 });
 
 test("legacy conversation snapshots remain readable without retroactively adding transits", () => {

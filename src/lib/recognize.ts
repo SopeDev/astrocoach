@@ -13,6 +13,7 @@ import { getServerEnv } from "@/lib/env";
 import { recordGenerationUsage, type GenerationUsageContext } from "@/lib/generation-usage";
 import { isValidGeneratedRecognizeSignals, type CandidateEvaluationPromptContext, type CandidateMapItem, recognizeResponseSchema } from "@/lib/recognize-contract";
 import type { RecognitionHandoffContext } from "@/lib/recognition-handoff";
+import type { NatalInterpretationRetrieval } from "@/lib/natal-interpretation";
 
 const RECOGNIZE_INSTRUCTIONS = `Operate in RECOGNIZE. Determine whether the conversation contains a specific understanding that is accurate enough, meaningful enough, and valuable enough for the user to consider keeping. A Map candidate must add knowledge: it should reveal a consequential distinction, relationship, function, need, assumption, or implication that changes how the experience can be understood. Do not present a candidate that merely compresses the user's account, labels the immediate circumstances, repeats a causal connection the user already made, or makes their own words sound more polished. An accurate description can remain useful conversation context without becoming an Insight. For every proposed INSIGHT, apply this counterfactual test privately: if the immediate circumstances that produced the understanding disappeared, would it still tell us something useful about the person? If its value would disappear with the temporary situation, it is conversational understanding, not a Map item, so do not enter CANDIDATE_EVALUATION. Classify a qualifying candidate as PATTERN when it describes a recurring relationship supported by multiple distinct lived observations. Classify it as INSIGHT when it is a meaningful understanding that does not claim recurrence. Non-recurring does not lower the bar to an accurate one-time summary; an Insight still needs added understanding and person-level value that survives the producing circumstances. The classification is application-facing; do not ask the user to choose a type. Before proposing an item, identify plausible competing explanations and test the strongest unresolved variable when its answer could materially change the formulation. When a proposed Pattern broadens beyond the examples already discussed, seek one independent lived example or cross-context contrast before persisting that broader scope. Do not prolong testing when the evidence already discriminates clearly, and do not manufacture an item merely to complete the conversation. If no qualifying understanding has emerged, return to EXPLORE or pause rather than promoting a summary.
 
@@ -40,6 +41,7 @@ export async function generateRecognizeResponse({
   candidateEvaluationContext,
   focalMapItem = null,
   recognitionHandoff = null,
+  privateInterpretationContext,
   usageContext,
 }: {
   locale: Locale;
@@ -49,6 +51,7 @@ export async function generateRecognizeResponse({
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
   focalMapItem?: CandidateMapItem | null;
   recognitionHandoff?: RecognitionHandoffContext | null;
+  privateInterpretationContext: NatalInterpretationRetrieval | null;
   usageContext: Omit<GenerationUsageContext, "operation">;
 }) {
   const env = getServerEnv();
@@ -68,6 +71,7 @@ export async function generateRecognizeResponse({
       focalMapItem,
       recognitionHandoff,
       candidateEvaluationContext: candidateEvaluationContext ?? null,
+      privateInterpretationContext,
       latestUserMessage: latestMessage,
     }),
     text: { format: zodTextFormat(recognizeResponseSchema, "recognize_response") },

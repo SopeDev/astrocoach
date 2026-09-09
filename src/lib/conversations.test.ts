@@ -51,6 +51,11 @@ test("serializes the conversation context snapshot without copying preferences o
       reasoningTokens: 25,
       totalTokens: 1100,
       computeUnits: null,
+      contextSelection: {
+        selectedFactors: 2,
+        maxFactors: 4,
+        factorSelections: [{ id: "placement.saturn", score: 8, reasons: ["recent_continuity"] }],
+      },
       createdAt: new Date("2026-09-04T10:01:59.000Z"),
     }],
   }, new Date("2026-09-04T11:00:00.000Z"));
@@ -67,5 +72,6 @@ test("serializes the conversation context snapshot without copying preferences o
   assert.equal(exported.conversation.generationUsage.totals.cachedInputTokens, 600);
   assert.equal(exported.conversation.generationUsage.byOperation.CHAT_RECOGNIZE.requests, 1);
   assert.equal(exported.conversation.generationUsage.requests[0].isInitialConversationResponse, true);
+  assert.equal((exported.conversation.generationUsage.requests[0].contextSelection as { selectedFactors: number }).selectedFactors, 2);
   assert.equal("providerConversationId" in exported.conversation.generationUsage.requests[0], false);
 });

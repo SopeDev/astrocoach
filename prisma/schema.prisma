@@ -208,6 +208,7 @@ model GenerationUsage {
   reasoningTokens       Int           @map("reasoning_tokens")
   totalTokens           Int           @map("total_tokens")
   computeUnits          Int?          @map("compute_units")
+  contextSelection      Json?         @map("context_selection")
   createdAt             DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   conversation          Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)

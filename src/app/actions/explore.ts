@@ -5,6 +5,7 @@ import { db } from "@/db/client";
 import { Prisma } from "@/generated/prisma/client";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
+import { storedAstrologyProvenance } from "@/lib/astrology-provenance";
 import {
   ConversationMessageLimitError,
   canAddAssistantMessage,
@@ -30,6 +31,7 @@ import {
   NATAL_INTERPRETATION_EVIDENCE_STATUS,
   NATAL_INTERPRETATION_SOURCE,
   themeConversationStarterSchema,
+  retrieveNatalInterpretation,
 } from "@/lib/natal-interpretation";
 import { generateRecognizeResponse } from "@/lib/recognize";
 import {
@@ -138,7 +140,7 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
   ]);
 
   if (!conversation) throw new Error("Completed conversation context is unavailable");
-  const { providerConversationId } = await ensureConversationProviderState({
+  const { providerConversationId, snapshot } = await ensureConversationProviderState({
     userId,
     locale,
     conversationId,
@@ -154,6 +156,10 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
       const parsed = parseStoredExploreSignals(message.internalSignals);
       return parsed ? [parsed.responseApproach] : [];
     });
+  const recentAssistantSignals = generationMessages
+    .filter((message) => message.role === "assistant")
+    .slice(-4)
+    .map((message) => message.internalSignals);
   const thread = generationMessages.map((message) => ({ role: message.role, content: message.content }));
   const activePractice = conversation.focalMapItemId
     ? await db.practice.findFirst({
@@ -162,7 +168,27 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
       })
     : null;
   const recentObservations = activePractice ? await db.practiceObservation.findMany({ where: { practiceId: activePractice.id, userId }, orderBy: { createdAt: "desc" }, take: 5, select: { content: true, learning: true } }) : [];
-  return { conversation, thread, providerConversationId, messageCounts, evaluationContext, recentResponseApproaches, activePractice, recentObservations: recentObservations.reverse() };
+  return { conversation, thread, providerConversationId, snapshot, messageCounts, evaluationContext, recentResponseApproaches, recentAssistantSignals, activePractice, recentObservations: recentObservations.reverse() };
+}
+
+function uniqueStrings(values: string[]) {
+  return [...new Set(values)];
+}
+
+function sanitizeAstrologyProvenance<T extends {
+  signals: { usedAstrologyFactorIds: string[]; usedTransitIds: string[] };
+}>(generated: T, snapshot: Awaited<ReturnType<typeof ensureConversationProviderState>>["snapshot"]) {
+  const allowedFactorIds = new Set(snapshot.natalInterpretation.rankedFactors.map((factor) => factor.id));
+  const allowedTransitIds = new Set("currentTransits" in snapshot
+    ? snapshot.currentTransits.activeAspects.map((aspect) => aspect.id)
+    : []);
+  generated.signals.usedAstrologyFactorIds = uniqueStrings(
+    generated.signals.usedAstrologyFactorIds.filter((id) => allowedFactorIds.has(id)),
+  );
+  generated.signals.usedTransitIds = uniqueStrings(
+    generated.signals.usedTransitIds.filter((id) => allowedTransitIds.has(id)),
+  );
+  return generated;
 }
 
 async function generateReply(userId: string, locale: Locale, conversationId: string, userMessage: StoredMessage) {
@@ -175,14 +201,56 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
   }
   const themeStarter = themeConversationStarterSchema.safeParse(userMessage.internalSignals);
   const recognitionHandoff = context.conversation.mode === "RECOGNIZE" ? await loadRecognitionHandoff(userId, conversationId) : null;
+  const recentProvenance = context.recentAssistantSignals.map(storedAstrologyProvenance);
+  const latestMaterialProvenance = recentProvenance.toReversed().find((item) =>
+    item.usedAstrologyFactorIds.length > 0 || item.usedTransitIds.length > 0,
+  );
+  const continuityFactorIds = latestMaterialProvenance?.usedAstrologyFactorIds ?? [];
+  const continuityTransitIds = new Set(latestMaterialProvenance?.usedTransitIds ?? []);
+  const transitActivatedFactorIds = "currentTransits" in context.snapshot
+    ? uniqueStrings(context.snapshot.currentTransits.activeAspects
+        .filter((aspect) => continuityTransitIds.has(aspect.id)
+          || continuityFactorIds.includes(aspect.natalPointId)
+          || aspect.activatesNatalAspectIds.some((id) => continuityFactorIds.includes(id)))
+        .flatMap((aspect) => [aspect.natalPointId, ...aspect.activatesNatalAspectIds]))
+    : [];
+  const stateText = JSON.stringify({
+    focalMapItem: context.conversation.focalMapItem,
+    recognitionHandoff,
+    candidateEvaluationContext: context.evaluationContext,
+    activePractice: context.activePractice,
+    recentObservations: context.recentObservations,
+    recentAssistantSignals: context.recentAssistantSignals,
+  });
+  const privateInterpretationContext = retrieveNatalInterpretation(
+    context.snapshot.natalInterpretation,
+    {
+      reason: "conversation",
+      lifeAreas: context.snapshot.onboarding.selectedLifeAreaKeys,
+      text: userMessage.content,
+      stateText,
+      continuityFactorIds,
+      transitActivatedFactorIds,
+      maxThemes: 0,
+      maxFactors: 4,
+      preferredThemeId: themeStarter.success ? themeStarter.data.themeId : null,
+    },
+  );
   const usageContext = {
     userId,
     conversationId,
     messageId: userMessage.id,
     providerConversationId: context.providerConversationId,
     conversationResponseNumber: context.messageCounts.assistant + 1,
+    contextSelection: privateInterpretationContext
+      ? {
+          ...privateInterpretationContext.selection,
+          selectedFactors: privateInterpretationContext.factors.length,
+          contextCharacters: JSON.stringify(privateInterpretationContext).length,
+        }
+      : null,
   };
-  const generated = context.conversation.mode === "RECOGNIZE"
+  const generated = sanitizeAstrologyProvenance(context.conversation.mode === "RECOGNIZE"
     ? await generateRecognizeResponse({
         locale,
         providerConversationId: context.providerConversationId,
@@ -193,6 +261,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
           ? { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement }
           : null,
         recognitionHandoff,
+        privateInterpretationContext,
         usageContext,
       })
     : context.conversation.mode === "DEEP_EXPLORE" && context.conversation.focalMapItem
@@ -208,6 +277,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
             : null,
           latestMessage: userMessage.content,
           candidateEvaluationContext: context.evaluationContext,
+          privateInterpretationContext,
           usageContext,
         })
     : context.conversation.mode === "INTEGRATE" && context.conversation.focalMapItem
@@ -225,6 +295,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
               }
             : null,
           recentObservations: context.recentObservations,
+          privateInterpretationContext,
           usageContext,
         })
       : await generateExploreResponse({
@@ -235,8 +306,9 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
           candidateEvaluationContext: context.evaluationContext,
           recentResponseApproaches: context.recentResponseApproaches,
           preferredThemeId: themeStarter.success ? themeStarter.data.themeId : null,
+          privateInterpretationContext,
           usageContext,
-        });
+        }), context.snapshot);
 
   const persisted = await serializableTransaction(async (transaction) => {
     const messageCounts = await loadMessageCounts(transaction, conversationId);
@@ -432,20 +504,42 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
     const focalMapItem = context.conversation.focalMapItem ? { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement } : null;
     const recognitionHandoff = await loadRecognitionHandoff(user.id, conversationId);
     if (sourceMode === "DEEP_EXPLORE" && !recognitionHandoff) return { ok: false as const, error: "message" as const };
-    const generated = await generateRecognizeResponse({
+    const recentProvenance = context.recentAssistantSignals.map(storedAstrologyProvenance);
+    const continuityFactorIds = recentProvenance.toReversed().find((item) => item.usedAstrologyFactorIds.length > 0)?.usedAstrologyFactorIds ?? [];
+    const privateInterpretationContext = retrieveNatalInterpretation(
+      context.snapshot.natalInterpretation,
+      {
+        reason: "conversation",
+        lifeAreas: context.snapshot.onboarding.selectedLifeAreaKeys,
+        text: [focalMapItem?.statement, recognitionHandoff?.candidateMapItem?.statement].filter(Boolean).join(" "),
+        stateText: JSON.stringify({ focalMapItem, recognitionHandoff, recentAssistantSignals: context.recentAssistantSignals }),
+        continuityFactorIds,
+        maxThemes: 0,
+        maxFactors: 4,
+      },
+    );
+    const generated = sanitizeAstrologyProvenance(await generateRecognizeResponse({
       locale,
       providerConversationId: context.providerConversationId,
       latestMessage: null,
       opening: true,
       focalMapItem,
       recognitionHandoff,
+      privateInterpretationContext,
       usageContext: {
         userId: user.id,
         conversationId,
         providerConversationId: context.providerConversationId,
         conversationResponseNumber: context.messageCounts.assistant + 1,
+        contextSelection: privateInterpretationContext
+          ? {
+              ...privateInterpretationContext.selection,
+              selectedFactors: privateInterpretationContext.factors.length,
+              contextCharacters: JSON.stringify(privateInterpretationContext).length,
+            }
+          : null,
       },
-    });
+    }), context.snapshot);
     const assistantMessage = await serializableTransaction(async (transaction) => {
       const messageCounts = await loadMessageCounts(transaction, conversationId);
       if (!canAddAssistantMessage(messageCounts)) {

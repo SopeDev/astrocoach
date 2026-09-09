@@ -45,6 +45,7 @@ type ExportableConversation = {
     reasoningTokens: number;
     totalTokens: number;
     computeUnits: number | null;
+    contextSelection: unknown;
     createdAt: Date;
   }>;
 };
@@ -126,6 +127,7 @@ export function serializeConversationExport(conversation: ExportableConversation
           reasoningTokens: usage.reasoningTokens,
           totalTokens: usage.totalTokens,
           computeUnits: usage.computeUnits,
+          contextSelection: usage.contextSelection,
           createdAt: usage.createdAt.toISOString(),
         })),
       },

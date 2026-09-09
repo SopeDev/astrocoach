@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { astrologyProvenanceFields } from "./astrology-provenance";
 
 export const MAP_ITEM_KINDS = ["PATTERN", "INSIGHT"] as const;
 export const mapItemKindSchema = z.enum(MAP_ITEM_KINDS);
@@ -19,6 +20,7 @@ export const recognizeSignalsSchema = z.object({
   recognitionStage: z.enum(["HYPOTHESIS_TESTING", "CANDIDATE_EVALUATION", "VALIDATED", "REJECTED"]),
   competingExplanations: z.array(z.string().max(300)).max(4),
   privateAstrologyInfluence: z.string().max(500).nullable(),
+  ...astrologyProvenanceFields,
   candidateMapItem: candidateMapItemSchema.nullable(),
   supportingObservations: z.array(z.string().max(300)).max(5),
   evidenceStrength: z.enum(["limited", "moderate", "strong"]),
@@ -39,7 +41,10 @@ const storedCandidateEvaluationSchema = z.object({
   action: candidateEvaluationActionSchema,
 });
 
-const recognizeStoredSignalsSchema = recognizeSignalsSchema.extend({
+const recognizeStoredSignalsSchema = recognizeSignalsSchema.partial({
+  usedAstrologyFactorIds: true,
+  usedTransitIds: true,
+}).extend({
   candidateEvaluation: storedCandidateEvaluationSchema.optional(),
 });
 
@@ -63,7 +68,11 @@ type StoredRecognizeSignals = z.infer<typeof recognizeStoredSignalsSchema>;
 
 function normalizeStoredSignals(value: unknown): StoredRecognizeSignals | null {
   const current = recognizeStoredSignalsSchema.safeParse(value);
-  if (current.success) return current.data;
+  if (current.success) return {
+    ...current.data,
+    usedAstrologyFactorIds: current.data.usedAstrologyFactorIds ?? [],
+    usedTransitIds: current.data.usedTransitIds ?? [],
+  };
   const legacy = legacyRecognizeSignalsSchema.safeParse(value);
   if (!legacy.success) return null;
   const accepted = legacy.data.userEvaluationStatus === "accepted" && legacy.data.proposedMapAction === "OFFER_SAVE";
@@ -75,6 +84,8 @@ function normalizeStoredSignals(value: unknown): StoredRecognizeSignals | null {
     recognitionStage: stage,
     competingExplanations: legacy.data.competingExplanations ?? [],
     privateAstrologyInfluence: legacy.data.privateAstrologyInfluence ?? null,
+    usedAstrologyFactorIds: [],
+    usedTransitIds: [],
     candidateMapItem: legacy.data.candidatePattern ? { kind: "PATTERN", statement: legacy.data.candidatePattern } : null,
     supportingObservations: legacy.data.supportingObservations ?? [],
     evidenceStrength: legacy.data.evidenceStrength ?? "moderate",

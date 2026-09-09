@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { candidateMapItemSchema, type CandidateMapItem } from "./recognize-contract";
+import { astrologyProvenanceFields } from "./astrology-provenance";
 
 export const DEEP_EXPLORATION_DIMENSIONS = [
   "CONDITIONS",
@@ -20,6 +21,7 @@ export const deepExploreSignalsSchema = z.object({
   currentMode: z.literal("DEEP_EXPLORE"),
   explorationDimension: z.enum(DEEP_EXPLORATION_DIMENSIONS),
   privateAstrologyInfluence: z.string().max(500).nullable(),
+  ...astrologyProvenanceFields,
   newObservations: z.array(z.string().max(300)).max(6),
   emergingInsights: z.array(z.string().max(300)).max(4),
   candidateMapItem: candidateMapItemSchema.nullable(),
@@ -48,10 +50,19 @@ export function hasConsistentDeepExploreCandidate(signals: DeepExploreSignals) {
 }
 
 export function deepRecognitionHandoff(value: unknown): DeepRecognitionHandoff | null {
-  const parsed = deepExploreSignalsSchema.safeParse(value);
-  if (!parsed.success || !hasConsistentDeepExploreCandidate(parsed.data) || !parsed.data.candidateMapItem || !parsed.data.candidateRelationshipToFocal) return null;
+  const parsed = deepExploreSignalsSchema.partial({
+    usedAstrologyFactorIds: true,
+    usedTransitIds: true,
+  }).safeParse(value);
+  if (!parsed.success) return null;
+  const signals = {
+    ...parsed.data,
+    usedAstrologyFactorIds: parsed.data.usedAstrologyFactorIds ?? [],
+    usedTransitIds: parsed.data.usedTransitIds ?? [],
+  };
+  if (!hasConsistentDeepExploreCandidate(signals) || !signals.candidateMapItem || !signals.candidateRelationshipToFocal) return null;
   return {
-    candidateMapItem: parsed.data.candidateMapItem,
-    relationshipToFocal: parsed.data.candidateRelationshipToFocal,
+    candidateMapItem: signals.candidateMapItem,
+    relationshipToFocal: signals.candidateRelationshipToFocal,
   };
 }

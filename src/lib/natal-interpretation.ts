@@ -222,6 +222,23 @@ export const natalInterpretationRetrievalSchema = z.object({
     reason: z.enum(["initial_discovery", "conversation"]),
     topics: z.array(z.string()),
     preferredThemeId: chartThemeIdSchema.nullable(),
+    themeAnchorIds: z.array(chartThemeIdSchema),
+    expandedThemeIds: z.array(chartThemeIdSchema),
+    maxExpandedThemes: z.number().int().min(0).max(3),
+    maxFactors: z.number().int().min(0).max(6),
+    factorSelections: z.array(z.object({
+      id: z.string().trim().min(1),
+      score: z.number().int().nonnegative(),
+      reasons: z.array(z.enum([
+        "preferred_theme",
+        "recent_continuity",
+        "conversation_state",
+        "latest_message",
+        "onboarding_interest",
+        "theme_support",
+        "transit_activation",
+      ])).min(1),
+    }).strict()),
   }).strict(),
   uncertainty: uncertaintySchema.nullable(),
   themes: z.array(chartThemeSchema).max(3),
@@ -803,6 +820,9 @@ export function retrieveNatalInterpretation(
     maxThemes?: number;
     maxFactors?: number;
     preferredThemeId?: z.infer<typeof chartThemeIdSchema> | null;
+    stateText?: string | null;
+    continuityFactorIds?: string[];
+    transitActivatedFactorIds?: string[];
   },
 ): NatalInterpretationRetrieval | null {
   const parsed = natalInterpretationDocumentSchema.safeParse(value);
@@ -811,9 +831,11 @@ export function retrieveNatalInterpretation(
   const document = parsed.data;
   const lifeAreaTopics = interpretationTopics(options.lifeAreas);
   const textTopics = interpretationTopics([], options.text);
-  const topics = unique([...textTopics, ...lifeAreaTopics]);
+  const stateTopics = interpretationTopics([], options.stateText);
+  const topics = unique([...textTopics, ...stateTopics, ...lifeAreaTopics]);
   const relevanceFor = (candidateTopics: string[]) => (
     overlapScore(candidateTopics, textTopics) * 3
+    + overlapScore(candidateTopics, stateTopics) * 2
     + overlapScore(candidateTopics, lifeAreaTopics)
   );
   const maxThemes = Math.min(3, Math.max(0, options.maxThemes ?? 3));
@@ -833,55 +855,69 @@ export function retrieveNatalInterpretation(
   const relevantThemes = rankedThemes.filter(
     (candidate) => candidate.preferred || candidate.relevance > 0,
   );
-  const themes = (topics.length === 0
-    ? rankedThemes
-    : relevantThemes.length > 0 ? relevantThemes : rankedThemes)
+  const themeAnchors = relevantThemes.slice(0, 2);
+  const themes = themeAnchors
     .slice(0, maxThemes)
     .map(({ theme }) => theme);
-  const supportingIds = themes.flatMap((theme) => theme.supportingFactorIds);
+  const supportingIds = themeAnchors.flatMap(({ theme }) => theme.supportingFactorIds);
   const supportOrder = new Map(unique(supportingIds).map((id, index) => [id, index]));
+  const preferredSupportIds = new Set(rankedThemes.find(({ preferred }) => preferred)?.theme.supportingFactorIds ?? []);
+  const continuityFactorIds = new Set(options.continuityFactorIds ?? []);
+  const transitActivatedFactorIds = new Set(options.transitActivatedFactorIds ?? []);
   const rankedFactorCandidates = document.rankedFactors
     .map((factor, index) => ({
       factor,
       index,
       support: supportOrder.has(factor.id) ? supportOrder.get(factor.id)! : Number.MAX_SAFE_INTEGER,
-      relevance: relevanceFor(factor.topics),
+      latestRelevance: overlapScore(factor.topics, textTopics),
+      stateRelevance: overlapScore(factor.topics, stateTopics),
+      lifeRelevance: overlapScore(factor.topics, lifeAreaTopics),
+      preferred: preferredSupportIds.has(factor.id),
+      continuity: continuityFactorIds.has(factor.id),
+      transitActivation: transitActivatedFactorIds.has(factor.id),
     }))
+    .map((candidate) => {
+      const reasons = [
+        ...(candidate.preferred ? ["preferred_theme" as const] : []),
+        ...(candidate.continuity ? ["recent_continuity" as const] : []),
+        ...(candidate.stateRelevance > 0 ? ["conversation_state" as const] : []),
+        ...(candidate.latestRelevance > 0 ? ["latest_message" as const] : []),
+        ...(candidate.lifeRelevance > 0 ? ["onboarding_interest" as const] : []),
+        ...(candidate.support !== Number.MAX_SAFE_INTEGER ? ["theme_support" as const] : []),
+        ...(candidate.transitActivation ? ["transit_activation" as const] : []),
+      ];
+      const score = Number(candidate.preferred) * 20
+        + Number(candidate.continuity) * 50
+        + candidate.stateRelevance * 4
+        + candidate.latestRelevance * 5
+        + candidate.lifeRelevance
+        + Number(candidate.support !== Number.MAX_SAFE_INTEGER) * 2
+        + Number(candidate.transitActivation) * 3;
+      return { ...candidate, reasons, score };
+    })
     .sort((left, right) => {
-      const leftSupported = left.support !== Number.MAX_SAFE_INTEGER;
-      const rightSupported = right.support !== Number.MAX_SAFE_INTEGER;
-      if (leftSupported !== rightSupported) return leftSupported ? -1 : 1;
-      if (left.support !== right.support) return left.support - right.support;
-      return right.relevance - left.relevance || right.factor.score - left.factor.score || left.index - right.index;
+      if (left.continuity !== right.continuity) return left.continuity ? -1 : 1;
+      return right.score - left.score || right.factor.score - left.factor.score || left.index - right.index;
     });
-  const relevantFactorCandidates = rankedFactorCandidates.filter(
-    (candidate) => candidate.support !== Number.MAX_SAFE_INTEGER || candidate.relevance > 0,
-  );
-  const selectedFactorCandidates = (topics.length === 0
-    ? rankedFactorCandidates
-    : relevantFactorCandidates.length > 0 ? relevantFactorCandidates : rankedFactorCandidates)
+  const selectedFactorCandidates = rankedFactorCandidates
+    .filter((candidate) => candidate.score >= 5)
     .slice(0, maxFactors);
-  if (
-    topics.length > 0
-    && selectedFactorCandidates.length > 0
-    && !selectedFactorCandidates.some((candidate) => candidate.relevance > 0)
-  ) {
-    const mostRelevant = rankedFactorCandidates
-      .filter((candidate) => candidate.relevance > 0)
-      .sort((left, right) => (
-        right.relevance - left.relevance
-        || right.factor.score - left.factor.score
-        || left.index - right.index
-      ))[0];
-    if (mostRelevant) selectedFactorCandidates[selectedFactorCandidates.length - 1] = mostRelevant;
-  }
   const factors = unique(selectedFactorCandidates.map(({ factor }) => factor));
 
   return natalInterpretationRetrievalSchema.parse({
     source: NATAL_INTERPRETATION_SOURCE,
     evidenceStatus: NATAL_INTERPRETATION_EVIDENCE_STATUS,
     schemaVersion: NATAL_INTERPRETATION_SCHEMA_VERSION,
-    selection: { reason: options.reason, topics, preferredThemeId },
+    selection: {
+      reason: options.reason,
+      topics,
+      preferredThemeId,
+      themeAnchorIds: themeAnchors.map(({ theme }) => theme.id),
+      expandedThemeIds: themes.map((theme) => theme.id),
+      maxExpandedThemes: maxThemes,
+      maxFactors,
+      factorSelections: selectedFactorCandidates.map(({ factor, score, reasons }) => ({ id: factor.id, score, reasons })),
+    },
     uncertainty: document.chartAtAGlance.uncertainty,
     themes,
     factors,

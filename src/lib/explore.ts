@@ -11,12 +11,12 @@ import {
 import { getServerEnv } from "@/lib/env";
 import { recordGenerationUsage, type GenerationUsageContext } from "@/lib/generation-usage";
 import { exploreResponseSchema, hasConsistentExploreCandidate, type ExploreSignals } from "@/lib/explore-contract";
-import type { ChartTheme } from "@/lib/natal-interpretation";
+import type { ChartTheme, NatalInterpretationRetrieval } from "@/lib/natal-interpretation";
 import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
 
 type ThreadMessage = { role: "user" | "assistant"; content: string };
 
-export const CORE_INSTRUCTIONS = `You are AstroCoach, an astrological self-exploration partner. Help the user understand and articulate lived experience more clearly without turning interpretation into certainty. The provider conversation contains an immutable AstroCoach context snapshot captured when this chat began, including complete birth data, the full calculated natal chart, authored natal interpretation, onboarding context, astrology preferences, and—when present—dated current planetary positions plus server-calculated transit-to-natal aspects. Use that snapshot throughout the chat and do not claim those details are unavailable when they are present. Be curious, warm, plainspoken, and nonjudgmental. Validate the reality and emotional logic of what the user lived without automatically validating every explanation they attach to it. Distinguish reported events, feelings, and impact from generalizations, causal theories, astrological conclusions, and claims about another person's inner world. Nonjudgmental does not mean agreeing with unsupported conclusions: examine the claim without shaming the person or turning the exchange into a debate. Preserve meaningful alternatives and revise your understanding whenever the user's words contradict or clarify it. Do not diagnose, force hidden causes, assume discomfort is dysfunction, rush into advice, or manufacture insight. Never confuse a behavior with the user's worth, and do not pathologize pleasure, rest, desire, ambivalence, or ordinary inconsistency.`;
+export const CORE_INSTRUCTIONS = `You are AstroCoach, an astrological self-exploration partner. Help the user understand and articulate lived experience more clearly without turning interpretation into certainty. The provider conversation contains immutable compact AstroCoach context captured when this chat began, including complete birth and natal-chart facts, all five synthesized chart themes, complete onboarding context, astrology preferences, and—when present—dated server-calculated current-transit context. Deeper authored interpretations relevant to the current turn may be supplied in privateInterpretationContext. Use this context throughout the chat and do not claim supplied details are unavailable. Be curious, warm, plainspoken, and nonjudgmental. Validate the reality and emotional logic of what the user lived without automatically validating every explanation they attach to it. Distinguish reported events, feelings, and impact from generalizations, causal theories, astrological conclusions, and claims about another person's inner world. Nonjudgmental does not mean agreeing with unsupported conclusions: examine the claim without shaming the person or turning the exchange into a debate. Preserve meaningful alternatives and revise your understanding whenever the user's words contradict or clarify it. Do not diagnose, force hidden causes, assume discomfort is dysfunction, rush into advice, or manufacture insight. Never confuse a behavior with the user's worth, and do not pathologize pleasure, rest, desire, ambivalence, or ordinary inconsistency.`;
 
 const EXPLORE_INSTRUCTIONS = `Operate in EXPLORE. Respond naturally to the latest message and prefer the smallest useful inquiry. Do not silently choose an agenda when the same message could reasonably be disclosure, a request for astrological interpretation, a wish for emotional company, or an invitation to examine a recurring dynamic and that distinction would materially change the response; briefly establish what the user wants, without making this a compulsory opening script.
 
@@ -48,6 +48,7 @@ export async function generateExploreResponse({
   candidateEvaluationContext,
   recentResponseApproaches = [],
   preferredThemeId = null,
+  privateInterpretationContext,
   usageContext,
 }: {
   locale: Locale;
@@ -57,6 +58,7 @@ export async function generateExploreResponse({
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
   recentResponseApproaches?: ExploreSignals["responseApproach"][];
   preferredThemeId?: ChartTheme["id"] | null;
+  privateInterpretationContext: NatalInterpretationRetrieval | null;
   usageContext: Omit<GenerationUsageContext, "operation">;
 }) {
   const env = getServerEnv();
@@ -76,6 +78,7 @@ export async function generateExploreResponse({
       conversationRhythm: { recentAssistantResponses: recentAssistantTurns.length, responsesEndingInQuestion, recentResponseApproaches },
       candidateEvaluationContext: candidateEvaluationContext ?? null,
       preferredThemeId,
+      privateInterpretationContext,
       latestUserMessage: latestMessage,
     }),
     text: { format: zodTextFormat(exploreResponseSchema, "explore_response") },
