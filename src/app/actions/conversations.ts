@@ -99,7 +99,10 @@ export async function exportConversation(locale: Locale, conversationId: string)
   const user = await requireCurrentUser(locale);
   const conversation = await db.conversation.findFirst({
     where: { id: parsedId.data, userId: user.id },
-    include: { messages: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] } },
+    include: {
+      messages: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+      generationUsages: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+    },
   });
   if (!conversation) return { ok: false as const };
 

@@ -129,6 +129,7 @@ model User {
   mapItems             MapItem[]
   practices            Practice[]
   practiceObservations PracticeObservation[]
+  generationUsages     GenerationUsage[]
 
   @@map("users")
 }
@@ -156,6 +157,7 @@ model Conversation {
   sourceMapItems         MapItem[]                   @relation("MapItemSourceConversation")
   practices              Practice[]
   practiceObservations   PracticeObservation[]
+  generationUsages       GenerationUsage[]
 
   @@index([userId, lastMessageAt(sort: Desc)])
   @@index([userId, archivedAt, lastMessageAt(sort: Desc)])
@@ -180,9 +182,41 @@ model Message {
   recognizedMapItem   MapItem?
   proposedPractice    Practice?
   practiceObservation PracticeObservation?
+  generationUsages    GenerationUsage[]
 
   @@index([conversationId, createdAt])
   @@map("messages")
+}
+
+model GenerationUsage {
+  id                   String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId               String        @map("user_id") @db.Uuid
+  conversationId       String?       @map("conversation_id") @db.Uuid
+  messageId            String?       @map("message_id") @db.Uuid
+  operation            String        @db.VarChar(40)
+  attempt              Int           @default(1)
+  responseId           String        @unique @map("response_id")
+  providerConversationId String?     @map("provider_conversation_id")
+  conversationResponseNumber Int?    @map("conversation_response_number")
+  model                 String
+  responseStatus        String?       @map("response_status")
+  inputTokens           Int           @map("input_tokens")
+  cachedInputTokens     Int           @map("cached_input_tokens")
+  cacheWriteTokens      Int           @map("cache_write_tokens")
+  uncachedInputTokens   Int           @map("uncached_input_tokens")
+  outputTokens          Int           @map("output_tokens")
+  reasoningTokens       Int           @map("reasoning_tokens")
+  totalTokens           Int           @map("total_tokens")
+  computeUnits          Int?          @map("compute_units")
+  createdAt             DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation          Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  message               Message?      @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([operation, createdAt(sort: Desc)])
+  @@map("generation_usages")
 }
 
 model MapItem {

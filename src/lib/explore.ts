@@ -9,6 +9,7 @@ import {
   ASTROLOGY_CONVERSATION_EXAMPLES,
 } from "@/lib/astrology-context";
 import { getServerEnv } from "@/lib/env";
+import { recordGenerationUsage, type GenerationUsageContext } from "@/lib/generation-usage";
 import { exploreResponseSchema, hasConsistentExploreCandidate, type ExploreSignals } from "@/lib/explore-contract";
 import type { ChartTheme } from "@/lib/natal-interpretation";
 import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
@@ -47,6 +48,7 @@ export async function generateExploreResponse({
   candidateEvaluationContext,
   recentResponseApproaches = [],
   preferredThemeId = null,
+  usageContext,
 }: {
   locale: Locale;
   thread: ThreadMessage[];
@@ -55,6 +57,7 @@ export async function generateExploreResponse({
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
   recentResponseApproaches?: ExploreSignals["responseApproach"][];
   preferredThemeId?: ChartTheme["id"] | null;
+  usageContext: Omit<GenerationUsageContext, "operation">;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -77,6 +80,7 @@ export async function generateExploreResponse({
     }),
     text: { format: zodTextFormat(exploreResponseSchema, "explore_response") },
   });
+  await recordGenerationUsage(response, { ...usageContext, operation: "CHAT_EXPLORE" });
 
   if (!response.output_parsed) throw new Error("The model did not return a valid EXPLORE response");
   const { reply, ...signals } = response.output_parsed;

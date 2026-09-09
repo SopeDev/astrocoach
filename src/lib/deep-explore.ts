@@ -10,6 +10,7 @@ import {
 import { deepExploreResponseSchema, hasConsistentDeepExploreCandidate } from "@/lib/deep-explore-contract";
 import { CORE_INSTRUCTIONS } from "@/lib/explore";
 import { getServerEnv } from "@/lib/env";
+import { recordGenerationUsage, type GenerationUsageContext } from "@/lib/generation-usage";
 import type { CandidateEvaluationPromptContext } from "@/lib/recognize-contract";
 
 const DEEP_EXPLORE_INSTRUCTIONS = `Operate in DEEP_EXPLORE. Begin from the supplied focal Pattern or Insight as something the user has already recognized. The user has deliberately chosen to understand it more deeply. Do not restart basic exploration, try to prove the item exists, or treat depth as increasingly elaborate interpretation.
@@ -34,12 +35,14 @@ export async function generateDeepExploreResponse({
   latestMessage,
   providerConversationId,
   candidateEvaluationContext,
+  usageContext,
 }: {
   locale: Locale;
   activePractice: { intention: string; instruction: string; cue: string } | null;
   latestMessage: string;
   providerConversationId: string;
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
+  usageContext: Omit<GenerationUsageContext, "operation">;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -58,6 +61,7 @@ export async function generateDeepExploreResponse({
     }),
     text: { format: zodTextFormat(deepExploreResponseSchema, "deep_explore_response") },
   });
+  await recordGenerationUsage(response, { ...usageContext, operation: "CHAT_DEEP_EXPLORE" });
 
   if (!response.output_parsed) throw new Error("The model did not return a valid DEEP_EXPLORE response");
   const { reply, ...signals } = response.output_parsed;

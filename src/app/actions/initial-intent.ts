@@ -81,6 +81,7 @@ export async function saveInitialIntent(
           model: existingInterpretation!.model,
         }
       : await prepareNatalInterpretation({
+          userId: user.id,
           chart: calculation.data,
           inputHash: calculation.inputHash,
           timeAccuracy: calculation.timeAccuracy,
@@ -96,6 +97,7 @@ export async function saveInitialIntent(
       transitSnapshot,
     });
     const questions = await generateInitialDiscoveryQuestions({
+      userId: user.id,
       locale,
       areaLabels,
       currentContext: result.data.currentContext || null,

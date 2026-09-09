@@ -26,6 +26,7 @@ export async function ensureNatalInterpretation(
   }
 
   const prepared = await prepareNatalInterpretation({
+    userId,
     chart: natalChart.data,
     inputHash: natalChart.inputHash,
     timeAccuracy: natalChart.timeAccuracy,

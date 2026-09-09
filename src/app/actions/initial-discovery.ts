@@ -65,6 +65,7 @@ export async function prepareFinalDiscoveryQuestions(locale: Locale, answers: st
           calculatedAt: intent.questionsGenerated ?? new Date(),
         });
     const questions = await generateFinalDiscoveryQuestions({
+      userId: user.id,
       locale,
       areaLabels,
       currentContext: intent.currentContext,

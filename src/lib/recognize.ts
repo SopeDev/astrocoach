@@ -10,6 +10,7 @@ import {
 } from "@/lib/astrology-context";
 import { CORE_INSTRUCTIONS } from "@/lib/explore";
 import { getServerEnv } from "@/lib/env";
+import { recordGenerationUsage, type GenerationUsageContext } from "@/lib/generation-usage";
 import { isValidGeneratedRecognizeSignals, type CandidateEvaluationPromptContext, type CandidateMapItem, recognizeResponseSchema } from "@/lib/recognize-contract";
 import type { RecognitionHandoffContext } from "@/lib/recognition-handoff";
 
@@ -39,6 +40,7 @@ export async function generateRecognizeResponse({
   candidateEvaluationContext,
   focalMapItem = null,
   recognitionHandoff = null,
+  usageContext,
 }: {
   locale: Locale;
   latestMessage: string | null;
@@ -47,6 +49,7 @@ export async function generateRecognizeResponse({
   candidateEvaluationContext?: CandidateEvaluationPromptContext | null;
   focalMapItem?: CandidateMapItem | null;
   recognitionHandoff?: RecognitionHandoffContext | null;
+  usageContext: Omit<GenerationUsageContext, "operation">;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -69,6 +72,7 @@ export async function generateRecognizeResponse({
     }),
     text: { format: zodTextFormat(recognizeResponseSchema, "recognize_response") },
   });
+  await recordGenerationUsage(response, { ...usageContext, operation: "CHAT_RECOGNIZE" });
 
   if (!response.output_parsed) throw new Error("The model did not return a valid RECOGNIZE response");
   const { reply, ...signals } = response.output_parsed;

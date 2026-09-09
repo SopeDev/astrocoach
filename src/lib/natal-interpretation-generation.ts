@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { getServerEnv } from "@/lib/env";
+import { recordGenerationUsage } from "@/lib/generation-usage";
 import {
   assertHumanFirstAstrologyLanguage,
   TechnicalAstrologyLanguageError,
@@ -146,6 +147,7 @@ function validateHumanFacingThemeLanguage(
 async function generateThemes(
   factors: RankedNatalFactor[],
   timeAccuracy: string,
+  userId: string,
 ): Promise<{ themes: ChartTheme[]; generationMethod: PreparedNatalInterpretation["generationMethod"]; model: string | null }> {
   const env = getServerEnv();
   const fallback = () => ({
@@ -166,6 +168,7 @@ async function generateThemes(
         input: JSON.stringify(buildNatalThemeGenerationInput(factors, timeAccuracy)),
         text: { format: zodTextFormat(generatedThemesSchema, "chart_at_a_glance") },
       });
+      await recordGenerationUsage(response, { userId, operation: "NATAL_THEMES", attempt: attempt + 1 });
 
       if (!response.output_parsed) throw new Error("The model did not return chart themes");
       try {
@@ -194,14 +197,16 @@ export async function prepareNatalInterpretation({
   chart,
   inputHash,
   timeAccuracy,
+  userId,
 }: {
   chart: unknown;
   inputHash: string;
   timeAccuracy: string;
+  userId: string;
 }): Promise<PreparedNatalInterpretation> {
   const rankedFactors = rankNatalChartFactors(chart);
   if (rankedFactors.length === 0) throw new Error("No authored interpretations match the natal chart");
-  const generated = await generateThemes(rankedFactors, timeAccuracy);
+  const generated = await generateThemes(rankedFactors, timeAccuracy, userId);
   const uncertainty = timeAccuracy === "unknown"
     ? {
         kind: "birth_time_unknown" as const,

@@ -175,6 +175,13 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
   }
   const themeStarter = themeConversationStarterSchema.safeParse(userMessage.internalSignals);
   const recognitionHandoff = context.conversation.mode === "RECOGNIZE" ? await loadRecognitionHandoff(userId, conversationId) : null;
+  const usageContext = {
+    userId,
+    conversationId,
+    messageId: userMessage.id,
+    providerConversationId: context.providerConversationId,
+    conversationResponseNumber: context.messageCounts.assistant + 1,
+  };
   const generated = context.conversation.mode === "RECOGNIZE"
     ? await generateRecognizeResponse({
         locale,
@@ -186,6 +193,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
           ? { kind: context.conversation.focalMapItem.kind, statement: context.conversation.focalMapItem.statement }
           : null,
         recognitionHandoff,
+        usageContext,
       })
     : context.conversation.mode === "DEEP_EXPLORE" && context.conversation.focalMapItem
       ? await generateDeepExploreResponse({
@@ -200,6 +208,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
             : null,
           latestMessage: userMessage.content,
           candidateEvaluationContext: context.evaluationContext,
+          usageContext,
         })
     : context.conversation.mode === "INTEGRATE" && context.conversation.focalMapItem
       ? await generateIntegrateResponse({
@@ -216,6 +225,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
               }
             : null,
           recentObservations: context.recentObservations,
+          usageContext,
         })
       : await generateExploreResponse({
           locale,
@@ -225,6 +235,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
           candidateEvaluationContext: context.evaluationContext,
           recentResponseApproaches: context.recentResponseApproaches,
           preferredThemeId: themeStarter.success ? themeStarter.data.themeId : null,
+          usageContext,
         });
 
   const persisted = await serializableTransaction(async (transaction) => {
@@ -428,6 +439,12 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
       opening: true,
       focalMapItem,
       recognitionHandoff,
+      usageContext: {
+        userId: user.id,
+        conversationId,
+        providerConversationId: context.providerConversationId,
+        conversationResponseNumber: context.messageCounts.assistant + 1,
+      },
     });
     const assistantMessage = await serializableTransaction(async (transaction) => {
       const messageCounts = await loadMessageCounts(transaction, conversationId);

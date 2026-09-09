@@ -11,6 +11,7 @@ import {
   type DiscoveryAstrologyContext,
 } from "@/lib/discovery-astrology";
 import { getServerEnv } from "@/lib/env";
+import { recordGenerationUsage } from "@/lib/generation-usage";
 import {
   assertHumanFirstAstrologyLanguage,
   DISCOVERY_QUESTION_STYLE_INSTRUCTIONS,
@@ -46,6 +47,7 @@ export const discoveryAnswersSchema = z.array(z.string().trim().min(1).max(2000)
 export const finalDiscoveryAnswersSchema = z.array(z.string().trim().min(1).max(2000)).length(2);
 
 type DiscoveryContext = {
+  userId: string;
   locale: Locale;
   areaLabels: string[];
   currentContext: string | null;
@@ -196,6 +198,7 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
         input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext: context.discoveryAstrologyContext }),
         text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
       });
+      await recordGenerationUsage(response, { userId: context.userId, operation: "DISCOVERY_INITIAL", attempt: attempt + 1 });
 
       if (!response.output_parsed) throw new Error("The model did not return initial discovery questions");
       const questions = response.output_parsed.questions.map(({ question }) => question);
@@ -239,6 +242,7 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
         input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext: context.discoveryAstrologyContext }),
         text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
       });
+      await recordGenerationUsage(response, { userId: context.userId, operation: "DISCOVERY_FINAL", attempt: attempt + 1 });
 
       if (!response.output_parsed) throw new Error("The model did not return final discovery questions");
       const questions = response.output_parsed.questions.map(({ question }) => question);

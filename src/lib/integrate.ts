@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { ASTROCOACH_VOICE_INSTRUCTIONS, ASTROLOGY_COMMUNICATION_INSTRUCTIONS } from "@/lib/astrology-context";
 import { CORE_INSTRUCTIONS } from "@/lib/explore";
 import { getServerEnv } from "@/lib/env";
+import { recordGenerationUsage, type GenerationUsageContext } from "@/lib/generation-usage";
 import { integrateResponseSchema } from "@/lib/integrate-contract";
 import { isSupportedPracticeProposal, type PracticeProposal } from "@/lib/practices";
 
@@ -21,12 +22,13 @@ When an active Practice exists and the user reports what happened in life, use L
 
 Astrology may personalize language or suggest a question, but it cannot prescribe the Practice or override lived evidence.`;
 
-export async function generateIntegrateResponse({ locale, latestMessage, activePractice, recentObservations, providerConversationId }: {
+export async function generateIntegrateResponse({ locale, latestMessage, activePractice, recentObservations, providerConversationId, usageContext }: {
   locale: Locale;
   latestMessage: string | null;
   activePractice: ActivePractice | null;
   recentObservations: Array<{ content: string; learning: string | null }>;
   providerConversationId: string;
+  usageContext: Omit<GenerationUsageContext, "operation">;
 }) {
   const env = getServerEnv();
   if (!env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
@@ -39,6 +41,7 @@ export async function generateIntegrateResponse({ locale, latestMessage, activeP
     input: JSON.stringify({ event: "user_message", activePractice, recentObservations, latestUserMessage: latestMessage }),
     text: { format: zodTextFormat(integrateResponseSchema, "integrate_response") },
   });
+  await recordGenerationUsage(response, { ...usageContext, operation: "CHAT_INTEGRATE" });
   if (!response.output_parsed) throw new Error("The model did not return a valid INTEGRATE response");
   const { integrationStage, proposedPractice } = response.output_parsed;
   if (

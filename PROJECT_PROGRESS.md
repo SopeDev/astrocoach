@@ -113,7 +113,12 @@ Last updated: 2026-09-07
 - Verified the shared-transit cache and conversation-context upgrade with Prisma schema validation, linting, strict TypeScript checking, all 29 test files, and a production Next.js build.
 - Repaired the Vercel install failure caused by a generic upgrade to the incompatible Prisma 8 prerelease CLI. The Prisma CLI, client, and PostgreSQL adapter are now pinned together at 7.10.0; clean installation, Prisma Client generation, linting, strict TypeScript checking, all 29 test files, and the production build pass.
 
+- Added backend-only OpenAI generation telemetry for natal-theme synthesis, both Initial Discovery stages, and every EXPLORE, RECOGNIZE, DEEP_EXPLORE, and INTEGRATE response. Each provider-returned attempt, including corrective retries, now records model/response provenance, full token and cache breakdowns, reasoning tokens, user/conversation/message linkage, and a conversation response number that isolates the context-heavy first turn; telemetry failures remain non-blocking to the product flow.
+- Upgraded conversation exports to version 3 with focal Map provenance and all conversation-scoped generation telemetry, including chronological request details, explicit first-response identification, and overall and per-operation token totals while continuing to omit the private provider conversation identifier.
+
 ## Remaining
+
+- Apply the generation-usage migration, then decide whether usage summaries need an owner-only UI or export surface.
 
 - Confirm the newly applied migrations and transit-informed flows against the deployed application after the corrected Prisma dependency deployment succeeds.
 - Add conversation-title editing after the core navigation is evaluated.
