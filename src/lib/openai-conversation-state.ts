@@ -53,10 +53,10 @@ export async function deleteProviderConversation(providerConversationId: string)
   for await (const item of openai.conversations.items.list(providerConversationId, { limit: 100 })) {
     if (item.id) items.push(item.id);
   }
-  for (const itemId of items) {
-    await openai.conversations.items.delete(itemId, {
+  await Promise.all(items.map((itemId) =>
+    openai.conversations.items.delete(itemId, {
       conversation_id: providerConversationId,
-    });
-  }
+    }),
+  ));
   await openai.conversations.delete(providerConversationId);
 }

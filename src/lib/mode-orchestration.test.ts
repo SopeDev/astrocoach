@@ -14,6 +14,7 @@ function signal(overrides: Record<string, unknown> = {}) {
     candidateMapItemSignal: true,
     candidateMapItemConfidence: 0.8,
     candidateMapItemKind: "PATTERN",
+    candidateMapItemStatement: "I repeatedly disappear from my own life when closeness feels unavailable.",
     recommendedNextMode: "RECOGNIZE",
     reasonForRecommendation: "A relationship appears across distinct examples.",
     ...overrides,
@@ -29,7 +30,7 @@ test("an older qualifying response does not trigger an invitation after the late
   const qualifying = { createdAt: new Date("2026-09-02T10:00:00Z"), internalSignals: signal() };
   const latest = {
     createdAt: new Date("2026-09-02T10:01:00Z"),
-    internalSignals: signal({ candidateMapItemSignal: false, candidateMapItemKind: null, recommendedNextMode: "EXPLORE" }),
+    internalSignals: signal({ candidateMapItemSignal: false, candidateMapItemKind: null, candidateMapItemStatement: null, candidateMapItemConfidence: 0.2, recommendedNextMode: "EXPLORE" }),
   };
   assert.equal(shouldOfferRecognition([qualifying, latest], null), false);
 });

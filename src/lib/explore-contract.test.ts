@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { exploreMessageSchema, exploreResponseSchema, exploreSignalsSchema, hasConsistentExploreCandidate, titleFromExploreMessage } from "./explore-contract";
+import { exploreMessageSchema, exploreResponseSchema, exploreSignalsSchema, hasConsistentExploreCandidate, titleFromExploreMessage, transitionSafeExploreSignals } from "./explore-contract";
 
 test("EXPLORE output keeps the visible reply separate from valid internal signals", () => {
   const result = exploreResponseSchema.safeParse({
@@ -15,6 +15,7 @@ test("EXPLORE output keeps the visible reply separate from valid internal signal
     candidateMapItemSignal: false,
     candidateMapItemConfidence: 0.1,
     candidateMapItemKind: null,
+    candidateMapItemStatement: null,
     recommendedNextMode: "EXPLORE",
     reasonForRecommendation: "Important context is still missing.",
   });
@@ -40,12 +41,41 @@ test("EXPLORE candidate state requires a classified item", () => {
     candidateMapItemSignal: true,
     candidateMapItemConfidence: 0.8,
     candidateMapItemKind: "INSIGHT",
+    candidateMapItemStatement: "Stability may have become a prerequisite for allowing myself closeness.",
     recommendedNextMode: "RECOGNIZE",
     reasonForRecommendation: "There is a specific understanding to evaluate.",
   });
   const signals = exploreSignalsSchema.parse(base);
   assert.equal(hasConsistentExploreCandidate(signals), true);
   assert.equal(hasConsistentExploreCandidate({ ...signals, candidateMapItemKind: null }), false);
+  assert.equal(hasConsistentExploreCandidate({ ...signals, questionPurpose: "Ask for more detail." }), false);
+});
+
+test("a candidate reply that asks a question remains in EXPLORE so the composer stays available", () => {
+  const signals = exploreSignalsSchema.parse({
+    currentMode: "EXPLORE",
+    responseApproach: "CONNECT",
+    questionPurpose: null,
+    privateAstrologyInfluence: null,
+    usedAstrologyFactorIds: [],
+    usedTransitIds: [],
+    understandingStatus: "clearer",
+    importantObservations: ["Scarcity appears to narrow the user's space for affection."],
+    unresolvedQuestions: ["How much is literal logistics and how much is a personal rule?"],
+    candidateMapItemSignal: true,
+    candidateMapItemConfidence: 0.82,
+    candidateMapItemKind: "INSIGHT",
+    candidateMapItemStatement: "Tenderness may support stability rather than only follow it.",
+    recommendedNextMode: "RECOGNIZE",
+    reasonForRecommendation: "A durable distinction is ready to examine.",
+  });
+
+  const safe = transitionSafeExploreSignals("How much is logistics, and how much is a rule?", signals);
+  assert.equal(safe.candidateMapItemSignal, false);
+  assert.equal(safe.candidateMapItemKind, null);
+  assert.equal(safe.candidateMapItemStatement, null);
+  assert.equal(safe.recommendedNextMode, "EXPLORE");
+  assert.equal(hasConsistentExploreCandidate(safe), true);
 });
 
 test("conversation titles are compact and single-line", () => {

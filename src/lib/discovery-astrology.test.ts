@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateNatalChart, NATAL_ENGINE_VERSION } from "./natal-chart";
+import { reasoningDiscoveryAstrologyContext } from "./astrology-model-context";
 import {
   CURRENT_CATALOG_VERSIONS,
   deterministicThemeFallback,
@@ -74,6 +75,41 @@ test("freezes the complete chart, all themes, current positions, and transit con
   )));
 });
 
+test("projects the lossless Discovery snapshot into reasoning-grade model context", () => {
+  const { chart, interpretation } = source("exact");
+  const context = createDiscoveryAstrologyContext({
+    natalChart: chart.data,
+    natalInterpretation: interpretation,
+    natalTimeAccuracy: chart.timeAccuracy,
+    engineVersion: NATAL_ENGINE_VERSION,
+    calculatedAt: new Date("2026-09-07T12:00:00.000Z"),
+  });
+  const modelContext = reasoningDiscoveryAstrologyContext(context, "en");
+  const serialized = JSON.stringify(modelContext);
+
+  assert.equal(modelContext.chart.placements.length, chart.data.planets.length);
+  assert.equal(modelContext.chart.aspects.length, chart.data.aspects.length);
+  assert.equal(modelContext.themes.length, 5);
+  assert.equal(modelContext.transits.positions.length, context.currentTransits.positions.length);
+  assert.equal(modelContext.transits.contacts.length, context.currentTransits.activeAspects.length);
+  assert.ok(modelContext.transits.activations);
+  for (const calculationKey of [
+    "natalChart",
+    "natalPoints",
+    "longitude",
+    "longitudeSpeed",
+    "separation",
+    "aspectAngle",
+    "strength",
+    "sourceChartInputHash",
+    "engine",
+    "translations",
+  ]) {
+    assert.equal(serialized.includes(`\"${calculationKey}\"`), false);
+  }
+  assert.ok(serialized.length < JSON.stringify(context).length * 0.35);
+});
+
 test("reuses one house-free transit snapshot and derives personal aspects from its positions", () => {
   const { chart, interpretation } = source("exact");
   const transitSnapshot = createCurrentTransitSnapshot({
@@ -142,9 +178,9 @@ test("links current contacts to supported natal aspects", () => {
 });
 
 test("treats the complete frozen snapshot as symbolic context with timing boundaries", () => {
-  assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /complete natalChart/i);
-  assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /all five natalThemes/i);
-  assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /natalAspectActivations/i);
+  assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /complete reasoning-grade chart/i);
+  assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /all five themes/i);
+  assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /transits\.activations/i);
   assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /does not prove an event/i);
   assert.match(DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS, /noon_reference/i);
 });

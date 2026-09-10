@@ -1,6 +1,6 @@
 # Project Progress
 
-Last updated: 2026-09-07
+Last updated: 2026-09-09
 
 ## Implemented
 
@@ -117,10 +117,14 @@ Last updated: 2026-09-07
 - Upgraded conversation exports to version 3 with focal Map provenance and all conversation-scoped generation telemetry, including chronological request details, explicit first-response identification, and overall and per-operation token totals while continuing to omit the private provider conversation identifier.
 - Added the first context-cost optimization without changing the lossless PostgreSQL snapshot: new provider conversations receive a compact bootstrap with complete chart facts, all five localized themes, all onboarding evidence, preferences, Map context, and compact frozen transit awareness, while every cognitive mode can receive a bounded deeper authored-factor packet per turn. A real 110,312-character snapshot projects to 32,527 characters (70.5% smaller); existing initialized provider conversations remain unchanged.
 - Corrected bounded astrology retrieval so limits behave as ceilings: global themes are no longer redundantly resent, zero detailed factors is valid, and factors must clear a scored material-relevance threshold. Retrieval now carries forward the latest materially used factor/transit provenance and considers current cognitive state, focal Map context, handoffs, Practices, observations, and frozen transit activation links before lexical recency. All modes emit validated used-factor/used-transit IDs, while generation telemetry and version 3 conversation exports include selected count, maximum, scores, reasons, and retrieval payload size; older stored messages remain readable.
+- Fixed the EXPLORE transition/composer contradiction. A qualifying Map candidate now carries its exact statement into the application-owned RECOGNIZE handoff, keeps any material unanswered distinction in structured state, and cannot hide the composer while its visible reply asks a question; the first RECOGNIZE turn receives the deferred candidate, observations, and uncertainty after the user accepts the transition.
+- Tightened authored-factor retrieval against real conversation telemetry. Broad onboarding interests and generic orchestration prose can no longer qualify deep factors by themselves; only the latest explicit cognitive state is topic-matched, exact factor references are recognized in English and Spanish, one current topic normally selects one factor, and explicit provenance remains the strongest continuity signal. The four-factor limit remains a ceiling rather than a target.
+- Bounded hidden provider-state growth with three-response context epochs and idle-session rotation at the 30-minute cache boundary. Each replacement conversation is rebuilt from the lossless compact snapshot and bounded visible transcript, receives a stable per-chat prompt-cache key, and discards accumulated per-turn retrieval packets and verbose structured outputs without relying on lossy opaque compaction.
+- Added one shared reasoning-grade astrology serializer at every model boundary: Chart-at-a-glance synthesis, both Discovery question stages, conversation bootstrap, and per-turn authored-factor retrieval. It preserves the full applicable symbolic topology while stripping calculation inputs, raw celestial geometry, redundant identifiers, source/ranking metadata, and repeated activation arrays; canonical database snapshots and conversation exports remain lossless. On the supplied real conversation export, the exact provider bootstrap fell from a 104,937-character snapshot to 12,533 characters (88.1% smaller), while retaining 11 placements, 2 nodes, 4 angles, 23 reliable natal aspects, all 5 themes, 12 transit positions, and all 22 active transit contacts.
 
 ## Remaining
 
-- Apply the generation-context-selection telemetry migration, then evaluate real selected-factor counts, reasons, continuity, token usage, and cache behavior before optimizing provider history or instructions.
+- Deploy the reasoning-grade projections, corrected selector, and bounded provider epochs, then evaluate a fresh exported conversation for selected-factor utilization, per-operation token reductions, epoch-reset input size, within-session cache reuse, and the first response after a 30+ minute gap before considering instruction compression.
 
 - Confirm the newly applied migrations and transit-informed flows against the deployed application after the corrected Prisma dependency deployment succeeds.
 - Add conversation-title editing after the core navigation is evaluated.
@@ -143,4 +147,4 @@ Last updated: 2026-09-07
 
 ## Next planned slice
 
-Apply the pending migrations, then manually verify transit-informed Discovery, the stateful conversation context, and the 15-by-15 message cap against the configured database and model.
+Manually exercise a fresh conversation across multiple provider epochs and a 30+ minute return, then inspect the version 3 export to tune retrieval sparsity or epoch length from real token and quality evidence.

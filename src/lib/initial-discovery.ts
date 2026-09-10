@@ -7,6 +7,10 @@ import type { Locale } from "@/i18n/config";
 import { ASTROCOACH_VOICE_INSTRUCTIONS } from "@/lib/astrology-context";
 import type { AstrologyFamiliarity, AstrologyStyle } from "@/lib/astrology-preferences";
 import {
+  reasoningDiscoveryAstrologyContext,
+  reasoningNatalChart,
+} from "@/lib/astrology-model-context";
+import {
   DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS,
   type DiscoveryAstrologyContext,
 } from "@/lib/discovery-astrology";
@@ -134,6 +138,9 @@ function validateInitialQuestionBasis(
   }
   const natalIds = new Set([
     ...astrologyContext.natalPoints.map(({ id }) => id),
+    ...Object.values(reasoningNatalChart(astrologyContext.natalChart))
+      .flat()
+      .map((fact) => fact.split(" | ")[0]),
     ...astrologyContext.natalThemes.flatMap((theme) => [
       theme.id,
       ...theme.supportingFactorIds,
@@ -189,13 +196,17 @@ export async function generateInitialDiscoveryQuestions(context: DiscoveryContex
 
   try {
     const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const discoveryAstrologyContext = reasoningDiscoveryAstrologyContext(
+      context.discoveryAstrologyContext,
+      context.locale,
+    );
     let correction = "";
     for (let attempt = 0; attempt < 2; attempt += 1) {
       const response = await client.responses.parse({
         model: env.OPENAI_MODEL,
         store: false,
         instructions: `${sharedInstructions(context.locale)} Generate exactly three initial Discovery questions. Together they should form a broad, personalized first picture across different dimensions. Move from an easy entry point toward slightly deeper inquiry. Use basisKind natal_pattern for a question primarily shaped by the stable natal chart, current_activation for one materially shaped by the frozen transit snapshot, and user_context only when primarily grounded in selectedLifeAreas or currentContext. At least one item must use natal_pattern; when active transit aspects are supplied, at least one must use current_activation. For natal_pattern, supportingAstrologyIds must contain exact supplied theme, natal-point, or supporting-factor IDs. For current_activation, it must contain at least one exact supplied transit ID and may also name an activated natal-aspect ID. Use an empty array for user_context when no astrological source materially shaped it. Explain the synthesis briefly in privateBasis. The visible wording must describe only the human experience being explored. Do not ask for information already present in the user's context.${correction}`,
-        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext: context.discoveryAstrologyContext }),
+        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext }),
         text: { format: zodTextFormat(initialQuestionSetSchema, "initial_discovery_questions") },
       });
       await recordGenerationUsage(response, { userId: context.userId, operation: "DISCOVERY_INITIAL", attempt: attempt + 1 });
@@ -233,13 +244,17 @@ export async function generateFinalDiscoveryQuestions(context: DiscoveryContext 
   try {
     const exchanges = context.initialQuestions.map((question, index) => ({ question, answer: context.initialAnswers[index] }));
     const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const discoveryAstrologyContext = reasoningDiscoveryAstrologyContext(
+      context.discoveryAstrologyContext,
+      context.locale,
+    );
     let correction = "";
     for (let attempt = 0; attempt < 2; attempt += 1) {
       const response = await client.responses.parse({
         model: env.OPENAI_MODEL,
         store: false,
         instructions: `${sharedInstructions(context.locale)} Generate exactly two finalizing Discovery questions after examining the three initial exchanges alongside the same frozen natal-and-transit snapshot used for the opening stage. For each item, copy a short, meaningful, verbatim phrase from a different answer into userGrounding, and include that exact phrase naturally in the visible question. Choose words the person would recognize as their own; do not use punctuation from the source question as part of the phrase. Begin from that concrete detail, tension, or distinction, then ask what would most improve your understanding. These are attentive follow-ups, not generic extra questions or a new chart reading. Treat the answers as more authoritative than natal or transit symbolism: use the astrology to notice what remains unresolved, never to override what the person just told you. Do not repeat an answered question, summarize everything, or offer a list of roles or priorities to choose among.${correction}`,
-        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext: context.discoveryAstrologyContext }),
+        input: JSON.stringify({ selectedLifeAreas: context.areaLabels, currentContext: context.currentContext, initialExchanges: exchanges, astrologyFamiliarity: context.astrologyFamiliarity, astrologyStyle: context.astrologyStyle, discoveryAstrologyContext }),
         text: { format: zodTextFormat(finalQuestionSetSchema, "final_discovery_questions") },
       });
       await recordGenerationUsage(response, { userId: context.userId, operation: "DISCOVERY_FINAL", attempt: attempt + 1 });

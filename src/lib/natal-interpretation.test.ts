@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateNatalChart } from "./natal-chart";
+import { reasoningInterpretationContext } from "./astrology-model-context";
 import {
   CURRENT_CATALOG_VERSIONS,
   anchoredThemeFactorIds,
@@ -107,7 +108,7 @@ test("stores three deterministic anchors followed by two emergent themes", () =>
   assert.ok(themes[2].supportingFactorIds.some((id) => id.startsWith("midheaven.")));
 });
 
-test("passes every eligible major aspect with exact geometry into theme generation", () => {
+test("passes every eligible major aspect to theme generation without calculation geometry", () => {
   const chart = calculateNatalChart({ ...referenceInput, birthTimeMinutes: 12 * 60 });
   const factors = rankNatalChartFactors(chart.data);
   const input = buildNatalThemeGenerationInput(factors, chart.timeAccuracy);
@@ -116,7 +117,7 @@ test("passes every eligible major aspect with exact geometry into theme generati
     ...input.emergentCandidateFactors,
   ];
   const suppliedAspectIds = new Set(
-    suppliedFactors.filter((factor) => "aspectDetails" in factor).map((factor) => factor.id),
+    suppliedFactors.filter((factor) => factor.id.startsWith("aspect.")).map((factor) => factor.id),
   );
   const rankedAspects = factors.filter((factor) => factor.kind === "major_aspect");
 
@@ -126,11 +127,12 @@ test("passes every eligible major aspect with exact geometry into theme generati
   );
   assert.ok(suppliedFactors.some((factor) => (
     factor.id === "aspect.saturn.trine.sun"
-    && "aspectDetails" in factor
-    && factor.aspectDetails?.type === "trine"
-    && factor.aspectDetails?.strength === 100
-    && factor.aspectDetails?.timeReliability === "exact_time"
+    && factor.fact.includes("Sun trine Saturn")
+    && factor.fact.includes("° orb")
   )));
+  assert.ok(suppliedFactors.every((factor) => !("aspectDetails" in factor)));
+  assert.ok(suppliedFactors.every((factor) => !("rankingReasons" in factor)));
+  assert.ok(suppliedFactors.every((factor) => !("topics" in factor)));
 });
 
 test("secondary karmic material enriches Moon and Saturn without increasing significance", () => {
@@ -292,6 +294,71 @@ test("conversation retrieval treats factor limits as ceilings and preserves cont
   );
   assert.equal(continuityContext?.selection.maxFactors, 2);
   assert.equal(continuityContext?.selection.expandedThemeIds.length, 0);
+});
+
+test("broad onboarding interests cannot qualify deep factors by themselves", () => {
+  const document = documentFor("exact");
+  const context = retrieveNatalInterpretation(document, {
+    reason: "conversation",
+    lifeAreas: ["relationships", "money", "career", "habits", "selfUnderstanding"],
+    text: "Nobody in my orbit. Astrology pun intended.",
+    maxThemes: 0,
+    maxFactors: 4,
+  });
+
+  assert.equal(context?.factors.length, 0);
+  assert.equal(context?.selection.factorSelections.length, 0);
+});
+
+test("one current topic selects sparsely while explicit astrology can select a deeper synthesis", () => {
+  const document = documentFor("exact");
+  const topical = retrieveNatalInterpretation(document, {
+    reason: "conversation",
+    lifeAreas: ["relationships", "money", "career"],
+    text: "I have been thinking about partnership.",
+    maxThemes: 0,
+    maxFactors: 4,
+  });
+  const explicit = retrieveNatalInterpretation(document, {
+    reason: "conversation",
+    lifeAreas: ["relationships", "money"],
+    text: "I keep thinking about the tension between my Moon and Saturn.",
+    maxThemes: 0,
+    maxFactors: 4,
+  });
+
+  assert.equal(topical?.factors.length, 1);
+  assert.ok((explicit?.factors.length ?? 0) >= 2);
+  assert.ok((explicit?.factors.length ?? 0) <= 4);
+  assert.ok(explicit?.selection.factorSelections.some((selection) => selection.reasons.includes("explicit_factor_reference")));
+});
+
+test("per-turn model context keeps selected authored meaning without retrieval machinery", () => {
+  const document = documentFor("exact");
+  const retrieved = retrieveNatalInterpretation(document, {
+    reason: "conversation",
+    lifeAreas: ["relationships", "money"],
+    text: "How do my Moon and Saturn work together here?",
+    maxThemes: 0,
+    maxFactors: 4,
+  });
+  const modelContext = reasoningInterpretationContext(retrieved);
+  const serialized = JSON.stringify(modelContext);
+
+  assert.ok((modelContext?.factors.length ?? 0) >= 2);
+  assert.ok(modelContext?.factors.every((factor) => factor.id && factor.fact && factor.interpretation));
+  for (const omittedKey of [
+    "selection",
+    "factorSelections",
+    "rankingReasons",
+    "sourceReferences",
+    "topics",
+    "strength",
+    "separation",
+    "aspectDetails",
+  ]) {
+    assert.equal(serialized.includes(`\"${omittedKey}\"`), false);
+  }
 });
 
 test("preferred theme retrieval pins the selected theme without changing provenance", () => {

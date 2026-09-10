@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { LifeAreaKey } from "@/lib/life-areas";
+import { reasoningFactor } from "@/lib/astrology-model-context";
 import {
   aspectInterpretationCatalog,
   getAspectInterpretation,
@@ -234,6 +235,7 @@ export const natalInterpretationRetrievalSchema = z.object({
         "recent_continuity",
         "conversation_state",
         "latest_message",
+        "explicit_factor_reference",
         "onboarding_interest",
         "theme_support",
         "transit_activation",
@@ -784,7 +786,7 @@ const LIFE_AREA_TOPICS: Record<LifeAreaKey, string[]> = {
 };
 
 const TEXT_TOPIC_PATTERNS: Array<[RegExp, string[]]> = [
-  [/\b(relationship|partner|dating|marriage|love|relaci[oó]n|pareja|amor)\b/i, LIFE_AREA_TOPICS.relationships],
+  [/\b(relationships?|partnerships?|partners?|dating|marriage|love|relaci[oó]n|pareja|amor)\b/i, LIFE_AREA_TOPICS.relationships],
   [/\b(money|income|debt|saving|financial|dinero|ingreso|deuda|ahorro|finanzas)\b/i, LIFE_AREA_TOPICS.money],
   [/\b(career|job|work|boss|profession|purpose|carrera|trabajo|jefe|profesi[oó]n|prop[oó]sito)\b/i, LIFE_AREA_TOPICS.career],
   [/\b(habit|routine|procrastinat|discipline|h[aá]bito|rutina|procrastin|disciplina)\b/i, LIFE_AREA_TOPICS.habits],
@@ -804,6 +806,54 @@ export function interpretationTopics(lifeAreas: LifeAreaKey[], text?: string | n
     }
   }
   return unique(topics);
+}
+
+function matchedTextTopicGroups(text?: string | null) {
+  if (!text) return 0;
+  return TEXT_TOPIC_PATTERNS.reduce(
+    (total, [pattern]) => total + Number(pattern.test(text)),
+    0,
+  );
+}
+
+const FACTOR_TERM_ALIASES: Record<string, string[]> = {
+  sun: ["sun", "sol"],
+  moon: ["moon", "luna"],
+  mercury: ["mercury", "mercurio"],
+  venus: ["venus"],
+  mars: ["mars", "marte"],
+  jupiter: ["jupiter", "júpiter"],
+  saturn: ["saturn", "saturno"],
+  uranus: ["uranus", "urano"],
+  neptune: ["neptune", "neptuno"],
+  pluto: ["pluto", "plutón"],
+  chiron: ["chiron", "quirón"],
+  "mean north node": ["north node", "nodo norte"],
+};
+
+function textMentionsTerm(text: string, term: string) {
+  const aliases = FACTOR_TERM_ALIASES[term.toLowerCase()] ?? [term.toLowerCase()];
+  return aliases.some((alias) => new RegExp(`(^|[^\\p{L}])${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^\\p{L}]|$)`, "iu").test(text));
+}
+
+function explicitFactorReferenceScore(factor: RankedNatalFactor, text?: string | null) {
+  if (!text) return 0;
+  if (factor.aspect) {
+    return textMentionsTerm(text, factor.aspect.body1) && textMentionsTerm(text, factor.aspect.body2) ? 3 : 0;
+  }
+  if (factor.kind === "planet_placement") {
+    return textMentionsTerm(text, factor.id.replace("placement.", "")) ? 2 : 0;
+  }
+  if (factor.kind === "lunar_node_axis") {
+    return /\b(north node|south node|nodo norte|nodo sur)\b/i.test(text) ? 2 : 0;
+  }
+  if (factor.kind === "ascendant") {
+    return /\b(ascendant|rising|ascendente)\b/i.test(text) ? 2 : 0;
+  }
+  if (factor.kind === "midheaven") {
+    return /\b(midheaven|medium coeli|medio cielo)\b/i.test(text) ? 2 : 0;
+  }
+  return 0;
 }
 
 function overlapScore(candidateTopics: string[], selectedTopics: string[]) {
@@ -832,7 +882,9 @@ export function retrieveNatalInterpretation(
   const lifeAreaTopics = interpretationTopics(options.lifeAreas);
   const textTopics = interpretationTopics([], options.text);
   const stateTopics = interpretationTopics([], options.stateText);
-  const topics = unique([...textTopics, ...stateTopics, ...lifeAreaTopics]);
+  const topics = unique(options.reason === "initial_discovery"
+    ? [...textTopics, ...stateTopics, ...lifeAreaTopics]
+    : [...textTopics, ...stateTopics]);
   const relevanceFor = (candidateTopics: string[]) => (
     overlapScore(candidateTopics, textTopics) * 3
     + overlapScore(candidateTopics, stateTopics) * 2
@@ -846,7 +898,9 @@ export function retrieveNatalInterpretation(
       theme,
       index,
       preferred: theme.id === preferredThemeId,
-      relevance: relevanceFor(theme.topics),
+      relevance: options.reason === "initial_discovery"
+        ? relevanceFor(theme.topics)
+        : overlapScore(theme.topics, textTopics) * 3 + overlapScore(theme.topics, stateTopics) * 2,
     }))
     .sort((left, right) => {
       if (left.preferred !== right.preferred) return left.preferred ? -1 : 1;
@@ -875,6 +929,7 @@ export function retrieveNatalInterpretation(
       preferred: preferredSupportIds.has(factor.id),
       continuity: continuityFactorIds.has(factor.id),
       transitActivation: transitActivatedFactorIds.has(factor.id),
+      explicitReference: explicitFactorReferenceScore(factor, options.text),
     }))
     .map((candidate) => {
       const reasons = [
@@ -882,6 +937,7 @@ export function retrieveNatalInterpretation(
         ...(candidate.continuity ? ["recent_continuity" as const] : []),
         ...(candidate.stateRelevance > 0 ? ["conversation_state" as const] : []),
         ...(candidate.latestRelevance > 0 ? ["latest_message" as const] : []),
+        ...(candidate.explicitReference > 0 ? ["explicit_factor_reference" as const] : []),
         ...(candidate.lifeRelevance > 0 ? ["onboarding_interest" as const] : []),
         ...(candidate.support !== Number.MAX_SAFE_INTEGER ? ["theme_support" as const] : []),
         ...(candidate.transitActivation ? ["transit_activation" as const] : []),
@@ -890,6 +946,7 @@ export function retrieveNatalInterpretation(
         + Number(candidate.continuity) * 50
         + candidate.stateRelevance * 4
         + candidate.latestRelevance * 5
+        + candidate.explicitReference * 10
         + candidate.lifeRelevance
         + Number(candidate.support !== Number.MAX_SAFE_INTEGER) * 2
         + Number(candidate.transitActivation) * 3;
@@ -900,9 +957,46 @@ export function retrieveNatalInterpretation(
       return right.score - left.score || right.factor.score - left.factor.score || left.index - right.index;
     });
   const selectedFactorCandidates = rankedFactorCandidates
-    .filter((candidate) => candidate.score >= 5)
-    .slice(0, maxFactors);
-  const factors = unique(selectedFactorCandidates.map(({ factor }) => factor));
+    .filter((candidate) => (
+      candidate.preferred ||
+      candidate.continuity ||
+      candidate.transitActivation ||
+      candidate.explicitReference > 0 ||
+      candidate.latestRelevance > 0 ||
+      candidate.stateRelevance > 0
+    ));
+  const directContinuityCapacity = selectedFactorCandidates.filter(
+    (candidate) => candidate.continuity,
+  ).length;
+  const continuityCapacity = directContinuityCapacity + Number(
+    selectedFactorCandidates.some((candidate) => candidate.transitActivation && !candidate.continuity),
+  );
+  const explicitCapacity = selectedFactorCandidates.filter(
+    (candidate) => candidate.explicitReference > 0,
+  ).length;
+  const preferredCapacity = preferredThemeId
+    ? Math.min(2, selectedFactorCandidates.filter((candidate) => candidate.preferred).length)
+    : 0;
+  const latestTopicCapacity = Math.min(2, matchedTextTopicGroups(options.text));
+  const stateTopicCapacity = latestTopicCapacity === 0
+    ? Math.min(1, matchedTextTopicGroups(options.stateText))
+    : 0;
+  const baseCapacity = Math.max(
+    continuityCapacity,
+    explicitCapacity,
+    preferredCapacity,
+    latestTopicCapacity,
+    stateTopicCapacity,
+  );
+  const hasNewSignalAlongsideContinuity = continuityCapacity > 0 && (
+    explicitCapacity > continuityCapacity || latestTopicCapacity > 0
+  );
+  const selectionCapacity = Math.min(
+    maxFactors,
+    baseCapacity + Number(hasNewSignalAlongsideContinuity),
+  );
+  const selectedWithinCapacity = selectedFactorCandidates.slice(0, selectionCapacity);
+  const factors = unique(selectedWithinCapacity.map(({ factor }) => factor));
 
   return natalInterpretationRetrievalSchema.parse({
     source: NATAL_INTERPRETATION_SOURCE,
@@ -916,7 +1010,7 @@ export function retrieveNatalInterpretation(
       expandedThemeIds: themes.map((theme) => theme.id),
       maxExpandedThemes: maxThemes,
       maxFactors,
-      factorSelections: selectedFactorCandidates.map(({ factor, score, reasons }) => ({ id: factor.id, score, reasons })),
+      factorSelections: selectedWithinCapacity.map(({ factor, score, reasons }) => ({ id: factor.id, score, reasons })),
     },
     uncertainty: document.chartAtAGlance.uncertainty,
     themes,
@@ -997,15 +1091,10 @@ export function buildNatalThemeGenerationInput(
   factors: RankedNatalFactor[],
   timeAccuracy: string,
 ) {
-  const sourceFactor = (factor: RankedNatalFactor) => ({
-    id: factor.id,
-    label: factor.label,
-    significanceScore: factor.score,
-    rankingReasons: factor.rankingReasons,
-    topics: factor.topics,
-    authoredInterpretation: factor.interpretation,
-    ...(factor.aspect ? { aspectDetails: factor.aspect } : {}),
-  });
+  const sourceFactor = (factor: RankedNatalFactor) => reasoningFactor(
+    factor,
+    { includeSignificance: true },
+  );
   const factorMap = new Map(factors.map((factor) => [factor.id, factor]));
   const anchors = anchoredThemeFactorIds(factors);
   const anchoredIds = new Set([...anchors.identity, ...anchors.karmic, ...anchors.mission]);

@@ -10,6 +10,7 @@ import {
   createConversationContextSnapshot,
   type ConversationContextSnapshot,
 } from "@/lib/conversation-context";
+import { shouldRotateProviderContext } from "@/lib/provider-context-rotation";
 import { createPersonalizedCurrentTransits } from "@/lib/discovery-astrology";
 import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
 import {
@@ -207,6 +208,7 @@ export async function ensureConversationProviderState({
       contextSnapshot: true,
       contextVersion: true,
       providerConversationId: true,
+      contextInitializedAt: true,
     },
   });
   if (!conversation) throw new Error("Conversation is unavailable");
@@ -233,6 +235,7 @@ export async function ensureConversationProviderState({
         contextSnapshot: true,
         contextVersion: true,
         providerConversationId: true,
+        contextInitializedAt: true,
       },
     });
     if (!conversation) throw new Error("Conversation is unavailable");
@@ -241,8 +244,35 @@ export async function ensureConversationProviderState({
   if (conversation.contextVersion !== snapshot.schemaVersion) {
     throw new Error("Conversation context version is inconsistent");
   }
-  if (conversation.providerConversationId) {
-    return { providerConversationId: conversation.providerConversationId, snapshot };
+  const previousProviderConversationId = conversation.providerConversationId;
+  if (previousProviderConversationId) {
+    const [generationsSinceInitialization, lastAssistant] = await Promise.all([
+      conversation.contextInitializedAt
+        ? db.message.count({
+            where: {
+              conversationId,
+              role: "assistant",
+              createdAt: { gte: conversation.contextInitializedAt },
+            },
+          })
+        : Promise.resolve(0),
+      db.message.findFirst({
+        where: { conversationId, role: "assistant" },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        select: { createdAt: true },
+      }),
+    ]);
+    if (!shouldRotateProviderContext({
+      initializedAt: conversation.contextInitializedAt,
+      lastAssistantAt: lastAssistant?.createdAt ?? null,
+      generationsSinceInitialization,
+    })) {
+      return { providerConversationId: previousProviderConversationId, snapshot };
+    }
+  }
+
+  if (previousProviderConversationId && !conversation.contextInitializedAt) {
+    console.warn("Rotating provider conversation with missing initialization timestamp");
   }
 
   const history = await db.message.findMany({
@@ -260,10 +290,19 @@ export async function ensureConversationProviderState({
   });
   const initializedAt = new Date();
   const claimed = await db.conversation.updateMany({
-    where: { id: conversationId, userId, providerConversationId: null },
+    where: { id: conversationId, userId, providerConversationId: previousProviderConversationId },
     data: { providerConversationId, contextInitializedAt: initializedAt },
   });
-  if (claimed.count === 1) return { providerConversationId, snapshot };
+  if (claimed.count === 1) {
+    if (previousProviderConversationId) {
+      try {
+        await deleteProviderConversation(previousProviderConversationId);
+      } catch (error) {
+        console.warn("Could not clean up a rotated provider conversation", error);
+      }
+    }
+    return { providerConversationId, snapshot };
+  }
 
   try {
     await deleteProviderConversation(providerConversationId);

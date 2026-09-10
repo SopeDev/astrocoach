@@ -15,6 +15,7 @@ export const exploreSignalsSchema = z.object({
   candidateMapItemSignal: z.boolean(),
   candidateMapItemConfidence: z.number().min(0).max(1),
   candidateMapItemKind: z.enum(["PATTERN", "INSIGHT"]).nullable(),
+  candidateMapItemStatement: z.string().min(1).max(500).nullable(),
   recommendedNextMode: z.enum(["EXPLORE", "RECOGNIZE", "PAUSE"]),
   reasonForRecommendation: z.string().max(500),
 });
@@ -27,8 +28,32 @@ export type ExploreSignals = Omit<z.infer<typeof exploreResponseSchema>, "reply"
 
 export function hasConsistentExploreCandidate(signals: ExploreSignals) {
   return signals.candidateMapItemSignal
-    ? signals.candidateMapItemKind !== null
-    : signals.candidateMapItemKind === null && signals.candidateMapItemConfidence < 0.7;
+    ? signals.candidateMapItemKind !== null &&
+      signals.candidateMapItemStatement !== null &&
+      signals.recommendedNextMode === "RECOGNIZE" &&
+      signals.questionPurpose === null
+    : signals.candidateMapItemKind === null &&
+      signals.candidateMapItemStatement === null &&
+      signals.candidateMapItemConfidence < 0.7 &&
+      signals.recommendedNextMode !== "RECOGNIZE";
+}
+
+function replyAsksAQuestion(reply: string) {
+  return reply.includes("?") || reply.includes("¿");
+}
+
+export function transitionSafeExploreSignals(reply: string, signals: ExploreSignals): ExploreSignals {
+  if (!signals.candidateMapItemSignal || !replyAsksAQuestion(reply)) return signals;
+
+  return {
+    ...signals,
+    candidateMapItemSignal: false,
+    candidateMapItemConfidence: Math.min(signals.candidateMapItemConfidence, 0.69),
+    candidateMapItemKind: null,
+    candidateMapItemStatement: null,
+    recommendedNextMode: "EXPLORE",
+    reasonForRecommendation: "The visible reply asks for more information, so exploration must remain available before offering recognition.",
+  };
 }
 
 const legacyExploreSignalsSchema = z.object({
@@ -49,13 +74,14 @@ export function parseStoredExploreSignals(value: unknown): ExploreSignals | null
   const current = exploreSignalsSchema.safeParse(value);
   if (current.success) return current.data;
   const currentWithoutProvenance = exploreSignalsSchema
-    .partial({ usedAstrologyFactorIds: true, usedTransitIds: true })
+    .partial({ usedAstrologyFactorIds: true, usedTransitIds: true, candidateMapItemStatement: true })
     .safeParse(value);
   if (currentWithoutProvenance.success) {
     return {
       ...currentWithoutProvenance.data,
       usedAstrologyFactorIds: currentWithoutProvenance.data.usedAstrologyFactorIds ?? [],
       usedTransitIds: currentWithoutProvenance.data.usedTransitIds ?? [],
+      candidateMapItemStatement: currentWithoutProvenance.data.candidateMapItemStatement ?? null,
     } as ExploreSignals;
   }
   const legacy = legacyExploreSignalsSchema.safeParse(value);
@@ -66,6 +92,7 @@ export function parseStoredExploreSignals(value: unknown): ExploreSignals | null
     candidateMapItemSignal: candidatePatternSignal,
     candidateMapItemConfidence: candidatePatternConfidence,
     candidateMapItemKind: candidatePatternSignal ? "PATTERN" : null,
+    candidateMapItemStatement: null,
     usedAstrologyFactorIds: [],
     usedTransitIds: [],
     recommendedNextMode: signals.recommendedNextMode === "RECOGNIZE" ? "RECOGNIZE"

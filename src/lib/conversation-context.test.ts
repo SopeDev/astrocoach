@@ -127,13 +127,33 @@ test("provider seed identifies the snapshot as persistent context rather than a 
 test("provider context preserves broad awareness without the full authored interpretation library", () => {
   const context = snapshot();
   const providerContext = providerConversationContext(context);
-  assert.equal(providerContext.natalInterpretation.themes.length, 5);
+  assert.equal(providerContext.themes.length, 5);
   assert.equal(providerContext.onboarding.exchanges.length, context.onboarding.exchanges.length);
-  assert.deepEqual(providerContext.natalChart.data, context.natalChart.data);
-  assert.equal("rankedFactors" in providerContext.natalInterpretation, false);
-  assert.equal("translations" in providerContext.natalInterpretation.themes[0], false);
+  assert.equal(providerContext.chart.placements.length, (context.natalChart.data as { planets: unknown[] }).planets.length);
+  assert.equal(providerContext.chart.aspects.length, (context.natalChart.data as { aspects: unknown[] }).aspects.length);
+  assert.equal("natalChart" in providerContext, false);
+  assert.equal("natalInterpretation" in providerContext, false);
+  assert.equal("translations" in providerContext.themes[0], false);
   assert.ok("currentTransits" in providerContext);
-  assert.ok(JSON.stringify(providerContext).length < JSON.stringify(context).length * 0.6);
+  assert.equal("activations" in (providerContext.currentTransits ?? {}), false);
+  const serialized = JSON.stringify(providerContext);
+  assert.equal((serialized.match(/2000-01-01/g) ?? []).length, 1);
+  for (const calculationKey of [
+    "latitude",
+    "longitude",
+    "longitudeSpeed",
+    "birthInstant",
+    "utcOffsetMinutes",
+    "timeMinutes",
+    "cusps",
+    "separation",
+    "aspectAngle",
+    "strength",
+    "activatesNatalAspectIds",
+  ]) {
+    assert.equal(serialized.includes(`\"${calculationKey}\"`), false);
+  }
+  assert.ok(serialized.length < JSON.stringify(context).length * 0.25);
 });
 
 test("legacy conversation snapshots remain readable without retroactively adding transits", () => {

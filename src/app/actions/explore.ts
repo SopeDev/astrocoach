@@ -6,6 +6,8 @@ import { Prisma } from "@/generated/prisma/client";
 import { isLocale, type Locale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth-user";
 import { storedAstrologyProvenance } from "@/lib/astrology-provenance";
+import { astrologyRetrievalState } from "@/lib/astrology-retrieval-state";
+import { reasoningInterpretationContext } from "@/lib/astrology-model-context";
 import {
   ConversationMessageLimitError,
   canAddAssistantMessage,
@@ -214,15 +216,15 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
           || aspect.activatesNatalAspectIds.some((id) => continuityFactorIds.includes(id)))
         .flatMap((aspect) => [aspect.natalPointId, ...aspect.activatesNatalAspectIds]))
     : [];
-  const stateText = JSON.stringify({
+  const stateText = astrologyRetrievalState({
     focalMapItem: context.conversation.focalMapItem,
     recognitionHandoff,
     candidateEvaluationContext: context.evaluationContext,
     activePractice: context.activePractice,
     recentObservations: context.recentObservations,
-    recentAssistantSignals: context.recentAssistantSignals,
+    latestAssistantSignals: context.recentAssistantSignals.at(-1),
   });
-  const privateInterpretationContext = retrieveNatalInterpretation(
+  const retrievedInterpretation = retrieveNatalInterpretation(
     context.snapshot.natalInterpretation,
     {
       reason: "conversation",
@@ -236,16 +238,17 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
       preferredThemeId: themeStarter.success ? themeStarter.data.themeId : null,
     },
   );
+  const privateInterpretationContext = reasoningInterpretationContext(retrievedInterpretation);
   const usageContext = {
     userId,
     conversationId,
     messageId: userMessage.id,
     providerConversationId: context.providerConversationId,
     conversationResponseNumber: context.messageCounts.assistant + 1,
-    contextSelection: privateInterpretationContext
+    contextSelection: retrievedInterpretation
       ? {
-          ...privateInterpretationContext.selection,
-          selectedFactors: privateInterpretationContext.factors.length,
+          ...retrievedInterpretation.selection,
+          selectedFactors: retrievedInterpretation.factors.length,
           contextCharacters: JSON.stringify(privateInterpretationContext).length,
         }
       : null,
@@ -506,18 +509,23 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
     if (sourceMode === "DEEP_EXPLORE" && !recognitionHandoff) return { ok: false as const, error: "message" as const };
     const recentProvenance = context.recentAssistantSignals.map(storedAstrologyProvenance);
     const continuityFactorIds = recentProvenance.toReversed().find((item) => item.usedAstrologyFactorIds.length > 0)?.usedAstrologyFactorIds ?? [];
-    const privateInterpretationContext = retrieveNatalInterpretation(
+    const retrievedInterpretation = retrieveNatalInterpretation(
       context.snapshot.natalInterpretation,
       {
         reason: "conversation",
         lifeAreas: context.snapshot.onboarding.selectedLifeAreaKeys,
         text: [focalMapItem?.statement, recognitionHandoff?.candidateMapItem?.statement].filter(Boolean).join(" "),
-        stateText: JSON.stringify({ focalMapItem, recognitionHandoff, recentAssistantSignals: context.recentAssistantSignals }),
+        stateText: astrologyRetrievalState({
+          focalMapItem,
+          recognitionHandoff,
+          latestAssistantSignals: context.recentAssistantSignals.at(-1),
+        }),
         continuityFactorIds,
         maxThemes: 0,
         maxFactors: 4,
       },
     );
+    const privateInterpretationContext = reasoningInterpretationContext(retrievedInterpretation);
     const generated = sanitizeAstrologyProvenance(await generateRecognizeResponse({
       locale,
       providerConversationId: context.providerConversationId,
@@ -531,10 +539,10 @@ export async function acceptRecognitionTransition(locale: Locale, conversationId
         conversationId,
         providerConversationId: context.providerConversationId,
         conversationResponseNumber: context.messageCounts.assistant + 1,
-        contextSelection: privateInterpretationContext
+        contextSelection: retrievedInterpretation
           ? {
-              ...privateInterpretationContext.selection,
-              selectedFactors: privateInterpretationContext.factors.length,
+              ...retrievedInterpretation.selection,
+              selectedFactors: retrievedInterpretation.factors.length,
               contextCharacters: JSON.stringify(privateInterpretationContext).length,
             }
           : null,
