@@ -346,7 +346,8 @@ test("per-turn model context keeps selected authored meaning without retrieval m
   const serialized = JSON.stringify(modelContext);
 
   assert.ok((modelContext?.factors.length ?? 0) >= 2);
-  assert.ok(modelContext?.factors.every((factor) => factor.id && factor.fact && factor.interpretation));
+  assert.ok(modelContext?.factors.every((factor) => factor.id && factor.fact));
+  assert.ok(modelContext?.factors.some((factor) => "interpretation" in factor));
   for (const omittedKey of [
     "selection",
     "factorSelections",
@@ -359,6 +360,40 @@ test("per-turn model context keeps selected authored meaning without retrieval m
   ]) {
     assert.equal(serialized.includes(`\"${omittedKey}\"`), false);
   }
+});
+
+test("a selected planet brings its complete one-hop natal topology without generic aspect interpretations", () => {
+  const document = documentFor("exact");
+  const venus = document.rankedFactors.find((factor) => factor.id === "placement.venus");
+  assert.ok(venus);
+
+  const retrieved = retrieveNatalInterpretation(document, {
+    reason: "conversation",
+    lifeAreas: [],
+    continuityFactorIds: ["placement.venus"],
+    maxThemes: 0,
+    maxFactors: 4,
+  });
+  const modelContext = reasoningInterpretationContext(retrieved);
+  const venusContext = modelContext?.factors.find((factor) => factor.id === "placement.venus");
+  const expectedAspects = document.rankedFactors.filter((factor) => (
+    factor.kind === "major_aspect"
+    && factor.aspect
+    && [factor.aspect.body1, factor.aspect.body2].includes("Venus")
+  ));
+
+  assert.ok(venusContext && "connections" in venusContext);
+  assert.deepEqual(
+    new Set(venusContext.connections.map((connection) => connection.id)),
+    new Set(expectedAspects.map((aspect) => aspect.id)),
+  );
+  assert.ok(venusContext.connections.every((connection) => (
+    connection.fact.startsWith(venus.label)
+  )));
+  assert.ok(modelContext?.factors.some((factor) => (
+    factor.id === "placement.venus" && "interpretation" in factor
+  )));
+  assert.ok(venusContext.connections.every((connection) => !("interpretation" in connection)));
 });
 
 test("preferred theme retrieval pins the selected theme without changing provenance", () => {

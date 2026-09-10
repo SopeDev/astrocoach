@@ -245,6 +245,13 @@ export const natalInterpretationRetrievalSchema = z.object({
   uncertainty: uncertaintySchema.nullable(),
   themes: z.array(chartThemeSchema).max(3),
   factors: z.array(rankedNatalFactorSchema).max(6),
+  focalPlanetConnections: z.array(z.object({
+    focalFactorId: z.string().regex(/^placement\./),
+    connections: z.array(z.object({
+      id: z.string().regex(/^aspect\./),
+      fact: z.string().trim().min(1),
+    }).strict()),
+  }).strict()).max(6),
 }).strict();
 
 export type RankedNatalFactor = z.infer<typeof rankedNatalFactorSchema>;
@@ -871,6 +878,20 @@ function overlapScore(candidateTopics: string[], selectedTopics: string[]) {
   return candidateTopics.reduce((total, topic) => total + (selected.has(topic) ? 1 : 0), 0);
 }
 
+function compactRetrievalFact(factor: RankedNatalFactor) {
+  if (!factor.aspect) return factor.label;
+  const phase = factor.aspect.applying === true
+    ? "applying"
+    : factor.aspect.applying === false ? "separating" : null;
+  return [
+    factor.label,
+    `${Math.round(factor.aspect.deviation * 100) / 100}° orb`,
+    phase,
+    factor.aspect.timeReliability === "stable_across_day" ? "stable across birth day" : null,
+    factor.aspect.outOfSign ? "out of sign" : null,
+  ].filter(Boolean).join(" | ");
+}
+
 export function retrieveNatalInterpretation(
   value: unknown,
   options: {
@@ -1007,6 +1028,42 @@ export function retrieveNatalInterpretation(
   );
   const selectedWithinCapacity = selectedFactorCandidates.slice(0, selectionCapacity);
   const factors = unique(selectedWithinCapacity.map(({ factor }) => factor));
+  const placementByBody = new Map(document.rankedFactors
+    .filter((factor) => factor.kind === "planet_placement")
+    .map((factor) => [factor.label.split(" in ")[0], factor]));
+  const focalPlanetConnections = factors
+    .filter((factor) => factor.kind === "planet_placement")
+    .map((factor) => {
+      const focalBody = factor.label.split(" in ")[0];
+      const aspects = document.rankedFactors.filter((candidate) => (
+        candidate.kind === "major_aspect"
+        && candidate.aspect
+        && (candidate.aspect.body1 === focalBody || candidate.aspect.body2 === focalBody)
+      ));
+      const connections = aspects.flatMap((aspect) => {
+        const otherBody = aspect.aspect!.body1 === focalBody
+          ? aspect.aspect!.body2
+          : aspect.aspect!.body1;
+        const placement = placementByBody.get(otherBody);
+        const phase = aspect.aspect!.applying === true
+          ? "applying"
+          : aspect.aspect!.applying === false ? "separating" : null;
+        return [{
+          id: aspect.id,
+          fact: [
+            `${compactRetrievalFact(factor)} ${aspect.aspect!.type} ${placement ? compactRetrievalFact(placement) : otherBody}`,
+            `${Math.round(aspect.aspect!.deviation * 100) / 100}° orb`,
+            phase,
+            aspect.aspect!.timeReliability === "stable_across_day" ? "stable across birth day" : null,
+            aspect.aspect!.outOfSign ? "out of sign" : null,
+          ].filter(Boolean).join(" | "),
+        }];
+      });
+      return {
+        focalFactorId: factor.id,
+        connections,
+      };
+    });
 
   return natalInterpretationRetrievalSchema.parse({
     source: NATAL_INTERPRETATION_SOURCE,
@@ -1025,6 +1082,7 @@ export function retrieveNatalInterpretation(
     uncertainty: document.chartAtAGlance.uncertainty,
     themes,
     factors,
+    focalPlanetConnections,
   });
 }
 

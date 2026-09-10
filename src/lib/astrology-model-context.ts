@@ -265,10 +265,23 @@ export function reasoningInterpretationContext(
   context: NatalInterpretationRetrieval | null,
 ) {
   if (!context || context.factors.length === 0) return null;
+  const bundledAspectIds = new Set(context.focalPlanetConnections.flatMap((bundle) => (
+    bundle.connections.map((connection) => connection.id)
+  )));
   return {
     evidenceStatus: context.evidenceStatus,
     birthTimeUncertainty: context.uncertainty?.kind ?? null,
-    factors: context.factors.map((factor) => reasoningFactor(factor)),
+    factors: context.factors
+      .filter((factor) => !bundledAspectIds.has(factor.id))
+      .map((factor) => {
+        const base = factor.kind === "major_aspect"
+          ? { id: factor.id, fact: factorFact(factor) }
+          : reasoningFactor(factor);
+        const connections = context.focalPlanetConnections.find(
+          (candidate) => candidate.focalFactorId === factor.id,
+        )?.connections;
+        return connections && connections.length > 0 ? { ...base, connections } : base;
+      }),
   };
 }
 
