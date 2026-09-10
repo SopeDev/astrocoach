@@ -82,7 +82,7 @@ test("matches and ranks exact-time chart factors from authored catalogs", () => 
   assert.equal(sunSaturnTrine?.aspect?.type, "trine");
   assert.equal(sunSaturnTrine?.aspect?.timeReliability, "exact_time");
   assert.equal(sunSaturnTrine?.aspect?.applying, false);
-  assert.ok((sunSaturnTrine?.aspect?.orb ?? 0) > 0);
+  assert.ok((sunSaturnTrine?.aspect?.deviation ?? 0) > 0);
   assert.ok(sunSaturnTrine?.sourceReferences.some((source) => source.entryId === "aspect.trine"));
 });
 
@@ -218,7 +218,7 @@ test("stable unknown-time aspects become explicit factors without double-countin
   assert.equal(moon?.score, 88);
   assert.equal(aspect?.id, "aspect.moon.trine.sun");
   assert.equal(aspect?.aspect?.timeReliability, "stable_across_day");
-  assert.deepEqual(aspect?.aspect?.sampleCoverage, { present: 13, total: 13 });
+  assert.equal(aspect?.aspect?.sampleCoverage, undefined);
   assert.ok(aspect?.rankingReasons.includes("stable_across_day"));
   assert.ok(aspect?.rankingReasons.includes("birth_time_unknown"));
 });

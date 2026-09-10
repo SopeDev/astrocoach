@@ -106,14 +106,14 @@ export const rankedNatalFactorSchema = z.object({
     body1: z.string().trim().min(1),
     body2: z.string().trim().min(1),
     type: z.enum(MAJOR_ASPECT_TYPES),
-    angle: z.number().min(0).max(180),
-    separation: z.number().min(0).max(180),
     deviation: z.number().nonnegative(),
-    orb: z.number().positive(),
-    strength: z.number().min(0).max(100),
     applying: z.boolean().nullable(),
     outOfSign: z.boolean(),
     timeReliability: z.enum(["exact_time", "stable_across_day"]),
+    angle: z.number().min(0).max(180).optional(),
+    separation: z.number().min(0).max(180).optional(),
+    orb: z.number().positive().optional(),
+    strength: z.number().min(0).max(100).optional(),
     referenceTimeMinutes: z.number().int().min(0).max(1439).optional(),
     sampleCoverage: z.object({
       present: z.number().int().positive(),
@@ -253,6 +253,33 @@ export type ChartThemePresentation = z.infer<typeof chartThemePresentationSchema
 export type NatalInterpretationDocument = z.infer<typeof natalInterpretationDocumentSchema>;
 export type NatalInterpretationRetrieval = z.infer<typeof natalInterpretationRetrievalSchema>;
 
+export function compactNatalInterpretationDocument(document: NatalInterpretationDocument) {
+  return natalInterpretationDocumentSchema.parse({
+    ...document,
+    rankedFactors: document.rankedFactors.map((factor) => ({
+      id: factor.id,
+      kind: factor.kind,
+      label: factor.label,
+      score: factor.score,
+      topics: factor.topics,
+      rankingReasons: factor.rankingReasons,
+      sourceReferences: factor.sourceReferences,
+      interpretation: factor.interpretation,
+      ...(factor.aspect ? {
+        aspect: {
+          body1: factor.aspect.body1,
+          body2: factor.aspect.body2,
+          type: factor.aspect.type,
+          deviation: factor.aspect.deviation,
+          applying: factor.aspect.applying,
+          outOfSign: factor.aspect.outOfSign,
+          timeReliability: factor.aspect.timeReliability,
+        },
+      } : {}),
+    })),
+  });
+}
+
 export const themeConversationStarterSchema = z.object({
   source: z.literal(NATAL_INTERPRETATION_SOURCE),
   evidenceStatus: z.literal(NATAL_INTERPRETATION_EVIDENCE_STATUS),
@@ -366,27 +393,10 @@ const chartSchema = z.object({
     body1: z.string(),
     body2: z.string(),
     type: z.enum(MAJOR_ASPECT_TYPES),
-    angle: z.number().min(0).max(180),
-    separation: z.number().min(0).max(180),
     deviation: z.number().nonnegative(),
-    orb: z.number().positive(),
-    strength: z.number().min(0).max(100),
     applying: z.boolean().nullable().optional(),
     outOfSign: z.boolean(),
-    timeReliability: z.enum(["stable_across_day", "time_sensitive"]).optional(),
-    referenceTimeMinutes: z.number().int().min(0).max(1439).optional(),
-    sampleCoverage: z.object({
-      present: z.number().int().positive(),
-      total: z.number().int().positive(),
-    }).strict().optional(),
-    strengthRange: z.object({
-      minimum: z.number().min(0).max(100),
-      maximum: z.number().min(0).max(100),
-    }).strict().optional(),
-    deviationRange: z.object({
-      minimum: z.number().nonnegative(),
-      maximum: z.number().nonnegative(),
-    }).strict().optional(),
+    timeReliability: z.enum(["exact_time", "stable_across_day", "time_sensitive"]).default("exact_time"),
   }).passthrough()).default([]),
   angles: z.record(z.string(), z.object({ sign: z.string() }).passthrough()).nullable().default(null),
   uncertainty: z.unknown().optional(),
@@ -489,6 +499,17 @@ function aspectSignificanceScore(body1: string, body2: string, strength: number)
     100,
     45 + Math.round(strength * 0.4) + luminaryCount * 6 + personalPlanetCount * 3 + developmentalPointCount * 2,
   );
+}
+
+function aspectStrengthFromDeviation(type: MajorAspectType, deviation: number) {
+  const maximumOrb: Record<MajorAspectType, number> = {
+    conjunction: 8,
+    sextile: 6,
+    square: 8,
+    trine: 8,
+    opposition: 8,
+  };
+  return Math.max(0, 100 * (1 - deviation / maximumOrb[type]));
 }
 
 export const CURRENT_CATALOG_VERSIONS = {
@@ -699,11 +720,12 @@ export function rankNatalChartFactors(value: unknown): RankedNatalFactor[] {
       || !isSupportedAspectBody(aspect.body2)
     ) continue;
 
+    const aspectStrength = aspectStrengthFromDeviation(aspect.type, aspect.deviation);
     const interpretation = getAspectInterpretation(aspect.type);
     const firstBody = aspectEndpointMaterial(aspect.body1);
     const secondBody = aspectEndpointMaterial(aspect.body2);
     const rankingReasons: RankedNatalFactor["rankingReasons"] = ["major_aspect"];
-    if (aspect.strength >= 75) rankingReasons.push("tight_orb");
+    if (aspectStrength >= 75) rankingReasons.push("tight_orb");
     if ([aspect.body1, aspect.body2].some((body) => body === "Sun" || body === "Moon")) {
       rankingReasons.push("luminary_aspect");
     }
@@ -718,7 +740,7 @@ export function rankNatalChartFactors(value: unknown): RankedNatalFactor[] {
       id: aspectFactorId(aspect.body1, aspect.body2, aspect.type),
       kind: "major_aspect",
       label: `${aspect.body1} ${aspect.type} ${aspect.body2}`,
-      score: aspectSignificanceScore(aspect.body1, aspect.body2, aspect.strength),
+      score: aspectSignificanceScore(aspect.body1, aspect.body2, aspectStrength),
       topics: unique([
         ...interpretation.topics,
         ...firstBody.topics,
@@ -747,22 +769,10 @@ export function rankNatalChartFactors(value: unknown): RankedNatalFactor[] {
         body1: aspect.body1,
         body2: aspect.body2,
         type: aspect.type,
-        angle: aspect.angle,
-        separation: aspect.separation,
         deviation: aspect.deviation,
-        orb: aspect.orb,
-        strength: aspect.strength,
         applying: aspect.applying ?? null,
         outOfSign: aspect.outOfSign,
-        timeReliability: aspect.timeReliability === "stable_across_day"
-          ? "stable_across_day"
-          : "exact_time",
-        ...(aspect.referenceTimeMinutes === undefined ? {} : {
-          referenceTimeMinutes: aspect.referenceTimeMinutes,
-        }),
-        ...(aspect.sampleCoverage ? { sampleCoverage: aspect.sampleCoverage } : {}),
-        ...(aspect.strengthRange ? { strengthRange: aspect.strengthRange } : {}),
-        ...(aspect.deviationRange ? { deviationRange: aspect.deviationRange } : {}),
+        timeReliability: aspect.timeReliability,
       },
     });
   }

@@ -4,7 +4,7 @@ import { AspectType, calculateChart, type Aspect, type BirthData, type ChartPlan
 
 export const NATAL_ENGINE = "celestine";
 export const NATAL_ENGINE_VERSION = "0.2.1";
-export const NATAL_SCHEMA_VERSION = 3;
+export const NATAL_SCHEMA_VERSION = 4;
 export const NATAL_HOUSE_SYSTEM = "placidus" as const;
 export const NATAL_NODE_METHOD = "mean" as const;
 export const NATAL_INCLUDE_CHIRON = true;
@@ -81,14 +81,17 @@ function mapAspect(aspect: Aspect) {
   };
 }
 
-export type UnknownTimeAspect = ReturnType<typeof mapAspect> & {
-  applying: null;
-  timeReliability: "stable_across_day" | "time_sensitive";
-  referenceTimeMinutes: number;
-  sampleCoverage: { present: number; total: number };
-  strengthRange: { minimum: number; maximum: number };
-  deviationRange: { minimum: number; maximum: number };
-};
+function interpretationAspect(aspect: ReturnType<typeof mapAspect>, timeReliability: "exact_time" | "stable_across_day") {
+  return {
+    body1: aspect.body1,
+    body2: aspect.body2,
+    type: aspect.type,
+    deviation: aspect.deviation,
+    applying: aspect.applying,
+    outOfSign: aspect.outOfSign,
+    timeReliability,
+  };
+}
 
 function aspectKey(aspect: Aspect) {
   return `${aspect.body1}|${aspect.type}|${aspect.body2}`;
@@ -157,25 +160,19 @@ function unknownTimeChart(input: NatalCalculationInput) {
 
 function mapPlanet(planet: ChartPlanet, includeHouse: boolean) {
   return {
-    body: String(planet.body),
     name: planet.name,
-    longitude: planet.longitude,
-    latitude: planet.latitude,
-    longitudeSpeed: planet.longitudeSpeed,
     retrograde: planet.isRetrograde,
     sign: planet.signName,
     degree: planet.degree,
     minute: planet.minute,
-    second: planet.second,
     ...(includeHouse ? { house: planet.house } : {}),
   };
 }
 
-function mapNode(node: { name: string; type: string; longitude: number; signName: string; degree: number; minute: number; house: number }, includeHouse: boolean) {
+function mapNode(node: { name: string; type: string; signName: string; degree: number; minute: number; house: number }, includeHouse: boolean) {
   return {
     name: node.name,
     type: node.type,
-    longitude: node.longitude,
     sign: node.signName,
     degree: node.degree,
     minute: node.minute,
@@ -210,18 +207,15 @@ export function calculateNatalChart(input: NatalCalculationInput) {
       houseSystem: null,
       data: {
         schemaVersion: NATAL_SCHEMA_VERSION,
-        input: normalizedInput,
         planets: chart.planets.map((planet) => mapPlanet(planet, false)),
         nodes: chart.nodes.map((node) => mapNode(node, false)),
-        aspects,
+        aspects: aspects
+          .filter((aspect) => aspect.timeReliability === "stable_across_day")
+          .map((aspect) => interpretationAspect(aspect, "stable_across_day")),
         angles: null,
-        houses: null,
         uncertainty: {
           time: "unknown",
-          referenceTime: "local-noon",
-          aspectMethod: "sampled-across-local-day",
-          aspectSampleMinutes: [...UNKNOWN_TIME_ASPECT_SAMPLE_MINUTES],
-          note: "Planetary and lunar node positions use local noon as a neutral reference. Houses and angles are omitted. Major aspects are sampled across the local birth day and marked as stable or time-sensitive.",
+          note: "Planetary and lunar node positions use local noon. Houses, angles, and time-sensitive aspects are omitted.",
         },
       },
     };
@@ -233,32 +227,18 @@ export function calculateNatalChart(input: NatalCalculationInput) {
     inputHash,
     timeAccuracy: "exact" as const,
     houseSystem: NATAL_HOUSE_SYSTEM,
-    data: {
-      schemaVersion: NATAL_SCHEMA_VERSION,
-      input: normalizedInput,
-      planets: chart.planets.map((planet) => mapPlanet(planet, true)),
-      nodes: chart.nodes.map((node) => mapNode(node, true)),
-      aspects: chart.aspects.all.map(mapAspect),
-      angles: Object.fromEntries(Object.entries(chart.angles).map(([key, angle]) => [key, {
-        name: angle.name,
-        abbreviation: angle.abbrev,
-        longitude: angle.longitude,
-        sign: angle.signName,
-        degree: angle.degree,
-        minute: angle.minute,
-        second: angle.second,
-      }])),
-      houses: {
-        system: chart.houses.system,
-        cusps: chart.houses.cusps.map((cusp) => ({
-          house: cusp.house,
-          longitude: cusp.longitude,
-          sign: cusp.signName,
-          degree: cusp.degree,
-          minute: cusp.minute,
-        })),
-      },
-      uncertainty: null,
+      data: {
+        schemaVersion: NATAL_SCHEMA_VERSION,
+        planets: chart.planets.map((planet) => mapPlanet(planet, true)),
+        nodes: chart.nodes.map((node) => mapNode(node, true)),
+        aspects: chart.aspects.all.map((aspect) => interpretationAspect(mapAspect(aspect), "exact_time")),
+        angles: Object.fromEntries(Object.entries(chart.angles).map(([key, angle]) => [key, {
+          name: angle.name,
+          sign: angle.signName,
+          degree: angle.degree,
+          minute: angle.minute,
+        }])),
+        uncertainty: null,
     },
   };
 }

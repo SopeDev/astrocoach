@@ -2,6 +2,7 @@ import "server-only";
 
 import { db } from "@/db/client";
 import {
+  compactNatalInterpretationDocument,
   interpretationIsCurrent,
   natalInterpretationDocumentSchema,
   NATAL_INTERPRETATION_SCHEMA_VERSION,
@@ -22,7 +23,15 @@ export async function ensureNatalInterpretation(
 ): Promise<NatalInterpretationDocument> {
   const existing = await db.natalInterpretation.findUnique({ where: { userId } });
   if (existing && interpretationIsCurrent(existing.data, natalChart.inputHash)) {
-    return natalInterpretationDocumentSchema.parse(existing.data);
+    const parsed = natalInterpretationDocumentSchema.parse(existing.data);
+    const compact = compactNatalInterpretationDocument(parsed);
+    if (JSON.stringify(compact).length < JSON.stringify(parsed).length) {
+      await db.natalInterpretation.update({
+        where: { id: existing.id },
+        data: { data: compact },
+      });
+    }
+    return compact;
   }
 
   const prepared = await prepareNatalInterpretation({

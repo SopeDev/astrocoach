@@ -137,7 +137,6 @@ function validateInitialQuestionBasis(
     throw new Error("At least one initial Discovery question must test a current transit activation");
   }
   const natalIds = new Set([
-    ...astrologyContext.natalPoints.map(({ id }) => id),
     ...Object.values(reasoningNatalChart(astrologyContext.natalChart))
       .flat()
       .map((fact) => fact.split(" | ")[0]),

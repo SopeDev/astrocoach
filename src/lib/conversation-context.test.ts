@@ -4,6 +4,7 @@ import {
   CONVERSATION_CONTEXT_VERSION,
   conversationContextSnapshotSchema,
   createConversationContextSnapshot,
+  exportConversationContext,
   providerConversationContext,
   providerConversationSeedItems,
   providerHistoryItems,
@@ -11,6 +12,7 @@ import {
 import {
   createCurrentTransitSnapshot,
   createPersonalizedCurrentTransits,
+  interpretationCurrentTransits,
 } from "./discovery-astrology";
 import { calculateNatalChart } from "./natal-chart";
 import {
@@ -60,34 +62,17 @@ function snapshot() {
     localeAtStart: "en",
     birth: {
       date: "2000-01-01",
-      timeMinutes: 720,
+      localTime: "12:00",
       timeAccuracy: "exact",
-      birthInstant: "2000-01-01T12:00:00.000Z",
-      utcOffsetMinutes: 0,
-      location: {
-        geonameId: 2643743,
-        name: "London",
-        administrativeArea: "England",
-        country: "United Kingdom",
-        countryCode: "GB",
-        latitude: 51.4779,
-        longitude: 0,
-        timezoneId: "UTC",
-      },
+      place: "London, England, United Kingdom",
     },
     natalChart: {
-      engine: "celestine",
-      engineVersion: "0.2.1",
-      schemaVersion: 3,
-      inputHash: chart.inputHash,
       timeAccuracy: chart.timeAccuracy,
       houseSystem: chart.houseSystem,
-      sourceProfileUpdatedAt: "2026-09-06T00:00:00.000Z",
-      calculatedAt: "2026-09-06T00:00:00.000Z",
       data: chart.data,
     },
     natalInterpretation: interpretation,
-    currentTransits,
+    currentTransits: interpretationCurrentTransits(currentTransits),
     onboarding: {
       selectedLifeAreaKeys: ["relationships"],
       selectedLifeAreas: ["Relationships"],
@@ -103,14 +88,18 @@ test("conversation context captures complete birth and chart data once", () => {
   const context = snapshot();
   assert.equal(context.schemaVersion, CONVERSATION_CONTEXT_VERSION);
   assert.equal(context.birth.date, "2000-01-01");
-  assert.equal(context.birth.timeMinutes, 720);
-  assert.equal(context.birth.location.name, "London");
+  assert.equal(context.birth.localTime, "12:00");
+  assert.match(context.birth.place ?? "", /London/);
   const chartData = context.natalChart.data as { aspects: unknown[] };
   assert.equal(chartData.aspects.length > 0, true);
   assert.equal(context.natalInterpretation.rankedFactors.some((factor) => factor.kind === "major_aspect"), true);
   assert.equal(context.currentTransits.snapshot.calculatedAt, "2026-09-06T06:00:00.000Z");
   assert.ok(context.currentTransits.snapshot.positions.every((position) => !("house" in position)));
   assert.ok(context.currentTransits.activeAspects.length > 0);
+  const serialized = JSON.stringify(context);
+  for (const calculationKey of ["latitude", "longitude", "longitudeSpeed", "second", "cusps", "separation", "strength"]) {
+    assert.equal(serialized.includes(`\"${calculationKey}\"`), false);
+  }
 });
 
 test("provider seed identifies the snapshot as persistent context rather than a request", () => {
@@ -156,6 +145,20 @@ test("provider context preserves broad awareness without the full authored inter
   assert.ok(serialized.length < JSON.stringify(context).length * 0.25);
 });
 
+test("conversation export context contains interpretation-grade astrology only", () => {
+  const exported = exportConversationContext(snapshot());
+  assert.ok(exported);
+  assert.equal(exported?.authoredFactors.length > 0, true);
+  assert.equal(exported?.themes.length, 5);
+  const serialized = JSON.stringify(exported);
+  for (const calculationKey of [
+    "latitude", "longitude", "longitudeSpeed", "birthInstant", "utcOffsetMinutes",
+    "cusps", "second", "separation", "aspectAngle", "strength", "activatesNatalAspectIds",
+  ]) {
+    assert.equal(serialized.includes(`\"${calculationKey}\"`), false);
+  }
+});
+
 test("legacy conversation snapshots remain readable without retroactively adding transits", () => {
   const current = snapshot();
   const { currentTransits: _currentTransits, ...withoutTransits } = current;
@@ -163,6 +166,34 @@ test("legacy conversation snapshots remain readable without retroactively adding
   const legacy = conversationContextSnapshotSchema.parse({
     ...withoutTransits,
     schemaVersion: 1,
+    birth: {
+      date: current.birth.date,
+      timeMinutes: 720,
+      timeAccuracy: "exact",
+      birthInstant: "2000-01-01T12:00:00.000Z",
+      utcOffsetMinutes: 0,
+      location: {
+        geonameId: 2643743,
+        name: "London",
+        administrativeArea: "England",
+        country: "United Kingdom",
+        countryCode: "GB",
+        latitude: 51.4779,
+        longitude: 0,
+        timezoneId: "UTC",
+      },
+    },
+    natalChart: {
+      engine: "celestine",
+      engineVersion: "0.2.1",
+      schemaVersion: 3,
+      inputHash: "legacy-input-hash",
+      timeAccuracy: current.natalChart.timeAccuracy,
+      houseSystem: current.natalChart.houseSystem,
+      sourceProfileUpdatedAt: "2026-09-06T00:00:00.000Z",
+      calculatedAt: "2026-09-06T00:00:00.000Z",
+      data: current.natalChart.data,
+    },
   });
 
   assert.equal(legacy.schemaVersion, 1);

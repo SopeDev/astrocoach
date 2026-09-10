@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { exportConversationContext } from "@/lib/conversation-context";
 
 export const conversationIdSchema = z.string().uuid();
 
@@ -85,9 +86,11 @@ export function serializeConversationExport(conversation: ExportableConversation
     addUsage(usageByOperation[usage.operation], usage);
   }
 
+  const contextSnapshot = exportConversationContext(conversation.contextSnapshot);
+
   return {
     format: "astrocoach-conversation",
-    version: 3,
+    version: 4,
     exportedAt: exportedAt.toISOString(),
     conversation: {
       id: conversation.id,
@@ -98,9 +101,9 @@ export function serializeConversationExport(conversation: ExportableConversation
       transitionState: conversation.transitionState,
       transitionReferenceAt: conversation.transitionReferenceAt?.toISOString() ?? null,
       context: {
-        version: conversation.contextVersion,
+        version: contextSnapshot?.schemaVersion ?? conversation.contextVersion,
         initializedAt: conversation.contextInitializedAt?.toISOString() ?? null,
-        snapshot: conversation.contextSnapshot,
+        snapshot: contextSnapshot,
       },
       lastMessageAt: conversation.lastMessageAt.toISOString(),
       archivedAt: conversation.archivedAt?.toISOString() ?? null,

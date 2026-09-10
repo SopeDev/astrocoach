@@ -210,11 +210,22 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
   const continuityFactorIds = latestMaterialProvenance?.usedAstrologyFactorIds ?? [];
   const continuityTransitIds = new Set(latestMaterialProvenance?.usedTransitIds ?? []);
   const transitActivatedFactorIds = "currentTransits" in context.snapshot
-    ? uniqueStrings(context.snapshot.currentTransits.activeAspects
-        .filter((aspect) => continuityTransitIds.has(aspect.id)
-          || continuityFactorIds.includes(aspect.natalPointId)
-          || aspect.activatesNatalAspectIds.some((id) => continuityFactorIds.includes(id)))
-        .flatMap((aspect) => [aspect.natalPointId, ...aspect.activatesNatalAspectIds]))
+    ? (() => {
+        const relevantContacts = context.snapshot.currentTransits.activeAspects.filter((aspect) => (
+          continuityTransitIds.has(aspect.id) || continuityFactorIds.includes(aspect.natalPointId)
+        ));
+        const relevantContactIds = new Set(relevantContacts.map((aspect) => aspect.id));
+        const activatedNatalAspects = context.snapshot.currentTransits.natalAspectActivations
+          .filter((activation) => (
+            continuityFactorIds.includes(activation.natalAspectId)
+            || activation.transitContactIds.some((id) => relevantContactIds.has(id))
+          ))
+          .map((activation) => activation.natalAspectId);
+        return uniqueStrings([
+          ...relevantContacts.map((aspect) => aspect.natalPointId),
+          ...activatedNatalAspects,
+        ]);
+      })()
     : [];
   const stateText = astrologyRetrievalState({
     focalMapItem: context.conversation.focalMapItem,

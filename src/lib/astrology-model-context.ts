@@ -28,7 +28,7 @@ const chartAspectSchema = z.object({
   deviation: z.number().nonnegative(),
   applying: z.boolean().nullable().optional(),
   outOfSign: z.boolean().optional(),
-  timeReliability: z.enum(["stable_across_day", "time_sensitive"]).optional(),
+  timeReliability: z.enum(["exact_time", "stable_across_day", "time_sensitive"]).optional(),
 }).passthrough();
 
 const chartAngleSchema = z.object({
@@ -40,10 +40,12 @@ const chartAngleSchema = z.object({
 }).passthrough();
 
 const reasoningChartSourceSchema = z.object({
+  schemaVersion: z.number().int().positive().optional(),
   planets: z.array(chartPositionSchema),
   nodes: z.array(chartPositionSchema.omit({ body: true, retrograde: true })),
   aspects: z.array(chartAspectSchema),
   angles: z.record(z.string(), chartAngleSchema).nullable(),
+  uncertainty: z.object({ time: z.literal("unknown"), note: z.string().optional() }).passthrough().nullable().optional(),
 }).passthrough();
 
 function round(value: number, digits: number) {
@@ -84,6 +86,55 @@ function aspectLine(aspect: z.infer<typeof chartAspectSchema>) {
     reliability,
     aspect.outOfSign ? "out of sign" : null,
   ].filter(Boolean).join(" | ");
+}
+
+export function compactNatalChartData(value: unknown) {
+  const chart = reasoningChartSourceSchema.parse(value);
+  return {
+    schemaVersion: 4,
+    planets: chart.planets.map((planet) => ({
+      name: planet.name,
+      retrograde: planet.retrograde ?? false,
+      sign: planet.sign,
+      degree: planet.degree,
+      minute: planet.minute,
+      ...(planet.house ? { house: planet.house } : {}),
+    })),
+    nodes: chart.nodes.map((node) => ({
+      name: node.name,
+      sign: node.sign,
+      degree: node.degree,
+      minute: node.minute,
+      ...(node.house ? { house: node.house } : {}),
+    })),
+    aspects: chart.aspects
+      .filter((aspect) => aspect.timeReliability !== "time_sensitive")
+      .map((aspect) => ({
+        body1: aspect.body1,
+        body2: aspect.body2,
+        type: aspect.type,
+        deviation: aspect.deviation,
+        applying: aspect.applying ?? null,
+        outOfSign: aspect.outOfSign ?? false,
+        timeReliability: aspect.timeReliability === "stable_across_day"
+          ? "stable_across_day" as const
+          : "exact_time" as const,
+      })),
+    angles: chart.angles
+      ? Object.fromEntries(Object.entries(chart.angles).map(([key, angle]) => [key, {
+          name: angle.name,
+          sign: angle.sign,
+          degree: angle.degree,
+          minute: angle.minute,
+        }]))
+      : null,
+    uncertainty: chart.uncertainty
+      ? {
+          time: "unknown" as const,
+          note: "Planetary and lunar node positions use local noon. Houses, angles, and time-sensitive aspects are omitted.",
+        }
+      : null,
+  };
 }
 
 export function reasoningNatalChart(value: unknown) {
@@ -150,14 +201,20 @@ export function reasoningFactor(
   };
 }
 
+type ReasoningTransitSource = {
+  snapshot: Pick<PersonalizedCurrentTransits["snapshot"], "calculatedAt" | "positions">;
+  activeAspects: PersonalizedCurrentTransits["activeAspects"];
+  natalAspectActivations: PersonalizedCurrentTransits["natalAspectActivations"];
+};
+
 export function reasoningCurrentTransits(
-  transits: PersonalizedCurrentTransits,
+  transits: ReasoningTransitSource,
   { includeActivations = false }: { includeActivations?: boolean } = {},
 ) {
   const positions = transits.snapshot.positions.map((position) => [
     position.body,
     `${position.sign} ${round(position.degree + position.minute / 60, 1)}°`,
-    position.retrograde ? "retrograde" : null,
+    position.stationary ? "stationary" : position.retrograde ? "retrograde" : null,
   ].filter(Boolean).join(" | "));
   const contacts = transits.activeAspects.map((aspect) => [
     aspect.id,
@@ -165,8 +222,6 @@ export function reasoningCurrentTransits(
     `${round(aspect.deviation, 2)}° orb`,
     aspect.phase,
     aspect.natalPositionReliability === "noon_reference" ? "natal position time-uncertain" : null,
-    aspect.transitingBodyRetrograde ? "transiting body retrograde" : null,
-    aspect.outOfSign ? "out of sign" : null,
   ].filter(Boolean).join(" | "));
   const activations = includeActivations
     ? Object.fromEntries(transits.natalAspectActivations.map((activation) => [
@@ -197,10 +252,7 @@ export function reasoningDiscoveryAstrologyContext(
     themes: context.natalThemes.map((theme) => reasoningTheme(theme, locale)),
     transits: reasoningCurrentTransits({
       snapshot: {
-        schemaVersion: 1,
-        source: "shared_current_transit_snapshot",
         calculatedAt: context.calculatedAt,
-        engine: context.engine,
         positions: context.currentTransits.positions,
       },
       activeAspects: context.currentTransits.activeAspects,

@@ -8,10 +8,15 @@ import {
   CONVERSATION_CONTEXT_VERSION,
   conversationContextSnapshotSchema,
   createConversationContextSnapshot,
+  upgradeConversationContextSnapshot,
   type ConversationContextSnapshot,
 } from "@/lib/conversation-context";
 import { shouldRotateProviderContext } from "@/lib/provider-context-rotation";
-import { createPersonalizedCurrentTransits } from "@/lib/discovery-astrology";
+import { compactNatalChartData } from "@/lib/astrology-model-context";
+import {
+  createPersonalizedCurrentTransits,
+  interpretationCurrentTransits,
+} from "@/lib/discovery-astrology";
 import { LIFE_AREA_KEYS, type LifeAreaKey } from "@/lib/life-areas";
 import {
   calculateNatalChart,
@@ -136,34 +141,23 @@ export async function captureConversationContextSnapshot(
     localeAtStart: locale,
     birth: {
       date: birthProfile.birthDate.toISOString().slice(0, 10),
-      timeMinutes: birthProfile.birthTimeMinutes,
+      localTime: birthProfile.birthTimeMinutes === null
+        ? null
+        : `${String(Math.floor(birthProfile.birthTimeMinutes / 60)).padStart(2, "0")}:${String(birthProfile.birthTimeMinutes % 60).padStart(2, "0")}`,
       timeAccuracy: parsedTimeAccuracy,
-      birthInstant: birthProfile.birthInstant?.toISOString() ?? null,
-      utcOffsetMinutes: birthProfile.utcOffsetMinutes,
-      location: {
-        geonameId: birthProfile.geonameId,
-        name: birthProfile.locationName,
-        administrativeArea: birthProfile.adminName,
-        country: birthProfile.countryName,
-        countryCode: birthProfile.countryCode,
-        latitude: Number(birthProfile.latitude),
-        longitude: Number(birthProfile.longitude),
-        timezoneId: birthProfile.timezoneId,
-      },
+      place: [...new Set([
+        birthProfile.locationName,
+        birthProfile.adminName,
+        birthProfile.countryName,
+      ].filter((value): value is string => Boolean(value)))].join(", ") || null,
     },
     natalChart: {
-      engine: natalChart.engine,
-      engineVersion: natalChart.engineVersion,
-      schemaVersion: natalChart.schemaVersion,
-      inputHash: natalChart.inputHash,
       timeAccuracy: parsedTimeAccuracy,
       houseSystem: natalChart.houseSystem,
-      sourceProfileUpdatedAt: natalChart.sourceProfileUpdated.toISOString(),
-      calculatedAt: natalChart.calculatedAt.toISOString(),
-      data: z.json().parse(natalChart.data),
+      data: compactNatalChartData(z.json().parse(natalChart.data)),
     },
     natalInterpretation,
-    currentTransits,
+    currentTransits: interpretationCurrentTransits(currentTransits),
     onboarding: {
       selectedLifeAreaKeys: lifeAreaKeys,
       selectedLifeAreas: lifeAreaKeys.map((key) => dictionary.initialIntent.areas[key]),
@@ -240,6 +234,30 @@ export async function ensureConversationProviderState({
     });
     if (!conversation) throw new Error("Conversation is unavailable");
     snapshot = conversationContextSnapshotSchema.parse(conversation.contextSnapshot);
+  }
+  const upgradedSnapshot = upgradeConversationContextSnapshot(snapshot);
+  if (upgradedSnapshot && upgradedSnapshot.schemaVersion !== snapshot.schemaVersion) {
+    const upgraded = await db.conversation.updateMany({
+      where: {
+        id: conversation.id,
+        userId,
+        contextVersion: snapshot.schemaVersion,
+      },
+      data: {
+        contextVersion: upgradedSnapshot.schemaVersion,
+        contextSnapshot: upgradedSnapshot,
+        contextInitializedAt: null,
+      },
+    });
+    if (upgraded.count === 1) {
+      snapshot = upgradedSnapshot;
+      conversation = {
+        ...conversation,
+        contextVersion: upgradedSnapshot.schemaVersion,
+        contextSnapshot: upgradedSnapshot,
+        contextInitializedAt: null,
+      };
+    }
   }
   if (conversation.contextVersion !== snapshot.schemaVersion) {
     throw new Error("Conversation context version is inconsistent");

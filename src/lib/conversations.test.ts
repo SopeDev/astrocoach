@@ -7,7 +7,7 @@ test("requires Conversation identifiers to be UUIDs", () => {
   assert.equal(conversationIdSchema.safeParse("not-a-conversation").success, false);
 });
 
-test("serializes the conversation context snapshot without copying preferences onto messages", () => {
+test("serializes conversation metadata without copying preferences onto messages", () => {
   const exported = serializeConversationExport({
     id: "4f692409-3ad9-4ec6-b4de-7e251c418d45",
     focalMapItemId: "41400a88-6dd5-4480-a2f5-f75fae813c5c",
@@ -60,11 +60,11 @@ test("serializes the conversation context snapshot without copying preferences o
     }],
   }, new Date("2026-09-04T11:00:00.000Z"));
 
-  assert.equal(exported.version, 3);
+  assert.equal(exported.version, 4);
   assert.equal(exported.exportedAt, "2026-09-04T11:00:00.000Z");
   assert.equal(exported.conversation.context.version, 1);
   assert.equal(exported.conversation.focalMapItemId, "41400a88-6dd5-4480-a2f5-f75fae813c5c");
-  assert.deepEqual(exported.conversation.context.snapshot, { birth: { date: "2000-01-01" } });
+  assert.equal(exported.conversation.context.snapshot, null);
   assert.equal(exported.conversation.messages[0].createdAt, "2026-09-04T10:02:00.000Z");
   assert.equal("astrologyFamiliarity" in exported.conversation.messages[0], false);
   assert.equal("astrologyStyle" in exported.conversation.messages[0], false);

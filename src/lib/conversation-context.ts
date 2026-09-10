@@ -4,16 +4,25 @@ import {
   astrologyFamiliaritySchema,
   astrologyStyleSchema,
 } from "@/lib/astrology-preferences";
-import { personalizedCurrentTransitsSchema } from "@/lib/discovery-astrology";
-import { LIFE_AREA_KEYS } from "@/lib/life-areas";
-import { natalInterpretationDocumentSchema } from "@/lib/natal-interpretation";
 import {
+  interpretationCurrentTransits,
+  interpretationCurrentTransitsSchema,
+  personalizedCurrentTransitsSchema,
+} from "@/lib/discovery-astrology";
+import { LIFE_AREA_KEYS } from "@/lib/life-areas";
+import {
+  compactNatalInterpretationDocument,
+  natalInterpretationDocumentSchema,
+} from "@/lib/natal-interpretation";
+import {
+  compactNatalChartData,
+  reasoningFactor,
   reasoningCurrentTransits,
   reasoningNatalChart,
   reasoningTheme,
 } from "@/lib/astrology-model-context";
 
-export const CONVERSATION_CONTEXT_VERSION = 2;
+export const CONVERSATION_CONTEXT_VERSION = 3;
 
 const mapItemContextSchema = z.object({
   kind: z.enum(["PATTERN", "INSIGHT"]),
@@ -77,15 +86,34 @@ const legacyConversationContextSnapshotSchema = z.object({
   ...conversationContextFields,
 }).strict();
 
-const currentConversationContextSnapshotSchema = z.object({
-  schemaVersion: z.literal(CONVERSATION_CONTEXT_VERSION),
+const previousConversationContextSnapshotSchema = z.object({
+  schemaVersion: z.literal(2),
   capturedAt: z.string().datetime(),
   ...conversationContextFields,
   currentTransits: personalizedCurrentTransitsSchema,
 }).strict();
 
+const currentConversationContextSnapshotSchema = z.object({
+  schemaVersion: z.literal(CONVERSATION_CONTEXT_VERSION),
+  capturedAt: z.string().datetime(),
+  ...conversationContextFields,
+  birth: z.object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    localTime: z.string().regex(/^\d{2}:\d{2}$/).nullable(),
+    timeAccuracy: z.enum(["exact", "unknown"]),
+    place: z.string().trim().min(1).nullable(),
+  }).strict(),
+  natalChart: z.object({
+    timeAccuracy: z.enum(["exact", "unknown"]),
+    houseSystem: z.string().nullable(),
+    data: z.json(),
+  }).strict(),
+  currentTransits: interpretationCurrentTransitsSchema,
+}).strict();
+
 export const conversationContextSnapshotSchema = z.union([
   legacyConversationContextSnapshotSchema,
+  previousConversationContextSnapshotSchema,
   currentConversationContextSnapshotSchema,
 ]);
 
@@ -97,7 +125,9 @@ function localBirthTime(minutes: number | null) {
   return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
 }
 
-function birthPlace(location: ConversationContextSnapshot["birth"]["location"]) {
+type LegacyBirthLocation = z.infer<typeof legacyConversationContextSnapshotSchema>["birth"]["location"];
+
+function birthPlace(location: LegacyBirthLocation) {
   return [...new Set([
     location.name,
     location.administrativeArea,
@@ -116,8 +146,12 @@ export function providerConversationContext(snapshot: ConversationContextSnapsho
   return {
     birth: {
       date: snapshot.birth.date,
-      localTime: localBirthTime(snapshot.birth.timeMinutes),
-      place: birthPlace(snapshot.birth.location),
+      localTime: "localTime" in snapshot.birth
+        ? snapshot.birth.localTime
+        : localBirthTime(snapshot.birth.timeMinutes),
+      place: "place" in snapshot.birth
+        ? snapshot.birth.place
+        : birthPlace(snapshot.birth.location),
       timeAccuracy: snapshot.birth.timeAccuracy,
       houseSystem: snapshot.natalChart.houseSystem,
     },
@@ -134,6 +168,32 @@ export function providerConversationContext(snapshot: ConversationContextSnapsho
   };
 }
 
+export function exportConversationContext(value: unknown) {
+  const parsed = conversationContextSnapshotSchema.safeParse(value);
+  if (!parsed.success) return null;
+  const snapshot = parsed.data;
+  const context = providerConversationContext(snapshot);
+  const currentTransits = "currentTransits" in snapshot
+    ? reasoningCurrentTransits(snapshot.currentTransits, { includeActivations: true })
+    : undefined;
+
+  return {
+    schemaVersion: CONVERSATION_CONTEXT_VERSION,
+    capturedAt: snapshot.capturedAt,
+    evidenceStatus: snapshot.natalInterpretation.evidenceStatus,
+    birth: context.birth,
+    chart: context.chart,
+    themes: context.themes,
+    authoredFactors: snapshot.natalInterpretation.rankedFactors.map((factor) => (
+      reasoningFactor(factor, { includeSignificance: true })
+    )),
+    onboarding: context.onboarding,
+    preferences: context.preferences,
+    conversationStart: context.conversationStart,
+    ...(currentTransits ? { currentTransits } : {}),
+  };
+}
+
 export function createConversationContextSnapshot(
   value: Omit<CurrentConversationContextSnapshot, "schemaVersion" | "capturedAt">,
   capturedAt = new Date(),
@@ -143,6 +203,33 @@ export function createConversationContextSnapshot(
     capturedAt: capturedAt.toISOString(),
     ...value,
   });
+}
+
+export function upgradeConversationContextSnapshot(
+  snapshot: ConversationContextSnapshot,
+): CurrentConversationContextSnapshot | null {
+  if (snapshot.schemaVersion === CONVERSATION_CONTEXT_VERSION) return snapshot;
+  if (snapshot.schemaVersion === 1) return null;
+
+  return createConversationContextSnapshot({
+    localeAtStart: snapshot.localeAtStart,
+    birth: {
+      date: snapshot.birth.date,
+      localTime: localBirthTime(snapshot.birth.timeMinutes),
+      timeAccuracy: snapshot.birth.timeAccuracy,
+      place: birthPlace(snapshot.birth.location),
+    },
+    natalChart: {
+      timeAccuracy: snapshot.natalChart.timeAccuracy,
+      houseSystem: snapshot.natalChart.houseSystem,
+      data: compactNatalChartData(snapshot.natalChart.data),
+    },
+    natalInterpretation: compactNatalInterpretationDocument(snapshot.natalInterpretation),
+    currentTransits: interpretationCurrentTransits(snapshot.currentTransits),
+    onboarding: snapshot.onboarding,
+    preferences: snapshot.preferences,
+    conversationStart: snapshot.conversationStart,
+  }, new Date(snapshot.capturedAt));
 }
 
 export function providerConversationSeedItems(snapshot: ConversationContextSnapshot) {

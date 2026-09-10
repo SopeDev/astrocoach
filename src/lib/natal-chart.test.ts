@@ -6,7 +6,6 @@ import {
   NATAL_ENGINE_VERSION,
   NATAL_NODE_METHOD,
   NATAL_SCHEMA_VERSION,
-  type UnknownTimeAspect,
 } from "./natal-chart";
 
 const referenceInput = {
@@ -33,54 +32,46 @@ test("calculates a deterministic exact-time chart near published J2000 positions
   assert.equal(first.data.nodes.length, 2);
   assert.equal(NATAL_NODE_METHOD, "mean");
   assert.ok(first.data.nodes.every((node) => node.type === "Mean"));
-  assert.equal(first.data.houses?.cusps.length, 12);
   assert.ok(first.data.angles);
   assert.ok(first.data.aspects.length > 0);
   assert.ok(first.data.aspects.every((aspect) => supportedAspectTypes.has(aspect.type)));
   assert.ok(first.data.aspects.every((aspect) => (
     aspect.body1.length > 0
     && aspect.body2.length > 0
-    && Number.isFinite(aspect.angle)
-    && Number.isFinite(aspect.separation)
     && Number.isFinite(aspect.deviation)
-    && Number.isFinite(aspect.orb)
-    && Number.isFinite(aspect.strength)
     && typeof aspect.outOfSign === "boolean"
   )));
-  assert.ok(sun && Math.abs(sun.longitude - 280.3765) < 0.01);
-  assert.ok(moon && Math.abs(moon.longitude - 223.3187) < 0.01);
+  assert.deepEqual(sun && [sun.sign, sun.degree, sun.minute], ["Capricorn", 10, 22]);
+  assert.deepEqual(moon && [moon.sign, moon.degree, moon.minute], ["Scorpio", 13, 19]);
+  const serialized = JSON.stringify(first.data);
+  for (const calculationKey of [
+    "input", "latitude", "longitude", "longitudeSpeed", "second", "houses", "cusps",
+    "angle", "separation", "orb", "strength", "abbreviation",
+  ]) {
+    assert.equal(serialized.includes(`\"${calculationKey}\"`), false);
+  }
 });
 
 test("unknown-time charts retain noon-reference positions and day-qualified major aspects", () => {
   const chart = calculateNatalChart({ ...referenceInput, birthTimeMinutes: null });
-  const unknownTimeAspects = chart.data.aspects as UnknownTimeAspect[];
+  const unknownTimeAspects = chart.data.aspects;
   const stableAspect = unknownTimeAspects.find((aspect) => aspect.timeReliability === "stable_across_day");
-  const timeSensitiveAspect = unknownTimeAspects.find((aspect) => aspect.timeReliability === "time_sensitive");
 
   assert.equal(chart.timeAccuracy, "unknown");
   assert.equal(chart.houseSystem, null);
-  assert.equal(chart.data.input.referenceTime, "local-noon");
-  assert.equal(chart.data.houses, null);
   assert.equal(chart.data.angles, null);
   assert.ok(chart.data.aspects.length > 0);
   assert.equal(unknownTimeAspects.length, chart.data.aspects.length);
   assert.ok(chart.data.aspects.every((aspect) => supportedAspectTypes.has(aspect.type)));
   assert.ok(stableAspect);
-  assert.ok(timeSensitiveAspect);
+  assert.ok(chart.data.aspects.every((aspect) => aspect.timeReliability === "stable_across_day"));
   assert.equal(stableAspect.applying, null);
-  assert.equal(stableAspect.sampleCoverage.present, stableAspect.sampleCoverage.total);
-  assert.ok(timeSensitiveAspect.sampleCoverage.present < timeSensitiveAspect.sampleCoverage.total);
-  assert.ok(stableAspect.strengthRange.minimum <= stableAspect.strengthRange.maximum);
-  assert.equal(timeSensitiveAspect.strengthRange.minimum, 0);
-  assert.ok(stableAspect.deviationRange.minimum <= stableAspect.deviationRange.maximum);
   assert.equal(chart.data.nodes.length, 2);
   assert.ok(chart.data.nodes.every((node) => !("house" in node)));
   assert.ok(chart.data.nodes.every((node) => typeof node.sign === "string"));
   assert.ok(chart.data.planets.some((planet) => planet.name === "Chiron"));
   assert.ok(chart.data.planets.every((planet) => !("house" in planet)));
   assert.match(chart.data.uncertainty?.note ?? "", /lunar node positions use local noon/i);
-  assert.equal(chart.data.uncertainty?.aspectMethod, "sampled-across-local-day");
-  assert.equal(chart.data.uncertainty?.aspectSampleMinutes.length, 13);
 });
 
 test("historical timezone offsets affect the normalized calculation input", () => {
@@ -98,6 +89,6 @@ test("historical timezone offsets affect the normalized calculation input", () =
   });
 
   assert.notEqual(winter.inputHash, summer.inputHash);
-  assert.equal(winter.data.input.referenceTime, "exact");
-  assert.equal(summer.data.input.referenceTime, "exact");
+  assert.equal("input" in winter.data, false);
+  assert.equal("input" in summer.data, false);
 });

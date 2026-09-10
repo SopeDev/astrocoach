@@ -1,5 +1,4 @@
 import {
-  AspectType,
   CelestialBody,
   eclipticToZodiac,
   time,
@@ -14,8 +13,8 @@ import {
   type NatalInterpretationDocument,
 } from "@/lib/natal-interpretation";
 
-export const DISCOVERY_ASTROLOGY_CONTEXT_VERSION = 1;
-export const CURRENT_TRANSIT_SNAPSHOT_VERSION = 1;
+export const DISCOVERY_ASTROLOGY_CONTEXT_VERSION = 2;
+export const CURRENT_TRANSIT_SNAPSHOT_VERSION = 2;
 export const CURRENT_TRANSIT_SNAPSHOT_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 export const DISCOVERY_ASTROLOGY_REASONING_INSTRUCTIONS = `The private discoveryAstrologyContext is a frozen symbolic snapshot, not lived evidence. Inspect its complete reasoning-grade chart, all five themes, transits.positions, every transits.contacts entry, and the explicit transits.activations map before deciding what is most worth asking. Calculation inputs and redundant celestial geometry have already been removed by the server; do not infer that the chart is incomplete. Look for a coherent whole rather than listing placements or mechanically choosing the tightest orb. Give longer-running transits more interpretive weight than brief contacts, while allowing an exact fast transit to sharpen the timing of a larger natal or slow-transit story. A transit may suggest what is especially active now; it does not prove an event occurred or cause the person's circumstances.
 
@@ -50,22 +49,26 @@ const TRANSIT_BODY_DISPLAY_NAMES = [
 ] as const;
 
 const chartPlanetSchema = z.object({
-  body: z.string().trim().min(1),
   name: z.string().trim().min(1),
-  longitude: z.number().finite(),
+  sign: z.string().trim().min(1),
+  degree: z.number().int().min(0).max(29),
+  minute: z.number().int().min(0).max(59),
   house: z.number().int().min(1).max(12).optional(),
 }).passthrough();
 
 const chartNodeSchema = z.object({
   name: z.string().trim().min(1),
-  longitude: z.number().finite(),
+  sign: z.string().trim().min(1),
+  degree: z.number().int().min(0).max(29),
+  minute: z.number().int().min(0).max(59),
   house: z.number().int().min(1).max(12).optional(),
 }).passthrough();
 
 const chartAngleSchema = z.object({
   name: z.string().trim().min(1),
-  abbreviation: z.string().trim().min(1),
-  longitude: z.number().finite(),
+  sign: z.string().trim().min(1),
+  degree: z.number().int().min(0).max(29),
+  minute: z.number().int().min(0).max(59),
 }).passthrough();
 
 const natalChartSourceSchema = z.object({
@@ -74,27 +77,17 @@ const natalChartSourceSchema = z.object({
   angles: z.record(z.string(), chartAngleSchema).nullable(),
 }).passthrough();
 
-const natalTransitPointSchema = z.object({
-  id: z.string().trim().min(1),
-  name: z.string().trim().min(1),
-  type: z.enum(["planet", "luminary", "angle", "node", "asteroid"]),
-  longitude: z.number().min(0).max(360),
-  house: z.number().int().min(1).max(12).optional(),
-  natalPositionReliability: z.enum(["exact_time", "noon_reference"]),
-}).strict();
-
 export const currentTransitPositionSchema = z.object({
   body: z.enum(TRANSIT_BODY_DISPLAY_NAMES),
-  longitude: z.number().min(0).max(360),
-  longitudeSpeed: z.number().finite(),
   retrograde: z.boolean(),
+  stationary: z.boolean().default(false),
   sign: z.string().trim().min(1),
   degree: z.number().int().min(0).max(29),
   minute: z.number().int().min(0).max(59),
-}).strict();
+});
 
 export const currentTransitSnapshotSchema = z.object({
-  schemaVersion: z.literal(CURRENT_TRANSIT_SNAPSHOT_VERSION),
+  schemaVersion: z.union([z.literal(1), z.literal(CURRENT_TRANSIT_SNAPSHOT_VERSION)]),
   source: z.literal("shared_current_transit_snapshot"),
   calculatedAt: z.string().datetime(),
   engine: z.object({
@@ -124,28 +117,15 @@ const activeTransitSchema = z.object({
   natalPoint: z.string().trim().min(1),
   natalPositionReliability: z.enum(["exact_time", "noon_reference"]),
   aspectType: z.enum(MAJOR_ASPECT_TYPES),
-  aspectAngle: z.number().min(0).max(180),
-  separation: z.number().min(0).max(180),
   deviation: z.number().min(0),
-  orb: z.number().positive(),
   phase: z.enum(["applying", "exact", "separating"]),
-  strength: z.number().min(0).max(100),
-  transitingBodyRetrograde: z.boolean(),
-  outOfSign: z.boolean(),
-  activatesNatalAspectIds: z.array(z.string().trim().min(1)),
-}).strict();
+});
 
 const natalAspectActivationSchema = z.object({
   natalAspectId: z.string().trim().min(1),
-  body1: z.string().trim().min(1),
-  body2: z.string().trim().min(1),
-  aspectType: z.enum(MAJOR_ASPECT_TYPES),
   transitContactIds: z.array(z.string().trim().min(1)).min(1),
-  contactedNatalPointIds: z.array(z.string().trim().min(1)).min(1),
-  sharedTransitingBodies: z.array(z.string().trim().min(1)),
   bothEndpointsActivated: z.boolean(),
-  strongestContactStrength: z.number().min(0).max(100),
-}).strict();
+});
 
 export const personalizedCurrentTransitsSchema = z.object({
   snapshot: currentTransitSnapshotSchema,
@@ -155,6 +135,46 @@ export const personalizedCurrentTransitsSchema = z.object({
 
 export type PersonalizedCurrentTransits = z.infer<typeof personalizedCurrentTransitsSchema>;
 
+export const interpretationCurrentTransitsSchema = z.object({
+  snapshot: z.object({
+    calculatedAt: z.string().datetime(),
+    positions: z.array(currentTransitPositionSchema),
+  }).strict(),
+  activeAspects: z.array(activeTransitSchema),
+  natalAspectActivations: z.array(natalAspectActivationSchema),
+}).strict();
+
+export function interpretationCurrentTransits(transits: PersonalizedCurrentTransits) {
+  return interpretationCurrentTransitsSchema.parse({
+    snapshot: {
+      calculatedAt: transits.snapshot.calculatedAt,
+      positions: transits.snapshot.positions.map((position) => ({
+        body: position.body,
+        retrograde: position.retrograde,
+        stationary: position.stationary,
+        sign: position.sign,
+        degree: position.degree,
+        minute: position.minute,
+      })),
+    },
+    activeAspects: transits.activeAspects.map((aspect) => ({
+      id: aspect.id,
+      transitingBody: aspect.transitingBody,
+      natalPointId: aspect.natalPointId,
+      natalPoint: aspect.natalPoint,
+      natalPositionReliability: aspect.natalPositionReliability,
+      aspectType: aspect.aspectType,
+      deviation: aspect.deviation,
+      phase: aspect.phase,
+    })),
+    natalAspectActivations: transits.natalAspectActivations.map((activation) => ({
+      natalAspectId: activation.natalAspectId,
+      transitContactIds: activation.transitContactIds,
+      bothEndpointsActivated: activation.bothEndpointsActivated,
+    })),
+  });
+}
+
 export const discoveryAstrologyContextSchema = z.object({
   schemaVersion: z.literal(DISCOVERY_ASTROLOGY_CONTEXT_VERSION),
   source: z.literal("discovery_astrology_context"),
@@ -162,15 +182,8 @@ export const discoveryAstrologyContextSchema = z.object({
   calculatedAt: z.string().datetime(),
   sourceChartInputHash: z.string().trim().min(1),
   natalTimeAccuracy: z.enum(["exact", "unknown"]),
-  engine: z.object({
-    name: z.literal("celestine"),
-    version: z.string().trim().min(1),
-    transitAspectTypes: z.array(z.enum(MAJOR_ASPECT_TYPES)).length(5),
-    transitingBodies: z.array(z.string().trim().min(1)).min(1),
-  }).strict(),
   natalChart: z.json(),
   natalThemes: z.array(chartThemeSchema).length(5),
-  natalPoints: z.array(natalTransitPointSchema).min(1),
   currentTransits: z.object({
     positions: z.array(currentTransitPositionSchema).min(1),
     activeAspects: z.array(activeTransitSchema),
@@ -206,6 +219,27 @@ function natalPointType(name: string): NatalPoint["type"] {
   return "planet";
 }
 
+const SIGN_LONGITUDES: Record<string, number> = {
+  Aries: 0,
+  Taurus: 30,
+  Gemini: 60,
+  Cancer: 90,
+  Leo: 120,
+  Virgo: 150,
+  Libra: 180,
+  Scorpio: 210,
+  Sagittarius: 240,
+  Capricorn: 270,
+  Aquarius: 300,
+  Pisces: 330,
+};
+
+function zodiacLongitude(position: { sign: string; degree: number; minute: number }) {
+  const signLongitude = SIGN_LONGITUDES[position.sign];
+  if (signLongitude === undefined) throw new Error(`Unsupported zodiac sign ${position.sign}`);
+  return signLongitude + position.degree + position.minute / 60;
+}
+
 function buildNatalPoints(
   chart: z.infer<typeof natalChartSourceSchema>,
   timeAccuracy: "exact" | "unknown",
@@ -216,7 +250,7 @@ function buildNatalPoints(
       id: `placement.${slug(planet.name)}`,
       name: planet.name,
       type: natalPointType(planet.name),
-      longitude: planet.longitude,
+      longitude: zodiacLongitude(planet),
       ...(planet.house ? { house: planet.house } : {}),
       natalPositionReliability,
     })),
@@ -224,7 +258,7 @@ function buildNatalPoints(
       id: `node.${slug(node.name)}`,
       name: node.name,
       type: "node" as const,
-      longitude: node.longitude,
+      longitude: zodiacLongitude(node),
       ...(node.house ? { house: node.house } : {}),
       natalPositionReliability,
     })),
@@ -232,7 +266,7 @@ function buildNatalPoints(
       id: `angle.${slug(key)}`,
       name: angle.name,
       type: "angle" as const,
-      longitude: angle.longitude,
+      longitude: zodiacLongitude(angle),
       natalPositionReliability: "exact_time" as const,
     })),
   ];
@@ -262,9 +296,8 @@ export function createCurrentTransitSnapshot({
       const zodiac = eclipticToZodiac(position.longitude);
       return {
         body: position.name,
-        longitude: position.longitude,
-        longitudeSpeed: position.longitudeSpeed,
         retrograde: position.isRetrograde,
+        stationary: Math.abs(position.longitudeSpeed) < 0.001,
         sign: zodiac.signName,
         degree: zodiac.degree,
         minute: zodiac.minute,
@@ -282,12 +315,83 @@ export function transitSnapshotIsFresh(
   return age >= 0 && age < maxAgeMs;
 }
 
-function celestialBodyForTransitName(name: z.infer<typeof currentTransitPositionSchema>["body"]) {
-  const body = DISCOVERY_TRANSIT_BODY_NAMES.find((candidate) => (
-    candidate === name || (candidate === CelestialBody.NorthNode && name === "North Node")
-  ));
-  if (!body) throw new Error(`Unsupported cached transiting body ${name}`);
-  return body;
+const TRANSIT_ASPECT_ANGLES: Record<(typeof MAJOR_ASPECT_TYPES)[number], number> = {
+  conjunction: 0,
+  sextile: 60,
+  square: 90,
+  trine: 120,
+  opposition: 180,
+};
+const TRANSIT_BASE_ORBS: Record<(typeof MAJOR_ASPECT_TYPES)[number], number> = {
+  conjunction: 3,
+  sextile: 1.5,
+  square: 2,
+  trine: 2,
+  opposition: 3,
+};
+const SLOW_TRANSIT_BODIES = new Set(["Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Chiron"]);
+
+function angularSeparation(left: number, right: number) {
+  const difference = Math.abs(left - right) % 360;
+  return Math.min(difference, 360 - difference);
+}
+
+function signedAngularDifference(left: number, right: number) {
+  let difference = right - left;
+  if (difference > 180) difference -= 360;
+  if (difference < -180) difference += 360;
+  return difference;
+}
+
+function effectiveTransitOrb(
+  aspectType: (typeof MAJOR_ASPECT_TYPES)[number],
+  point: NatalPoint,
+  position: z.infer<typeof currentTransitPositionSchema>,
+) {
+  return TRANSIT_BASE_ORBS[aspectType]
+    + Number(position.body === "Sun" || position.body === "Moon")
+    + Number(point.type === "luminary")
+    + Number(point.type === "angle")
+    + Number(SLOW_TRANSIT_BODIES.has(position.body)) * 0.5;
+}
+
+function transitContact(
+  point: NatalPoint,
+  position: z.infer<typeof currentTransitPositionSchema>,
+) {
+  const transitLongitude = zodiacLongitude(position);
+  const separation = angularSeparation(transitLongitude, point.longitude);
+  const closest = MAJOR_ASPECT_TYPES
+    .map((aspectType) => ({
+      aspectType,
+      deviation: Math.abs(separation - TRANSIT_ASPECT_ANGLES[aspectType]),
+      orb: effectiveTransitOrb(aspectType, point, position),
+    }))
+    .find((candidate) => candidate.deviation <= candidate.orb);
+  if (!closest) return null;
+  const aspectAngle = TRANSIT_ASPECT_ANGLES[closest.aspectType];
+  const isPastExact = separation > aspectAngle;
+  let phase: "applying" | "exact" | "separating";
+  if (closest.deviation <= 0.1 || position.stationary) {
+    phase = "exact";
+  } else if (position.retrograde) {
+    if (aspectAngle === 0) {
+      phase = signedAngularDifference(transitLongitude, point.longitude) < 0 ? "applying" : "separating";
+    } else {
+      phase = isPastExact ? "applying" : "separating";
+    }
+  } else if (aspectAngle === 0) {
+    phase = signedAngularDifference(transitLongitude, point.longitude) > 0 ? "applying" : "separating";
+  } else if (aspectAngle === 180) {
+    phase = (separation < 180) === isPastExact ? "separating" : "applying";
+  } else {
+    phase = isPastExact ? "separating" : "applying";
+  }
+  return {
+    aspectType: closest.aspectType,
+    deviation: closest.deviation,
+    phase,
+  };
 }
 
 export function createPersonalizedCurrentTransits({
@@ -304,74 +408,36 @@ export function createPersonalizedCurrentTransits({
   const chart = natalChartSourceSchema.parse(natalChart);
   const snapshot = currentTransitSnapshotSchema.parse(transitSnapshot);
   const natalPoints = buildNatalPoints(chart, natalTimeAccuracy);
-  const pointMap = new Map(natalPoints.map((point) => [point.id, point]));
-  const transitConfig = {
-    aspectTypes: [
-      AspectType.Conjunction,
-      AspectType.Sextile,
-      AspectType.Square,
-      AspectType.Trine,
-      AspectType.Opposition,
-    ],
-    includeHouseIngress: false,
-    calculateExactTimes: false,
-    includeOutOfSign: true,
-    minimumStrength: 0,
-  };
   const detectedTransits = natalPoints.flatMap((point) => snapshot.positions.flatMap((position) => {
-    const transit = transits.detectTransit(
-      {
-        name: point.id,
-        longitude: point.longitude,
-        type: point.type,
-        ...("house" in point && point.house ? { house: point.house } : {}),
-      },
-      {
-        name: position.body,
-        body: celestialBodyForTransitName(position.body),
-        longitude: position.longitude,
-        longitudeSpeed: position.longitudeSpeed,
-        isRetrograde: position.retrograde,
-      },
-      transitConfig,
-    );
-    return transit ? [transit] : [];
+    const contact = transitContact(point, position);
+    return contact ? [{ point, position, ...contact }] : [];
   }));
   const natalAspectFactors = natalInterpretation.rankedFactors.filter(
     (factor) => factor.kind === "major_aspect" && factor.aspect,
   );
-  const activeAspects = detectedTransits
+  const activeAspectCandidates = detectedTransits
     .map((transit) => {
-      const point = pointMap.get(transit.natalPoint);
-      if (!point) throw new Error(`Transit references unknown natal point ${transit.natalPoint}`);
-      const activatesNatalAspectIds = natalAspectFactors
+      const activatedFactorIds = natalAspectFactors
         .filter((factor) => (
-          factor.aspect?.body1 === point.name || factor.aspect?.body2 === point.name
+          factor.aspect?.body1 === transit.point.name || factor.aspect?.body2 === transit.point.name
         ))
         .map((factor) => factor.id);
       return {
-        id: `transit.${slug(transit.transitingBody)}.${transit.aspectType}.${point.id}`,
-        transitingBody: transit.transitingBody,
-        natalPointId: point.id,
-        natalPoint: point.name,
-        natalPositionReliability: point.natalPositionReliability,
+        id: `transit.${slug(transit.position.body)}.${transit.aspectType}.${transit.point.id}`,
+        transitingBody: transit.position.body,
+        natalPointId: transit.point.id,
+        natalPoint: transit.point.name,
+        natalPositionReliability: transit.point.natalPositionReliability,
         aspectType: transit.aspectType,
-        aspectAngle: transit.aspectAngle,
-        separation: transit.separation,
         deviation: transit.deviation,
-        orb: transit.orb,
         phase: transit.phase,
-        strength: transit.strength,
-        transitingBodyRetrograde: transit.isRetrograde,
-        outOfSign: transit.isOutOfSign,
-        activatesNatalAspectIds,
+        activatedFactorIds,
       };
     })
-    .sort((left, right) => right.strength - left.strength || left.id.localeCompare(right.id));
+    .sort((left, right) => left.deviation - right.deviation || left.id.localeCompare(right.id));
   const natalAspectActivations = natalAspectFactors.flatMap((factor) => {
-    const contacts = activeAspects.filter((transit) => transit.activatesNatalAspectIds.includes(factor.id));
+    const contacts = activeAspectCandidates.filter((transit) => transit.activatedFactorIds.includes(factor.id));
     if (contacts.length === 0 || !factor.aspect) return [];
-    const contactedNatalPointIds = [...new Set(contacts.map((transit) => transit.natalPointId))];
     const body1Transits = new Set(contacts
       .filter((transit) => transit.natalPoint === factor.aspect?.body1)
       .map((transit) => transit.transitingBody));
@@ -383,20 +449,23 @@ export function createPersonalizedCurrentTransits({
       .sort();
     return [{
       natalAspectId: factor.id,
-      body1: factor.aspect.body1,
-      body2: factor.aspect.body2,
-      aspectType: factor.aspect.type,
       transitContactIds: contacts.map((transit) => transit.id),
-      contactedNatalPointIds,
-      sharedTransitingBodies,
       bothEndpointsActivated: sharedTransitingBodies.length > 0,
-      strongestContactStrength: Math.max(...contacts.map((transit) => transit.strength)),
     }];
   }).sort((left, right) => (
     Number(right.bothEndpointsActivated) - Number(left.bothEndpointsActivated)
-    || right.strongestContactStrength - left.strongestContactStrength
     || left.natalAspectId.localeCompare(right.natalAspectId)
   ));
+  const activeAspects = activeAspectCandidates.map((aspect) => ({
+    id: aspect.id,
+    transitingBody: aspect.transitingBody,
+    natalPointId: aspect.natalPointId,
+    natalPoint: aspect.natalPoint,
+    natalPositionReliability: aspect.natalPositionReliability,
+    aspectType: aspect.aspectType,
+    deviation: aspect.deviation,
+    phase: aspect.phase,
+  }));
 
   return personalizedCurrentTransitsSchema.parse({
     snapshot,
@@ -420,8 +489,6 @@ export function createDiscoveryAstrologyContext({
   calculatedAt?: Date;
   transitSnapshot?: CurrentTransitSnapshot;
 }) {
-  const chart = natalChartSourceSchema.parse(natalChart);
-  const natalPoints = buildNatalPoints(chart, natalTimeAccuracy);
   const resolvedTransitSnapshot = transitSnapshot ?? createCurrentTransitSnapshot({
     engineVersion,
     calculatedAt,
@@ -440,12 +507,8 @@ export function createDiscoveryAstrologyContext({
     calculatedAt: personalizedTransits.snapshot.calculatedAt,
     sourceChartInputHash: natalInterpretation.sourceChartInputHash,
     natalTimeAccuracy,
-    engine: {
-      ...personalizedTransits.snapshot.engine,
-    },
     natalChart,
     natalThemes: natalInterpretation.chartAtAGlance.themes,
-    natalPoints,
     currentTransits: {
       positions: personalizedTransits.snapshot.positions,
       activeAspects: personalizedTransits.activeAspects,
