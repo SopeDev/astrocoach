@@ -124,20 +124,36 @@
     "returnNote": "Podrás volver a estos temas desde Mi Mapa."
   },
   "orientation": {
-    "title": "Así funciona AstroCoach",
-    "description": "Ven cuando haya algo en tu vida que quieras comprender mejor. Te ayudaremos a explorarlo y a conservar lo que te resulte útil.",
-    "share": {
-      "title": "Comienza con lo que está pasando",
-      "description": "Trae un momento, una emoción, una decisión o algo que sigues notando."
-    },
-    "explore": {
-      "title": "Compréndelo en compañía",
-      "description": "Te haremos preguntas cuidadosas y te ayudaremos a entender tu propia experiencia."
-    },
-    "keep": {
-      "title": "Conserva lo que encaje",
-      "description": "Cuando algo se sienta verdadero y útil, podrás guardarlo en Mi Mapa y retomarlo después."
-    },
+    "screens": [
+      {
+        "title": "Empieza con lo que está pasando",
+        "paragraphs": [
+          "Algo en tu vida llama tu atención.",
+          "Una relación. El dinero. El trabajo. Una sensación que no logras explicar del todo. Una decisión. Algo que sigue ocurriendo.",
+          "Tráelo a una conversación aquí.",
+          "Tu carta astrológica le da un mapa a AstroCoach, pero cada conversación empieza con lo que realmente estás viviendo."
+        ]
+      },
+      {
+        "title": "Ve lo que antes no podías ver",
+        "paragraphs": [
+          "Un mismo patrón puede influir silenciosamente en tus decisiones durante años antes de que notes que está ahí.",
+          "Cuando lo notas, el trabajo no termina: todavía puedes decidir qué relación quieres tener con él. A veces eso significa cambiar. A veces significa elegir, conscientemente, conservarlo.",
+          "En cualquier caso, no puedes elegir hasta que puedas verlo."
+        ]
+      },
+      {
+        "title": "Construye tu Mapa",
+        "paragraphs": [
+          "No todas las conversaciones tienen que terminar con una respuesta.",
+          "Pero cuando algo se vuelve claro —y sigue demostrando ser cierto en tu vida— puedes guardarlo en Mi Mapa.",
+          "Tu carta es el mapa que te da la astrología. Mi Mapa es el que construyes al vivir tu vida."
+        ]
+      }
+    ],
+    "step": "Pantalla",
+    "back": "Atrás",
+    "next": "Continuar",
     "continue": "Ir a mi inicio"
   },
   "appShell": {

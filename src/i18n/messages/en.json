@@ -124,20 +124,36 @@
     "returnNote": "You’ll be able to return to these themes from My Map."
   },
   "orientation": {
-    "title": "Here’s how AstroCoach works",
-    "description": "Come here when something in your life feels worth understanding. We’ll help you explore it and keep what becomes useful.",
-    "share": {
-      "title": "Start with what’s happening",
-      "description": "Bring a moment, feeling, decision, or something you keep noticing."
-    },
-    "explore": {
-      "title": "Understand it together",
-      "description": "We’ll ask thoughtful questions and help you make sense of your own experience."
-    },
-    "keep": {
-      "title": "Keep what fits",
-      "description": "When something feels true and useful, you can save it to My Map and return to it later."
-    },
+    "screens": [
+      {
+        "title": "Start with what’s happening",
+        "paragraphs": [
+          "Something in your life catches your attention.",
+          "A relationship. Money. Work. A feeling you can’t quite explain. A decision. Something that keeps happening.",
+          "Bring it into a conversation here.",
+          "Your astrological chart gives AstroCoach a map, but every conversation starts with what you’re actually living."
+        ]
+      },
+      {
+        "title": "See what you couldn’t see before",
+        "paragraphs": [
+          "The same pattern can quietly shape your choices for years before you notice it’s there.",
+          "Once you do notice it, the work isn’t over—you still get to decide what relationship you want to have with it. Sometimes that means changing. Sometimes it means choosing, on purpose, to keep it.",
+          "Either way, you can’t choose until you can see it."
+        ]
+      },
+      {
+        "title": "Build your Map",
+        "paragraphs": [
+          "Not every conversation needs to end with an answer.",
+          "But when something becomes clear—and keeps proving true in your life—you can save it in My Map.",
+          "Your chart is the map astrology gives you. My Map is the one you build by living your life."
+        ]
+      }
+    ],
+    "step": "Screen",
+    "back": "Back",
+    "next": "Continue",
     "continue": "Go to my home"
   },
   "appShell": {
