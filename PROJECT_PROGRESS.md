@@ -131,6 +131,7 @@ Last updated: 2026-09-11
 - Verified Practice-proposal negotiation with linting, strict TypeScript checking, all 31 test files, and a production Next.js build.
 - Fixed the deployed post-save continuation 500 by keeping the continuation-value tuple private to its `"use server"` module; server-action files now expose only async runtime functions while retaining type-only exports for the client.
 - Fixed post-save continuation reconciliation after confirming the production mutation had succeeded despite the UI error. Conversation loading no longer reconstructs a stale RECOGNIZE save milestone after the mode changes, and continuation actions are idempotent when the requested transition already committed before a response interruption.
+- Made unresolved conversation controls mode-aware so a historical RECOGNIZE save offer cannot block messages after the same conversation moves into INTEGRATE or DEEP_EXPLORE. Server-side submission errors now use action-failure copy instead of incorrectly claiming the visible composer is empty; regression coverage exercises the legacy saved-Pattern case.
 
 ## Remaining
 

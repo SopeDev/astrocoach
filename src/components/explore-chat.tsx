@@ -258,7 +258,7 @@ export function ExploreChat({ locale, initialConversationId, initialMessages, in
       } else {
         setThread((existing) => existing.filter((message) => message.id !== optimisticId));
         setDraft(content);
-        setError("message");
+        setError("action");
       }
     });
   }

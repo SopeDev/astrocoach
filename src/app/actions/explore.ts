@@ -14,6 +14,7 @@ import {
   canAddUserMessage,
   type ConversationMessageCounts,
 } from "@/lib/conversation-limits";
+import { hasUnresolvedConversationControl } from "@/lib/conversation-controls";
 import { CONVERSATION_CONTEXT_VERSION } from "@/lib/conversation-context";
 import {
   captureConversationContextSnapshot,
@@ -439,7 +440,8 @@ export async function sendExploreMessage(
       const conversation = await transaction.conversation.findFirst({ where: { id: activeConversationId!, userId: user.id, status: "active", archivedAt: null } });
       if (!conversation || conversation.transitionState === "OFFERED") return { status: "unavailable" as const };
       const latestMessage = await transaction.message.findFirst({ where: { conversationId: activeConversationId! }, orderBy: [{ createdAt: "desc" }, { id: "desc" }] });
-      if (latestMessage && (evaluationOfferFromMessage(latestMessage) || mapItemOfferFromMessage(latestMessage) || practiceOfferFromMessage(latestMessage))) return { status: "unavailable" as const };
+      const hasUnresolvedModeOffer = latestMessage && hasUnresolvedConversationControl(conversation.mode, latestMessage.internalSignals);
+      if (hasUnresolvedModeOffer) return { status: "unavailable" as const };
       const messageCounts = await loadMessageCounts(transaction, activeConversationId!);
       if (!canAddUserMessage(messageCounts)) return { status: "limit" as const };
       const created = await transaction.message.create({ data: { conversationId: activeConversationId!, role: "user", mode: conversation.mode, content: parsed.data } });
@@ -496,7 +498,8 @@ export async function retryExploreResponse(locale: Locale, conversationId: strin
   const existingReply = await db.message.findUnique({ where: { inReplyToId: userMessage.id }, include: { conversation: true } });
   if (existingReply) {
     const practice = existingReply.conversation.focalMapItemId ? await db.practice.findFirst({ where: { userId: user.id, mapItemId: existingReply.conversation.focalMapItemId, status: "ACTIVE" }, orderBy: { createdAt: "desc" } }) : null;
-    return { ok: true, conversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(existingReply), mode: existingReply.conversation.mode, transitionOffered: existingReply.conversation.transitionState === "OFFERED", candidateEvaluationOffer: evaluationOfferFromMessage(existingReply), mapItemSaveOffer: mapItemOfferFromMessage(existingReply), practiceProposalOffer: practiceOfferFromMessage(existingReply), activePractice: serializePractice(practice) };
+    const replyMode = existingReply.conversation.mode;
+    return { ok: true, conversationId, userMessage: serializeMessage(userMessage), assistantMessage: serializeMessage(existingReply), mode: replyMode, transitionOffered: existingReply.conversation.transitionState === "OFFERED", candidateEvaluationOffer: replyMode === "RECOGNIZE" ? evaluationOfferFromMessage(existingReply) : null, mapItemSaveOffer: replyMode === "RECOGNIZE" ? mapItemOfferFromMessage(existingReply) : null, practiceProposalOffer: replyMode === "INTEGRATE" ? practiceOfferFromMessage(existingReply) : null, activePractice: serializePractice(practice) };
   }
 
   try {

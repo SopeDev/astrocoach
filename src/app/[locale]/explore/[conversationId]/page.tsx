@@ -32,11 +32,11 @@ export default async function ConversationPage({ params }: { params: Promise<{ l
   const messageCounts = countConversationMessages(conversation.messages);
   const canRetryLastUserMessage = canAddAssistantMessage(messageCounts);
   const interactive = !conversation.archivedAt;
-  const evaluationOffer = interactive && lastMessage?.role === "assistant" ? candidateEvaluationOffer(lastMessage.id, lastMessage.internalSignals) : null;
+  const evaluationOffer = interactive && conversation.mode === "RECOGNIZE" && lastMessage?.role === "assistant" ? candidateEvaluationOffer(lastMessage.id, lastMessage.internalSignals) : null;
   const recognizedItem = lastMessage?.role === "assistant" ? recognizedMapItemOffer(lastMessage.internalSignals) : null;
   const savedItem = lastMessage ? conversation.sourceMapItems.find((item) => item.sourceMessageId === lastMessage.id) : null;
   const mapItemSaveOffer = conversation.mode === "RECOGNIZE" && recognizedItem && lastMessage && (interactive || savedItem) ? { messageId: lastMessage.id, ...recognizedItem, ...(savedItem ? { mapItemId: savedItem.id } : {}) } : null;
-  const practiceOffer = interactive && lastMessage?.role === "assistant" ? practiceProposalOffer(lastMessage.id, lastMessage.internalSignals) : null;
+  const practiceOffer = interactive && conversation.mode === "INTEGRATE" && lastMessage?.role === "assistant" ? practiceProposalOffer(lastMessage.id, lastMessage.internalSignals) : null;
   const activePractice = conversation.practices[0];
   const profileInitial = (user.name?.trim()[0] ?? user.email?.trim()[0] ?? "A").toUpperCase();
   return <><ThemePreferenceSync preference={user.theme} userId={user.id} /><ExploreChat initialActivePractice={activePractice ? { id: activePractice.id, intention: activePractice.intention, purpose: activePractice.purpose, primitive: activePractice.primitive, instruction: activePractice.instruction, cue: activePractice.cue } : null} initialArchived={Boolean(conversation.archivedAt)} initialCandidateEvaluationOffer={evaluationOffer} initialClosed={!interactive || conversation.status !== "active"} initialConversationId={conversation.id} initialFailedMessageId={interactive && conversation.status === "active" && lastMessage?.role === "user" && canRetryLastUserMessage ? lastMessage.id : null} initialMapItemSaveOffer={mapItemSaveOffer} initialMessages={conversation.messages.map((message) => ({ id: message.id, role: message.role, mode: message.mode, content: message.content, createdAt: message.createdAt.toISOString() }))} initialMode={conversation.mode} initialPracticeProposalOffer={practiceOffer} initialTransitionOffered={interactive && conversation.transitionState === "OFFERED"} locale={locale} messages={messages.explore} profileInitial={profileInitial} /></>;
