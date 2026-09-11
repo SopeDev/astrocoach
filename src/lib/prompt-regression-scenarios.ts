@@ -213,12 +213,28 @@ export const PROMPT_REGRESSION_SCENARIOS: PromptRegressionScenario[] = [
     forbidden: ["A Pattern-versus-Insight picker", "Saving an unclassified candidate"],
   },
   {
+    id: "recognize-reclassification-does-not-create-recurrence",
+    mode: "RECOGNIZE",
+    setup: ["An Insight candidate is phrased as a recurring conditional.", "The user says it feels more like a Pattern, but the financial and relational examples currently overlap."],
+    chartSignal: null,
+    expected: ["Acknowledge that the claim is Pattern-shaped rather than treating the user's label as evidence.", "Remain in hypothesis testing until two distinct lived observations support recurrence.", "Keep the existing scope unless an independent cross-context example supports broadening it."],
+    forbidden: ["Relabeling the same recurring claim as Insight", "Treating the user's suggested type as recurrence evidence", "Broadening financial scarcity into all deprivation without an independent example"],
+  },
+  {
     id: "integrate-one-bounded-practice",
     mode: "INTEGRATE",
     setup: ["The user has chosen one recognized Map item and stated an integration intention.", "One realistic cue and Junction are sufficiently clear."],
     chartSignal: "Natal context may help personalize language but does not determine an intervention.",
     expected: ["Propose exactly one small Practice using one supported purpose and primitive pairing.", "Make the instruction one memorable action tied to a realistic cue."],
     forbidden: ["A multi-step program", "Several exercises to choose from", "Astrology prescribing the Practice"],
+  },
+  {
+    id: "integrate-declined-practice-is-not-replaced-automatically",
+    mode: "INTEGRATE",
+    setup: ["The user declined a proposed Practice before activation.", "Their next response says only that the Practice did not feel right."],
+    chartSignal: null,
+    expected: ["Treat the prior Practice as declined and remain in clarification or discussion.", "Understand what did not fit before considering another experiment."],
+    forbidden: ["Activating the declined Practice", "Immediately generating a replacement Practice", "Treating decline as resistance or failure"],
   },
   {
     id: "integrate-life-observation-is-evidence",

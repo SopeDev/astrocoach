@@ -1,6 +1,6 @@
 # Project Progress
 
-Last updated: 2026-09-10
+Last updated: 2026-09-11
 
 ## Implemented
 
@@ -124,6 +124,11 @@ Last updated: 2026-09-10
 - Removed calculation-grade ephemeris payloads from persistence and exports, not only model prompts. Natal-chart schema 4 stores only interpretation-relevant positions and aspects; transit snapshot schema 2 never stores planetary speed or raw longitude; Discovery context schema 2 removes derived natal-point and engine duplication; conversation context schema 3 stores compact birth, chart, authored interpretation, and non-redundant transit topology. Version 4 exports sanitize legacy snapshots retroactively. The supplied 104,937-character legacy context now exports as 55,933 characters with all 36 authored factors, 23 natal aspects, and 22 transit contacts intact and none of the prohibited calculation fields present.
 - Expanded selected planet placements into a compact one-hop natal bundle for conversation turns: all touching natal aspects and the compact placements at their other endpoints. The focal placement retains its authored material, while connected aspects remain terse facts rather than carrying generic aspect-type and planet-archetype text that could be mistaken for a specific authored interpretation.
 - Replaced the compressed onboarding orientation cards with a mobile-first three-screen progression that explains starting from lived experience, recognizing previously invisible patterns and choice, and building the user's lived My Map alongside the astrological chart. Added equivalent Spanish copy and retained the final Home completion action.
+- Changed Map saving from a conversation-ending action into an in-thread milestone. A saved Pattern or Insight now offers only Keep talking, Explore this more deeply, and Work with this in my life; each continues the same conversation, restores its originating mode when appropriate, and makes the new item focal for DEEP_EXPLORE or INTEGRATE. Previously closed save milestones can be resumed through the same controls without a data migration.
+- Tightened Pattern/Insight reclassification with an explicit recurrence assessment in generated RECOGNIZE state. Pattern candidates must reference at least two distinct lived observations, recurring conditionals cannot be mislabeled as Insights, user-requested labels do not count as evidence, and type corrections cannot opportunistically broaden scope.
+- Verified the in-thread save continuation and classification corrections with linting, strict TypeScript checking, all 31 test files, and a production Next.js build.
+- Made INTEGRATE Practice proposals explicitly negotiable without adding a second model-owned stage. Users can activate, discuss adjustments, or decline; only activation creates a Practice row, while adjustment and decline persist application-owned resolution metadata, reopen the same conversation, and supply the prior proposal to the next model turn. Decline does not trigger generation or imply a request for a replacement.
+- Verified Practice-proposal negotiation with linting, strict TypeScript checking, all 31 test files, and a production Next.js build.
 
 ## Remaining
 
@@ -134,6 +139,7 @@ Last updated: 2026-09-10
 - Apply the pending Map-item/Insight/Integration migration before manually exercising the new loop against a database.
 - Run the prompt regression scenarios against the configured model and evaluate EXPLORE readiness, Pattern-versus-Insight classification, RECOGNIZE accuracy, and bounded Practice generation.
 - Add richer Map-item provenance and longitudinal Integration behavior only after the small intention → Practice → life → observation loop is useful in practice.
+- Add in-conversation revision of an already active Practice as a separate lifecycle slice; active Practices remain editable from My Map in the meantime.
 - Apply the DEEP_EXPLORE conversation-mode migration before manually exercising the new flow against a database.
 - Manually verify microphone permission, recording, cancellation, and transcription on an installed iPhone and Android PWA.
 

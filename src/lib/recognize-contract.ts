@@ -11,6 +11,11 @@ export const candidateMapItemSchema = z.object({
 });
 export type CandidateMapItem = z.infer<typeof candidateMapItemSchema>;
 
+const recurrenceAssessmentSchema = z.object({
+  claimsRecurrence: z.boolean(),
+  supportingObservationIndexes: z.array(z.number().int().min(0).max(4)).max(5),
+});
+
 export const CANDIDATE_EVALUATION_ACTIONS = ["YES_EXACTLY", "PARTLY", "NO", "LET_ME_EXPLAIN"] as const;
 export const candidateEvaluationActionSchema = z.enum(CANDIDATE_EVALUATION_ACTIONS);
 export type CandidateEvaluationAction = z.infer<typeof candidateEvaluationActionSchema>;
@@ -23,6 +28,7 @@ export const recognizeSignalsSchema = z.object({
   ...astrologyProvenanceFields,
   candidateMapItem: candidateMapItemSchema.nullable(),
   supportingObservations: z.array(z.string().max(300)).max(5),
+  recurrenceAssessment: recurrenceAssessmentSchema,
   evidenceStrength: z.enum(["limited", "moderate", "strong"]),
   unresolvedUncertainty: z.array(z.string().max(300)).max(4),
   userEvaluationStatus: z.enum(["awaiting", "accepted", "partial", "rejected", "uncertain"]),
@@ -44,6 +50,7 @@ const storedCandidateEvaluationSchema = z.object({
 const recognizeStoredSignalsSchema = recognizeSignalsSchema.partial({
   usedAstrologyFactorIds: true,
   usedTransitIds: true,
+  recurrenceAssessment: true,
 }).extend({
   candidateEvaluation: storedCandidateEvaluationSchema.optional(),
 });
@@ -68,11 +75,20 @@ type StoredRecognizeSignals = z.infer<typeof recognizeStoredSignalsSchema>;
 
 function normalizeStoredSignals(value: unknown): StoredRecognizeSignals | null {
   const current = recognizeStoredSignalsSchema.safeParse(value);
-  if (current.success) return {
-    ...current.data,
-    usedAstrologyFactorIds: current.data.usedAstrologyFactorIds ?? [],
-    usedTransitIds: current.data.usedTransitIds ?? [],
-  };
+  if (current.success) {
+    const defaultClaimsRecurrence = current.data.candidateMapItem?.kind === "PATTERN";
+    return {
+      ...current.data,
+      usedAstrologyFactorIds: current.data.usedAstrologyFactorIds ?? [],
+      usedTransitIds: current.data.usedTransitIds ?? [],
+      recurrenceAssessment: current.data.recurrenceAssessment ?? {
+        claimsRecurrence: defaultClaimsRecurrence,
+        supportingObservationIndexes: defaultClaimsRecurrence
+          ? current.data.supportingObservations.slice(0, 2).map((_, index) => index)
+          : [],
+      },
+    };
+  }
   const legacy = legacyRecognizeSignalsSchema.safeParse(value);
   if (!legacy.success) return null;
   const accepted = legacy.data.userEvaluationStatus === "accepted" && legacy.data.proposedMapAction === "OFFER_SAVE";
@@ -88,6 +104,10 @@ function normalizeStoredSignals(value: unknown): StoredRecognizeSignals | null {
     usedTransitIds: [],
     candidateMapItem: legacy.data.candidatePattern ? { kind: "PATTERN", statement: legacy.data.candidatePattern } : null,
     supportingObservations: legacy.data.supportingObservations ?? [],
+    recurrenceAssessment: {
+      claimsRecurrence: Boolean(legacy.data.candidatePattern),
+      supportingObservationIndexes: (legacy.data.supportingObservations ?? []).slice(0, 2).map((_, index) => index),
+    },
     evidenceStrength: legacy.data.evidenceStrength ?? "moderate",
     unresolvedUncertainty: legacy.data.unresolvedUncertainty ?? [],
     userEvaluationStatus: legacy.data.userEvaluationStatus,
@@ -110,6 +130,15 @@ export type CandidateEvaluationPromptContext = {
 };
 
 export function isValidGeneratedRecognizeSignals(signals: z.infer<typeof recognizeSignalsSchema>) {
+  const observationIndexes = [...new Set(signals.recurrenceAssessment.supportingObservationIndexes)];
+  const indexesAreValid = observationIndexes.every((index) => index < signals.supportingObservations.length);
+  const classificationIsConsistent = signals.candidateMapItem === null
+    ? !signals.recurrenceAssessment.claimsRecurrence && observationIndexes.length === 0
+    : signals.candidateMapItem.kind === "PATTERN"
+      ? signals.recurrenceAssessment.claimsRecurrence && observationIndexes.length >= 2 && indexesAreValid
+      : !signals.recurrenceAssessment.claimsRecurrence && observationIndexes.length === 0;
+  if (!classificationIsConsistent) return false;
+
   if (signals.recognitionStage === "HYPOTHESIS_TESTING") {
     return signals.candidateMapItem === null &&
       (signals.userEvaluationStatus === "awaiting" || signals.userEvaluationStatus === "uncertain") &&

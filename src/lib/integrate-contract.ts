@@ -20,19 +20,53 @@ export const integrateResponseSchema = integrateSignalsSchema.extend({
   reply: z.string().min(1).max(4000),
 });
 
+export const PRACTICE_PROPOSAL_EVALUATION_ACTIONS = ["ADJUST", "DECLINE"] as const;
+export const practiceProposalEvaluationActionSchema = z.enum(PRACTICE_PROPOSAL_EVALUATION_ACTIONS);
+export type PracticeProposalEvaluationAction = z.infer<typeof practiceProposalEvaluationActionSchema>;
+
 const storedIntegrateSignalsSchema = integrateSignalsSchema.partial({
   usedAstrologyFactorIds: true,
   usedTransitIds: true,
 }).extend({
   practiceActivation: z.object({ practiceId: z.string().uuid() }).optional(),
+  practiceProposalEvaluation: z.object({ action: practiceProposalEvaluationActionSchema }).optional(),
 });
 
 export type PracticeProposalOffer = { messageId: string; intention: string; proposal: PracticeProposal };
+export type PracticeProposalEvaluationContext = {
+  action: PracticeProposalEvaluationAction;
+  intention: string;
+  proposal: PracticeProposal;
+};
 
 export function practiceProposalOffer(messageId: string, value: unknown): PracticeProposalOffer | null {
   const parsed = storedIntegrateSignalsSchema.safeParse(value);
-  if (!parsed.success || parsed.data.integrationStage !== "PRACTICE_PROPOSAL" || !parsed.data.proposedPractice || !isSupportedPracticeProposal(parsed.data.proposedPractice) || parsed.data.practiceActivation) return null;
+  if (!parsed.success || parsed.data.integrationStage !== "PRACTICE_PROPOSAL" || !parsed.data.proposedPractice || !isSupportedPracticeProposal(parsed.data.proposedPractice) || parsed.data.practiceActivation || parsed.data.practiceProposalEvaluation) return null;
   return { messageId, intention: parsed.data.integrationIntention, proposal: parsed.data.proposedPractice };
+}
+
+export function applyPracticeProposalEvaluation(value: unknown, action: PracticeProposalEvaluationAction) {
+  const parsedAction = practiceProposalEvaluationActionSchema.safeParse(action);
+  const parsed = storedIntegrateSignalsSchema.safeParse(value);
+  if (!parsedAction.success || !parsed.success || !practiceProposalOffer("proposal", value)) return null;
+  return {
+    ...parsed.data,
+    practiceProposalEvaluation: { action: parsedAction.data },
+    recommendedNextMode: "INTEGRATE" as const,
+    reasonForRecommendation: parsedAction.data === "ADJUST"
+      ? "The user wants to discuss or adjust the proposed Practice before deciding whether to activate it."
+      : "The user declined the proposed Practice; no Practice was activated and no replacement has been requested.",
+  };
+}
+
+export function practiceProposalEvaluationContext(value: unknown): PracticeProposalEvaluationContext | null {
+  const parsed = storedIntegrateSignalsSchema.safeParse(value);
+  if (!parsed.success || !parsed.data.practiceProposalEvaluation || !parsed.data.proposedPractice || !isSupportedPracticeProposal(parsed.data.proposedPractice)) return null;
+  return {
+    action: parsed.data.practiceProposalEvaluation.action,
+    intention: parsed.data.integrationIntention,
+    proposal: parsed.data.proposedPractice,
+  };
 }
 
 export function applyPracticeActivation(value: unknown, practiceId: string) {

@@ -10,6 +10,7 @@ const acceptedResponse = {
   privateAstrologyInfluence: null,
   candidateMapItem: { kind: "INSIGHT", statement: "Having complete information is less important to me than trusting my own preference." },
   supportingObservations: ["The user distinguished certainty from self-trust."],
+  recurrenceAssessment: { claimsRecurrence: false, supportingObservationIndexes: [] },
   evidenceStrength: "moderate",
   unresolvedUncertainty: [],
   userEvaluationStatus: "accepted",
@@ -61,7 +62,7 @@ test("LET_ME_EXPLAIN remains distinct from partial agreement", () => {
 });
 
 test("hypothesis testing can continue without manufacturing a Map item", () => {
-  const result = recognizeResponseSchema.safeParse({ ...acceptedResponse, reply: "One distinction is still unresolved.", recognitionStage: "HYPOTHESIS_TESTING", candidateMapItem: null, evidenceStrength: "limited", userEvaluationStatus: "awaiting", proposedMapAction: "NONE", recommendedNextMode: "RECOGNIZE" });
+  const result = recognizeResponseSchema.safeParse({ ...acceptedResponse, reply: "One distinction is still unresolved.", recognitionStage: "HYPOTHESIS_TESTING", candidateMapItem: null, recurrenceAssessment: { claimsRecurrence: false, supportingObservationIndexes: [] }, evidenceStrength: "limited", userEvaluationStatus: "awaiting", proposedMapAction: "NONE", recommendedNextMode: "RECOGNIZE" });
   assert.equal(result.success, true);
   assert.equal(result.success && recognizedMapItemOffer(result.data), null);
 });
@@ -71,6 +72,24 @@ test("model output cannot claim application-owned validation", () => {
   const awaitingSignals = recognizeSignalsSchema.parse(awaitingCandidate);
   assert.equal(isValidGeneratedRecognizeSignals(awaitingSignals), true);
   assert.equal(isValidGeneratedRecognizeSignals(acceptedSignals), false);
+});
+
+test("generated classification requires recurrence evidence for Patterns and forbids it for Insights", () => {
+  const pattern = recognizeSignalsSchema.parse({
+    ...awaitingCandidate,
+    candidateMapItem: { kind: "PATTERN", statement: "When scarcity rises, I cut off nourishing pleasure." },
+    supportingObservations: ["This happened during one financially tight period.", "It also happened during an earlier relationally isolated period."],
+    recurrenceAssessment: { claimsRecurrence: true, supportingObservationIndexes: [0, 1] },
+  });
+  const unsupportedPattern = { ...pattern, recurrenceAssessment: { claimsRecurrence: true, supportingObservationIndexes: [0] } };
+  const recurringInsight = {
+    ...recognizeSignalsSchema.parse(awaitingCandidate),
+    recurrenceAssessment: { claimsRecurrence: true, supportingObservationIndexes: [0] },
+  };
+
+  assert.equal(isValidGeneratedRecognizeSignals(pattern), true);
+  assert.equal(isValidGeneratedRecognizeSignals(unsupportedPattern), false);
+  assert.equal(isValidGeneratedRecognizeSignals(recurringInsight), false);
 });
 
 test("accepted Pattern offers under the prior contract remain usable", () => {

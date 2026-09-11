@@ -34,7 +34,7 @@ export function recognitionHandoffFromOrigin(origin: { mode: RecognitionOriginMo
   return handoff ? { originMode: "DEEP_EXPLORE", relationshipToFocal: handoff.relationshipToFocal, candidateMapItem: handoff.candidateMapItem, supportingObservations: [], unresolvedQuestions: [] } : null;
 }
 
-export function recognitionRejectionMode(handoff: RecognitionHandoffContext | null, hasFocalMapItem: boolean): RecognitionOriginMode {
+export function recognitionReturnMode(handoff: RecognitionHandoffContext | null, hasFocalMapItem: boolean): RecognitionOriginMode {
   return handoff?.originMode ?? (hasFocalMapItem ? "INTEGRATE" : "EXPLORE");
 }
 

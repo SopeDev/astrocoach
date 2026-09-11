@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { applyPracticeActivation, integrateResponseSchema, livedEvidenceFromIntegrate, practiceProposalOffer, shouldOfferMapItemRevision } from "./integrate-contract";
+import { applyPracticeActivation, applyPracticeProposalEvaluation, integrateResponseSchema, livedEvidenceFromIntegrate, practiceProposalEvaluationContext, practiceProposalOffer, shouldOfferMapItemRevision } from "./integrate-contract";
 
 const proposalResponse = {
   reply: "Try naming the tightening when it first arrives.",
@@ -12,8 +12,8 @@ const proposalResponse = {
   proposedPractice: { purpose: "NOTICE_EARLIER", primitive: "NAME_CUE", instruction: "Silently say, ‘the tightening is here.’", cue: "Your shoulders first tighten." },
   newLivedEvidence: null,
   mapItemRevisionSignal: false,
-  recommendedNextMode: "PAUSE",
-  reasonForRecommendation: "One Practice is ready for life.",
+  recommendedNextMode: "INTEGRATE",
+  reasonForRecommendation: "One Practice is ready for the user's decision.",
 };
 
 test("INTEGRATE proposes exactly one bounded Practice", () => {
@@ -24,6 +24,28 @@ test("INTEGRATE proposes exactly one bounded Practice", () => {
 test("activation consumes the proposal", () => {
   const activated = applyPracticeActivation(proposalResponse, "4f692409-3ad9-4ec6-b4de-7e251c418d45");
   assert.equal(practiceProposalOffer("message", activated), null);
+  assert.equal(activated?.recommendedNextMode, "PAUSE");
+});
+
+test("adjusting consumes the offer without activating it and preserves proposal context", () => {
+  const adjusted = applyPracticeProposalEvaluation(proposalResponse, "ADJUST");
+  assert.equal(practiceProposalOffer("message", adjusted), null);
+  assert.deepEqual(practiceProposalEvaluationContext(adjusted), {
+    action: "ADJUST",
+    intention: proposalResponse.integrationIntention,
+    proposal: proposalResponse.proposedPractice,
+  });
+  assert.equal(adjusted?.practiceActivation, undefined);
+  assert.equal(adjusted?.recommendedNextMode, "INTEGRATE");
+});
+
+test("declining consumes the offer without activating or requesting a replacement", () => {
+  const declined = applyPracticeProposalEvaluation(proposalResponse, "DECLINE");
+  assert.equal(practiceProposalOffer("message", declined), null);
+  assert.equal(practiceProposalEvaluationContext(declined)?.action, "DECLINE");
+  assert.equal(declined?.practiceActivation, undefined);
+  assert.match(declined?.reasonForRecommendation ?? "", /no replacement has been requested/i);
+  assert.equal(applyPracticeActivation(declined, "4f692409-3ad9-4ec6-b4de-7e251c418d45"), null);
 });
 
 test("a life observation exposes new evidence separately", () => {

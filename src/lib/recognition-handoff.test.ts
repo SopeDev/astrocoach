@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { recognitionHandoffFromOrigin, recognitionRejectionMode, shouldReviseFocalMapItem } from "./recognition-handoff";
+import { recognitionHandoffFromOrigin, recognitionReturnMode, shouldReviseFocalMapItem } from "./recognition-handoff";
 
 const deepSignals = {
   currentMode: "DEEP_EXPLORE",
@@ -60,9 +60,13 @@ test("DEEP_EXPLORE preserves whether its candidate is new or a revision", () => 
   assert.equal(shouldReviseFocalMapItem(revision, true), true);
 });
 
-test("rejection returns to the mode that initiated recognition", () => {
+test("recognition returns to the mode that initiated it", () => {
+  const exploreHandoff = recognitionHandoffFromOrigin({ mode: "EXPLORE", internalSignals: null });
+  const integrateHandoff = recognitionHandoffFromOrigin({ mode: "INTEGRATE", internalSignals: null });
   const deepHandoff = recognitionHandoffFromOrigin({ mode: "DEEP_EXPLORE", internalSignals: deepSignals });
-  assert.equal(recognitionRejectionMode(deepHandoff, true), "DEEP_EXPLORE");
-  assert.equal(recognitionRejectionMode(null, false), "EXPLORE");
-  assert.equal(recognitionRejectionMode(null, true), "INTEGRATE");
+  assert.equal(recognitionReturnMode(exploreHandoff, false), "EXPLORE");
+  assert.equal(recognitionReturnMode(integrateHandoff, true), "INTEGRATE");
+  assert.equal(recognitionReturnMode(deepHandoff, true), "DEEP_EXPLORE");
+  assert.equal(recognitionReturnMode(null, false), "EXPLORE");
+  assert.equal(recognitionReturnMode(null, true), "INTEGRATE");
 });

@@ -24,7 +24,7 @@ import { deepExploreFocusSchema, deepRecognitionHandoff } from "@/lib/deep-explo
 import { generateExploreResponse } from "@/lib/explore";
 import { exploreMessageSchema, parseStoredExploreSignals, titleFromExploreMessage } from "@/lib/explore-contract";
 import { generateIntegrateResponse } from "@/lib/integrate";
-import { applyPracticeActivation, livedEvidenceFromIntegrate, practiceProposalOffer, shouldOfferMapItemRevision, type PracticeProposalOffer } from "@/lib/integrate-contract";
+import { applyPracticeActivation, applyPracticeProposalEvaluation, livedEvidenceFromIntegrate, practiceProposalEvaluationActionSchema, practiceProposalEvaluationContext, practiceProposalOffer, shouldOfferMapItemRevision, type PracticeProposalEvaluationAction, type PracticeProposalOffer } from "@/lib/integrate-contract";
 import { shouldOfferRecognition } from "@/lib/mode-orchestration";
 import { ensureNatalInterpretation } from "@/lib/natal-interpretation-persistence";
 import {
@@ -45,7 +45,7 @@ import {
   type CandidateEvaluationAction,
   type CandidateEvaluationOffer,
 } from "@/lib/recognize-contract";
-import { recognitionHandoffFromOrigin, recognitionRejectionMode, shouldReviseFocalMapItem } from "@/lib/recognition-handoff";
+import { recognitionHandoffFromOrigin, recognitionReturnMode, shouldReviseFocalMapItem } from "@/lib/recognition-handoff";
 import { isSupportedPracticeProposal, practiceIntentionSchema, type PracticeProposal } from "@/lib/practices";
 import { mapItemIdSchema } from "@/lib/map-items";
 
@@ -61,6 +61,9 @@ export type ConversationMessage = {
 
 export type MapItemSaveOffer = { messageId: string; kind: "PATTERN" | "INSIGHT"; statement: string; mapItemId?: string };
 export type ActivePractice = PracticeProposal & { id: string; intention: string };
+export const POST_SAVE_CONTINUATIONS = ["KEEP_TALKING", "DEEP_EXPLORE", "INTEGRATE"] as const;
+export type PostSaveContinuation = (typeof POST_SAVE_CONTINUATIONS)[number];
+const postSaveContinuationSchema = z.enum(POST_SAVE_CONTINUATIONS);
 
 export type ConversationActionResult =
   | { ok: true; conversationId: string; userMessage?: ConversationMessage; assistantMessage: ConversationMessage; mode: ConversationMode; transitionOffered: boolean; candidateEvaluationOffer: CandidateEvaluationOffer | null; mapItemSaveOffer: MapItemSaveOffer | null; practiceProposalOffer: PracticeProposalOffer | null; activePractice: ActivePractice | null }
@@ -151,6 +154,7 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
   const generationMessages = recentMessages.reverse().filter((message) => message.id !== excludedMessageId);
   const precedingMessage = generationMessages.at(-1);
   const evaluationContext = precedingMessage?.role === "assistant" ? candidateEvaluationPromptContext(precedingMessage.internalSignals) : null;
+  const practiceEvaluationContext = precedingMessage?.role === "assistant" ? practiceProposalEvaluationContext(precedingMessage.internalSignals) : null;
   const recentResponseApproaches = generationMessages
     .filter((message) => message.role === "assistant" && message.mode === "EXPLORE")
     .slice(-4)
@@ -170,7 +174,7 @@ async function loadGenerationContext(userId: string, locale: Locale, conversatio
       })
     : null;
   const recentObservations = activePractice ? await db.practiceObservation.findMany({ where: { practiceId: activePractice.id, userId }, orderBy: { createdAt: "desc" }, take: 5, select: { content: true, learning: true } }) : [];
-  return { conversation, thread, providerConversationId, snapshot, messageCounts, evaluationContext, recentResponseApproaches, recentAssistantSignals, activePractice, recentObservations: recentObservations.reverse() };
+  return { conversation, thread, providerConversationId, snapshot, messageCounts, evaluationContext, practiceEvaluationContext, recentResponseApproaches, recentAssistantSignals, activePractice, recentObservations: recentObservations.reverse() };
 }
 
 function uniqueStrings(values: string[]) {
@@ -282,6 +286,10 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
       ? await generateDeepExploreResponse({
           locale,
           providerConversationId: context.providerConversationId,
+          focalMapItem: {
+            kind: context.conversation.focalMapItem.kind,
+            statement: context.conversation.focalMapItem.statement,
+          },
           activePractice: context.activePractice
             ? {
                 intention: context.activePractice.intention,
@@ -298,6 +306,10 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
       ? await generateIntegrateResponse({
           locale,
           providerConversationId: context.providerConversationId,
+          focalMapItem: {
+            kind: context.conversation.focalMapItem.kind,
+            statement: context.conversation.focalMapItem.statement,
+          },
           latestMessage: userMessage.content,
           activePractice: context.activePractice
             ? {
@@ -309,6 +321,7 @@ async function generateReply(userId: string, locale: Locale, conversationId: str
               }
             : null,
           recentObservations: context.recentObservations,
+          practiceProposalEvaluationContext: context.practiceEvaluationContext,
           privateInterpretationContext,
           usageContext,
         })
@@ -604,7 +617,7 @@ export async function evaluateRecognizeCandidate(locale: Locale, conversationId:
     if (!nextSignals) return null;
     await transaction.message.update({ where: { id: source.id }, data: { internalSignals: nextSignals } });
 
-    const rejectionMode: ConversationMode = recognitionRejectionMode(recognitionHandoff, Boolean(conversation.focalMapItemId));
+    const rejectionMode: ConversationMode = recognitionReturnMode(recognitionHandoff, Boolean(conversation.focalMapItemId));
     const mode: ConversationMode = parsedAction.data === "NO" ? rejectionMode : "RECOGNIZE";
     if (mode !== "RECOGNIZE") {
       await transaction.conversation.update({
@@ -638,11 +651,12 @@ export async function saveRecognizedMapItem(locale: Locale, conversationId: stri
       select: { focalMapItemId: true },
     });
     if (!conversation) throw new Error("Conversation is no longer available for Map item saving");
-    const available = await transaction.conversation.updateMany({
-      where: { id: conversationId, userId: user.id, status: "active", archivedAt: null },
-      data: { status: "closed" },
+    const latestMessage = await transaction.message.findFirst({
+      where: { conversationId },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: { id: true },
     });
-    if (available.count !== 1) throw new Error("Conversation is no longer available for Map item saving");
+    if (latestMessage?.id !== sourceMessageId) throw new Error("The recognized item is no longer the latest conversation state");
     const revisesFocal = shouldReviseFocalMapItem(recognitionHandoff, Boolean(conversation.focalMapItemId));
     const existingItem = revisesFocal && conversation.focalMapItemId
       ? await transaction.mapItem.findFirst({ where: { id: conversation.focalMapItemId, userId: user.id } })
@@ -656,6 +670,64 @@ export async function saveRecognizedMapItem(locale: Locale, conversationId: stri
     return saved;
   });
   return { ok: true as const, mapItemId: mapItem.id, kind: mapItem.kind };
+}
+
+export async function continueAfterMapItemSave(
+  locale: Locale,
+  conversationId: string,
+  sourceMessageId: string,
+  continuation: PostSaveContinuation,
+) {
+  if (!isLocale(locale)) return { ok: false as const };
+  const parsedContinuation = postSaveContinuationSchema.safeParse(continuation);
+  if (!parsedContinuation.success) return { ok: false as const };
+  const user = await requireCurrentUser(locale);
+  const recognitionHandoff = await loadRecognitionHandoff(user.id, conversationId);
+
+  const result = await db.$transaction(async (transaction) => {
+    const conversation = await transaction.conversation.findFirst({
+      where: { id: conversationId, userId: user.id, mode: "RECOGNIZE", status: { in: ["active", "closed"] }, archivedAt: null },
+      select: { focalMapItemId: true },
+    });
+    const latestMessage = await transaction.message.findFirst({
+      where: { conversationId },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: { id: true },
+    });
+    const savedItem = await transaction.mapItem.findFirst({
+      where: { sourceMessageId, conversationId, userId: user.id, archivedAt: null },
+      select: { id: true },
+    });
+    if (!conversation || latestMessage?.id !== sourceMessageId || !savedItem) return null;
+
+    const mode: ConversationMode = parsedContinuation.data === "KEEP_TALKING"
+      ? recognitionReturnMode(recognitionHandoff, Boolean(conversation.focalMapItemId))
+      : parsedContinuation.data;
+    const focalMapItemId = parsedContinuation.data === "KEEP_TALKING"
+      ? conversation.focalMapItemId
+      : savedItem.id;
+    await transaction.conversation.update({
+      where: { id: conversationId },
+      data: {
+        mode,
+        status: "active",
+        focalMapItemId,
+        transitionState: "IDLE",
+        transitionReferenceAt: new Date(),
+      },
+    });
+    const activePractice = focalMapItemId
+      ? await transaction.practice.findFirst({
+          where: { userId: user.id, mapItemId: focalMapItemId, status: "ACTIVE" },
+          orderBy: { createdAt: "desc" },
+        })
+      : null;
+    return { mode, activePractice };
+  });
+
+  return result
+    ? { ok: true as const, mode: result.mode, activePractice: serializePractice(result.activePractice) }
+    : { ok: false as const };
 }
 
 export async function startIntegration(locale: Locale, mapItemId: string, intention: string) {
@@ -747,4 +819,41 @@ export async function activatePractice(locale: Locale, conversationId: string, s
     return practice;
   });
   return result ? { ok: true as const, activePractice: serializePractice(result) } : { ok: false as const };
+}
+
+export async function evaluatePracticeProposal(
+  locale: Locale,
+  conversationId: string,
+  sourceMessageId: string,
+  action: PracticeProposalEvaluationAction,
+) {
+  if (!isLocale(locale)) return { ok: false as const };
+  const parsedAction = practiceProposalEvaluationActionSchema.safeParse(action);
+  if (!parsedAction.success) return { ok: false as const };
+  const user = await requireCurrentUser(locale);
+  const result = await db.$transaction(async (transaction) => {
+    const conversation = await transaction.conversation.findFirst({
+      where: { id: conversationId, userId: user.id, mode: "INTEGRATE", status: "active", archivedAt: null },
+      select: { focalMapItemId: true },
+    });
+    const source = await transaction.message.findFirst({
+      where: { id: sourceMessageId, conversationId, role: "assistant", mode: "INTEGRATE" },
+    });
+    const latest = await transaction.message.findFirst({
+      where: { conversationId },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: { id: true },
+    });
+    if (!conversation?.focalMapItemId || !source || latest?.id !== source.id) return null;
+    const activePractice = await transaction.practice.findFirst({
+      where: { userId: user.id, mapItemId: conversation.focalMapItemId, status: "ACTIVE" },
+      select: { id: true },
+    });
+    if (activePractice) return null;
+    const nextSignals = applyPracticeProposalEvaluation(source.internalSignals, parsedAction.data);
+    if (!nextSignals) return null;
+    await transaction.message.update({ where: { id: source.id }, data: { internalSignals: nextSignals } });
+    return parsedAction.data;
+  });
+  return result ? { ok: true as const, action: result } : { ok: false as const };
 }
