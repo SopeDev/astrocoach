@@ -686,8 +686,8 @@ export async function continueAfterMapItemSave(
 
   const result = await db.$transaction(async (transaction) => {
     const conversation = await transaction.conversation.findFirst({
-      where: { id: conversationId, userId: user.id, mode: "RECOGNIZE", status: { in: ["active", "closed"] }, archivedAt: null },
-      select: { focalMapItemId: true },
+      where: { id: conversationId, userId: user.id, status: { in: ["active", "closed"] }, archivedAt: null },
+      select: { mode: true, status: true, focalMapItemId: true },
     });
     const latestMessage = await transaction.message.findFirst({
       where: { conversationId },
@@ -706,16 +706,22 @@ export async function continueAfterMapItemSave(
     const focalMapItemId = parsedContinuation.data === "KEEP_TALKING"
       ? conversation.focalMapItemId
       : savedItem.id;
-    await transaction.conversation.update({
-      where: { id: conversationId },
-      data: {
-        mode,
-        status: "active",
-        focalMapItemId,
-        transitionState: "IDLE",
-        transitionReferenceAt: new Date(),
-      },
-    });
+    const alreadyContinued = conversation.mode === mode &&
+      conversation.status === "active" &&
+      conversation.focalMapItemId === focalMapItemId;
+    if (conversation.mode !== "RECOGNIZE" && !alreadyContinued) return null;
+    if (!alreadyContinued) {
+      await transaction.conversation.update({
+        where: { id: conversationId },
+        data: {
+          mode,
+          status: "active",
+          focalMapItemId,
+          transitionState: "IDLE",
+          transitionReferenceAt: new Date(),
+        },
+      });
+    }
     const activePractice = focalMapItemId
       ? await transaction.practice.findFirst({
           where: { userId: user.id, mapItemId: focalMapItemId, status: "ACTIVE" },

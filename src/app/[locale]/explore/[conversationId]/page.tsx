@@ -35,7 +35,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ l
   const evaluationOffer = interactive && lastMessage?.role === "assistant" ? candidateEvaluationOffer(lastMessage.id, lastMessage.internalSignals) : null;
   const recognizedItem = lastMessage?.role === "assistant" ? recognizedMapItemOffer(lastMessage.internalSignals) : null;
   const savedItem = lastMessage ? conversation.sourceMapItems.find((item) => item.sourceMessageId === lastMessage.id) : null;
-  const mapItemSaveOffer = recognizedItem && lastMessage && (interactive || savedItem) ? { messageId: lastMessage.id, ...recognizedItem, ...(savedItem ? { mapItemId: savedItem.id } : {}) } : null;
+  const mapItemSaveOffer = conversation.mode === "RECOGNIZE" && recognizedItem && lastMessage && (interactive || savedItem) ? { messageId: lastMessage.id, ...recognizedItem, ...(savedItem ? { mapItemId: savedItem.id } : {}) } : null;
   const practiceOffer = interactive && lastMessage?.role === "assistant" ? practiceProposalOffer(lastMessage.id, lastMessage.internalSignals) : null;
   const activePractice = conversation.practices[0];
   const profileInitial = (user.name?.trim()[0] ?? user.email?.trim()[0] ?? "A").toUpperCase();
