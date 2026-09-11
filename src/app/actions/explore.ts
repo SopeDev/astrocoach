@@ -61,7 +61,7 @@ export type ConversationMessage = {
 
 export type MapItemSaveOffer = { messageId: string; kind: "PATTERN" | "INSIGHT"; statement: string; mapItemId?: string };
 export type ActivePractice = PracticeProposal & { id: string; intention: string };
-export const POST_SAVE_CONTINUATIONS = ["KEEP_TALKING", "DEEP_EXPLORE", "INTEGRATE"] as const;
+const POST_SAVE_CONTINUATIONS = ["KEEP_TALKING", "DEEP_EXPLORE", "INTEGRATE"] as const;
 export type PostSaveContinuation = (typeof POST_SAVE_CONTINUATIONS)[number];
 const postSaveContinuationSchema = z.enum(POST_SAVE_CONTINUATIONS);
 

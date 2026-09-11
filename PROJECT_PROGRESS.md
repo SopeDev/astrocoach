@@ -129,6 +129,7 @@ Last updated: 2026-09-11
 - Verified the in-thread save continuation and classification corrections with linting, strict TypeScript checking, all 31 test files, and a production Next.js build.
 - Made INTEGRATE Practice proposals explicitly negotiable without adding a second model-owned stage. Users can activate, discuss adjustments, or decline; only activation creates a Practice row, while adjustment and decline persist application-owned resolution metadata, reopen the same conversation, and supply the prior proposal to the next model turn. Decline does not trigger generation or imply a request for a replacement.
 - Verified Practice-proposal negotiation with linting, strict TypeScript checking, all 31 test files, and a production Next.js build.
+- Fixed the deployed post-save continuation 500 by keeping the continuation-value tuple private to its `"use server"` module; server-action files now expose only async runtime functions while retaining type-only exports for the client.
 
 ## Remaining
 
